@@ -10,16 +10,18 @@ public class TeleOPMode extends LinearOpMode {
     RobotDrive robot = new RobotDrive();
 
     public void runOpMode() {
-        robot.initializeRobot(hardwareMap, telemetry, RobotDrive.color.blue);
+        robot.initializeRobot(hardwareMap, telemetry, RobotDrive.allianceColor.blue);
+
 
         waitForStart();
 
         while (opModeIsActive()) {
-            //Gamepad 1  **Drivetrain**
+            //Gamepad 1  ***Drivetrain***
             double forward = gamepad1.left_stick_y * -1; //The y direction on the gamepad is reversed idk why
             double strafe = gamepad1.left_stick_x;
             //Using a cube to add exponential growth to the control of rotation
             double rotate = gamepad1.right_stick_x * robot.motorPower;
+
 
 
             if (gamepad1.left_bumper) robot.motorPower = 0.2;
@@ -28,7 +30,7 @@ public class TeleOPMode extends LinearOpMode {
             //Wheel control
             robot.mixDrive(forward, strafe, rotate);
 
-            //Gamepad 2  **Gun and intake**
+            //Gamepad 2  ***Gun and intake***
 
 
             telemetry.addData("Red: ", robot.colorSensor.red());

@@ -17,19 +17,20 @@ public class RobotDrive {
     private final double P_Strafe = 0.025;
     private final double P_Turn = 0.005;
 
-
     Telemetry telemetry = null;
-    color teamColor = null;
+    allianceColor teamColor = null;
 
     //Proportional Value used in self-correcting gyro code for encoder driving
     private final double TURN_P = 0.005;
+
     private final double GYRO_P = 0.01;
     private final double wheelDiameter = 3.93701;
+    //PID utilities for GyroTurn function
 
 
     //Hardware
     private DcMotorEx leftFront, leftRear, rightFront, rightRear = null;
-    DcMotorEx[] motors = {leftFront, leftRear, rightFront, rightRear};
+    private final DcMotorEx[] motors = {leftFront, leftRear, rightFront, rightRear};
     private BNO055IMU imu = null;
     public DistanceSensor dist = null;
     public ColorSensor colorSensor = null;
@@ -37,20 +38,19 @@ public class RobotDrive {
     //Default motor power levels for wheels
     public double motorPower = 0.5;
 
-    //Debug the error angle in order to get this value
+    //Debug the error angle in order to get this value, sets the offset to which the robot will turn to meet the required degrees turned
      private final double TURNING_BUFFER = 0;
 
-    //
     enum direction {
-        left, right;
+        left, right
     }
 
-    enum color {
-        red, blue;
+    enum allianceColor {
+        red, blue
     }
 
     //Assigning software objects to hardware, receives hardwareMap and telemetry objects from the op mode which calls it
-    void initializeRobot(HardwareMap hardwareMap, Telemetry telem, color clr) {
+    void initializeRobot(HardwareMap hardwareMap, Telemetry telem, allianceColor clr) {
         telemetry = telem;
         teamColor = clr;
 
@@ -191,7 +191,7 @@ public class RobotDrive {
         while (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) > 30) {
             //wait until the motors are done running
 
-
+            //Gyro Stabilize forward movement
             if (Math.abs((initialHeading - getHeading()) % 360) > 1) {
                 double degreesCorrect = (initialHeading - getHeading()) % 360;
                 double motorCorrect = clamp(degreesCorrect * GYRO_P, -.8, .8);
@@ -206,6 +206,8 @@ public class RobotDrive {
             telemetry.addData("Back Right: ", rightRear.getCurrentPosition());
             telemetry.update();
         }
+
+        //Once motors are done running
         for (DcMotor motor : motors) {
             motor.setPower(0);
         }
@@ -218,7 +220,7 @@ public class RobotDrive {
 
     /*******************************************TURNING********************************************/
     //Send this a value of degrees to turn, positive value turns right and negative value turns left, uses IMU gyroscope to precisely turn that distance
-    void gyroTurn(double degrees) {
+    void gyroTurn(double degrees, long currentMillis) {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double target_angle = getHeading() - degrees;
         if (degrees < 0) {target_angle += TURNING_BUFFER;} else if (degrees > 0) {target_angle -= TURNING_BUFFER;}
@@ -245,7 +247,7 @@ public class RobotDrive {
         rightRear.setPower(0);
     }
 
-    void gyroTurn(double degrees, double motorClamp) {
+    void gyroTurn(double degrees, double motorClamp, long currentMillis) {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double target_angle = getHeading() - degrees;
         if (degrees < 0) {target_angle += TURNING_BUFFER;} else if (degrees > 0) {target_angle -= TURNING_BUFFER;}
@@ -273,8 +275,7 @@ public class RobotDrive {
     }
 
 
-
-    /*********************************************SERVOS*********************************************/
+    /******************************************SERVOS********************************************/
 
     /** MOST OF THESE FUNCTIONS ARE FROM SKYSTONE AND NOW DEPRECATED, BUT LEFT AROUND FOR REFERENCE IN CONTROLLING SERVOS**/
 
@@ -285,7 +286,7 @@ public class RobotDrive {
        }
 
        mixDrive(0.2, 0, 0);
-       if (teamColor == color.red) {
+       if (teamColor == allianceColor.red) {
            while (colorSensor.red() < 230);
            mixDrive(0, 0, 0);
            grabMat(90);
@@ -390,7 +391,7 @@ public class RobotDrive {
     }
 
     //turning distance measurements into usable motor output via Proportional control)
-    void DistanceToDrive(double forward, double right, double turn){
+    void distanceToDrive(double forward, double right, double turn){
 
         double ForwardOut = forward * P_Forward;
         double RightOut = right * P_Strafe;
@@ -398,7 +399,7 @@ public class RobotDrive {
         mixDrive(ForwardOut, RightOut, TurnOut);
     }
 
-    void LiftTime(long time) throws InterruptedException {
+    void liftTime(long time) throws InterruptedException {
         //armLift.setPower(liftPower);
         Thread.sleep(time);
         //armLift.setPower(0);

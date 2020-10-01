@@ -29,7 +29,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 public class VuforiaClass {
     Telemetry telemetry = null;
     RobotDrive robotDrive = new RobotDrive();
-    RobotDrive.color teamColor;
+    RobotDrive.allianceColor teamColor;
     VuforiaTrackables targetsSkyStone;
     List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
 
@@ -92,7 +92,7 @@ public class VuforiaClass {
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
 
-    public void InitVuforia(HardwareMap hardwareMap, Telemetry telem, RobotDrive.color team_color) {
+    public void InitVuforia(HardwareMap hardwareMap, Telemetry telem, RobotDrive.allianceColor team_color) {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -319,14 +319,14 @@ public class VuforiaClass {
                         } else {
 
                             //If distance is past threshold, continue to move the motors.
-                           robotDrive.DistanceToDrive(-1 * translation.get(1) / mmPerInch,-1 * (translation.get(0) / mmPerInch) - armLength, rotation.thirdAngle);
+                           robotDrive.distanceToDrive(-1 * translation.get(1) / mmPerInch,-1 * (translation.get(0) / mmPerInch) - armLength, rotation.thirdAngle);
 
                         }
 
             }
             else {
                 if (!foundOnce && !speedSet) {
-                    if (teamColor == RobotDrive.color.blue)
+                    if (teamColor == RobotDrive.allianceColor.blue)
                         robotDrive.mixDrive(0.05, 0, 0);
                     else robotDrive.mixDrive(-0.05, 0, 0);
                     telemetry.addData("Visible Target", "none");
