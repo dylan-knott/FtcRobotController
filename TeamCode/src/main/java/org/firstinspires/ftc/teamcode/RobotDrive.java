@@ -55,14 +55,14 @@ public class RobotDrive {
         teamColor = clr;
 
         //Initialize hardware from hardware map
-        /*leftFront = (DcMotorEx)hardwareMap.dcMotor.get("front_left_motor");
+        leftFront = (DcMotorEx)hardwareMap.dcMotor.get("front_left_motor");
         rightFront = (DcMotorEx)hardwareMap.dcMotor.get("front_right_motor");
         leftRear = (DcMotorEx)hardwareMap.dcMotor.get("back_left_motor");
         rightRear = (DcMotorEx)hardwareMap.dcMotor.get("back_right_motor");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         dist = hardwareMap.get(DistanceSensor.class, "distance");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSense");
-        */
+
 
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -70,10 +70,10 @@ public class RobotDrive {
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //Sensor Initialization
-        /*if (colorSensor instanceof SwitchableLight) {
+        if (colorSensor instanceof SwitchableLight) {
             ((SwitchableLight)colorSensor).enableLight(false);
         }
-        */
+
 
         //Motor initialization
         rightFront.setDirection(DcMotor.Direction.REVERSE);

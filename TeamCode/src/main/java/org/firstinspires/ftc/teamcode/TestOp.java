@@ -5,8 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class TestOp extends LinearOpMode {
     RobotDrive robot = new RobotDrive();
-    OpenCVClass openCV = new OpenCVClass();
-    VuforiaClass vuforia = new VuforiaClass();
+    TestClass localInstance1 = new TestClass();
 
     public void runOpMode() {
         //Init button is hit
@@ -16,9 +15,10 @@ public class TestOp extends LinearOpMode {
         //Run one time when start button is pressed
         waitForStart();
 
+
+
         //Run repeatedly once op mode is started
         while(opModeIsActive()) {
-
 
         }
     }
