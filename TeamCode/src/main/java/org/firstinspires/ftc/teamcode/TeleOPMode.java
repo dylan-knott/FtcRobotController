@@ -22,7 +22,7 @@ public class TeleOPMode extends LinearOpMode {
             //Using a cube to add exponential growth to the control of rotation
             double rotate = gamepad1.right_stick_x * robot.motorPower;
 
-
+            //Yont
 
             if (gamepad1.left_bumper) robot.motorPower = 0.2;
             else if (gamepad1.right_bumper) robot.motorPower= 0.15;
