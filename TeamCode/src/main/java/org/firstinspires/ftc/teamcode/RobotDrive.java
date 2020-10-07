@@ -29,7 +29,7 @@ public class RobotDrive {
 
 
     //Hardware
-    private DcMotorEx leftFront, leftRear, rightFront, rightRear = null;
+    public DcMotorEx leftFront, leftRear, rightFront, rightRear = null;
     private final DcMotorEx[] motors = {leftFront, leftRear, rightFront, rightRear};
     private BNO055IMU imu = null;
     public DistanceSensor dist = null;
@@ -148,6 +148,8 @@ public class RobotDrive {
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
+
+
 
     /*******************************************STRAFING*******************************************/
     //Send this function a time value as well as a direction (Ex: RobotDrive.direction.left) and it will strafe that direction for the specified amount of time
