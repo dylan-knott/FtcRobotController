@@ -22,7 +22,7 @@ public class OpenCVClass {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
-        phoneCam.setPipeline(new SamplePipeline());
+        phoneCam.setPipeline(new RingDeterminationPipeline());
         // OR...  Do Not Activate the Camera Monitor View
         //phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
 
@@ -33,7 +33,7 @@ public class OpenCVClass {
         phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_RIGHT);
+                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
 
                 //Demonstrate how to turn on the flashlight
