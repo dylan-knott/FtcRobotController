@@ -242,6 +242,7 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     public void init(Mat firstFrame) {
         convImage(firstFrame);
 
+        //CommentS
         //Draw rectangle
         for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) {
             // p1 = {}
