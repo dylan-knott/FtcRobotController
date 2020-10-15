@@ -16,7 +16,7 @@ public class OpenCVClass {
 
 
 
-    public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, RingDeterminationPipeline pipeline) {
+    public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, OpenCvPipeline pipeline) {
         //Initialization code
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -36,8 +36,7 @@ public class OpenCVClass {
                 phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
 
-                //Demonstrate how to turn on the flashlight
-
+                //Turn on the phone's flash
                 phoneCam.setFlashlightEnabled(true);
             }
         });
@@ -55,7 +54,6 @@ public class OpenCVClass {
 
 class SamplePipeline extends OpenCvPipeline
 {
-    boolean viewportPaused = false;
 
     /*
      * NOTE: if you wish to use additional Mat objects in your processing pipeline, it is
@@ -211,27 +209,18 @@ class RingDeterminationPipeline extends OpenCvPipeline
 
 class GoalDeterminationPipeline extends OpenCvPipeline {
 
+
     //Screen size 320 by 240
 
     //Constructor
-    void GoalDeterminationPipeline(RobotDrive.allianceColor allianceColor) {
-        regionWidth = SCREEN_WIDTH / REGION_COUNT;
+    public GoalDeterminationPipeline(RobotDrive.allianceColor allianceColor) {
+        int regionLeft;
         teamColor = allianceColor;
-
-        for (int i = 0; i < REGION_COUNT; i++) {
-            int regionLeft = i * regionWidth;
-            CbRegions[i] = Cb.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_HEIGHT);
-        }
-    }
+   }
 
     RobotDrive.allianceColor teamColor;
-    //Image mats for processing
-    Mat YCrCb = new Mat();
-    Mat Cb = new Mat();
-    Mat Cr = new Mat();
-    Mat[] CbRegions = new Mat[REGION_COUNT];
-    Mat[] CrRegions = new Mat[REGION_COUNT];
 
+    //Some constants regarding sizing of elements
     static final int SCREEN_HEIGHT = 240;
     static final int SCREEN_WIDTH = 320;
     static final int REGION_HEIGHT = 120; //Sensing region will take up middle 50% of the camera's height.
@@ -239,16 +228,34 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     static final int REGION_Y_ANCHOR = 60; //Marks the top of the sensing regions
     int regionWidth;
 
+    //Image mats for processing
+    Mat YCrCb = new Mat();
+    Mat Cb = new Mat();
+    Mat Cr = new Mat();
+    Mat[] CbRegions = new Mat[REGION_COUNT];
+    Mat[] CrRegions = new Mat[REGION_COUNT];
+    int[] regionAnalysis;
+    Scalar GREEN = new Scalar(0, 255, 0);
+
+    //Point p1;
+    //Point p2;
+
+
     public void init(Mat firstFrame) {
+        int regionLeft;
+        regionWidth = SCREEN_WIDTH / REGION_COUNT;
         convImage(firstFrame);
 
-        //CommentS
-        //Draw rectangle
+        //Split original image into submats for processing
+        for (int i = 0; i < REGION_COUNT; i++) {
+            regionLeft = i * regionWidth;
+            CbRegions[i] = Cb.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_Y_ANCHOR + REGION_HEIGHT);
+        }
+        //Draw rectangle on the screen
         for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) {
-            // p1 = {}
-           // Imgproc{
-             //   Imgproc.rectangle(firstFrame,
-           // }
+            Point p1 = new Point(i * regionWidth, REGION_Y_ANCHOR);
+            Point p2 = new Point(i * regionWidth + regionWidth, REGION_Y_ANCHOR + REGION_HEIGHT);
+            Imgproc.rectangle(firstFrame, p1, p2, GREEN, 2);
         }
     }
 
@@ -261,6 +268,33 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         convImage(input);
+
+        //Draw rectangle on the screen
+        for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) {
+            Point p1 = new Point(i, REGION_Y_ANCHOR);
+            Point p2 = new Point(p1.x + regionWidth, REGION_Y_ANCHOR + REGION_HEIGHT);
+            Imgproc.rectangle(input, new Rect(p1, p2), GREEN, 2);
+        }
         return input;
     }
+
+    void analyzeFrame() {
+        int avg;
+        if (teamColor == RobotDrive.allianceColor.blue) {
+            for (int i = 0; i < REGION_COUNT; i ++) { // Loop through regions averaging values and populating the array
+                avg = (int) Core.mean(CbRegions[i]).val[0];
+                regionAnalysis[i] = avg;
+            }
+        }
+        else if (teamColor == RobotDrive.allianceColor.red) {
+            for (int i = 0; i < REGION_COUNT; i ++) { // Loop through regions averaging values and populating the array
+                avg = (int) Core.mean(CrRegions[i]).val[0];
+                regionAnalysis[i] = avg;
+            }
+        }
+
+
+    }
+
+    public int[] getRegionAnalysis() { return regionAnalysis; }
 }

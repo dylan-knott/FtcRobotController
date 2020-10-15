@@ -9,19 +9,23 @@ public class OpenCVOp extends LinearOpMode {
     OpenCVClass openCV = new OpenCVClass();
     RobotDrive robot = new RobotDrive();
     RingDeterminationPipeline ringDeterm = new RingDeterminationPipeline(RobotDrive.allianceColor.blue);
+    GoalDeterminationPipeline goalDeterm = new GoalDeterminationPipeline(RobotDrive.allianceColor.red);
 
     public void runOpMode() throws InterruptedException{
 
-        openCV.initOpenCV(hardwareMap, telemetry, ringDeterm);
+        openCV.initOpenCV(hardwareMap, telemetry, goalDeterm);
 
         waitForStart();
             openCV.startStream();
 
 
             while (opModeIsActive()) {
-                telemetry.addLine("Yellow Value: " + ringDeterm.getAnalysis());
-                telemetry.addLine("Ring Position: " + ringDeterm.getPosition());
+                //telemetry.addLine("Yellow Value: " + ringDeterm.getAnalysis());
+                //telemetry.addLine("Ring Position: " + ringDeterm.getPosition());
+                telemetry.addData("Red Values", goalDeterm.getRegionAnalysis());
                 telemetry.update();
             }
+            openCV.stopStream();
+            openCV.closeCamera();
     }
 }
