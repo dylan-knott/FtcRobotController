@@ -16,13 +16,13 @@ public class OpenCVClass {
 
 
 
-    public void initOpenCV(HardwareMap hardwareMap, Telemetry telem) {
+    public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, RingDeterminationPipeline pipeline) {
         //Initialization code
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
-        phoneCam.setPipeline(new RingDeterminationPipeline());
+        phoneCam.setPipeline(pipeline);
         // OR...  Do Not Activate the Camera Monitor View
         //phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
 
@@ -103,9 +103,15 @@ class SamplePipeline extends OpenCvPipeline
 
 class RingDeterminationPipeline extends OpenCvPipeline
 {
+    public RingDeterminationPipeline(RobotDrive.allianceColor allianceColor) {
+        teamColor = allianceColor;
+    }
+
     /*
      * An enum to define the number of rings
      */
+
+    RobotDrive.allianceColor teamColor;
     public enum RingPosition
     {
         FOUR,
@@ -146,7 +152,7 @@ class RingDeterminationPipeline extends OpenCvPipeline
     int avg1;
 
     // Volatile since accessed by OpMode thread w/o synchronization
-    private volatile RingPosition position = RingPosition.FOUR;
+    public volatile RingPosition position = RingPosition.FOUR;
 
     /*
      * This function takes the RGB frame, converts to YCrCb,
@@ -199,8 +205,61 @@ class RingDeterminationPipeline extends OpenCvPipeline
         return input;
     }
 
-    public int getAnalysis()
-    {
-        return avg1;
+    public int getAnalysis() { return avg1; }
+    public RingPosition getPosition() { return position; }
+}
+
+class GoalDeterminationPipeline extends OpenCvPipeline {
+
+    //Screen size 320 by 240
+
+    //Constructor
+    void GoalDeterminationPipeline(RobotDrive.allianceColor allianceColor) {
+        regionWidth = SCREEN_WIDTH / REGION_COUNT;
+        teamColor = allianceColor;
+
+        for (int i = 0; i < REGION_COUNT; i++) {
+            int regionLeft = i * regionWidth;
+            CbRegions[i] = Cb.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_HEIGHT);
+        }
+    }
+
+    RobotDrive.allianceColor teamColor;
+    //Image mats for processing
+    Mat YCrCb = new Mat();
+    Mat Cb = new Mat();
+    Mat Cr = new Mat();
+    Mat[] CbRegions = new Mat[REGION_COUNT];
+    Mat[] CrRegions = new Mat[REGION_COUNT];
+
+    static final int SCREEN_HEIGHT = 240;
+    static final int SCREEN_WIDTH = 320;
+    static final int REGION_HEIGHT = 120; //Sensing region will take up middle 50% of the camera's height.
+    static final int REGION_COUNT = 8;
+    static final int REGION_Y_ANCHOR = 60; //Marks the top of the sensing regions
+    int regionWidth;
+
+    public void init(Mat firstFrame) {
+        convImage(firstFrame);
+
+        //Draw rectangle
+        for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) {
+            // p1 = {}
+           // Imgproc{
+             //   Imgproc.rectangle(firstFrame,
+           // }
+        }
+    }
+
+    void convImage(Mat input) {
+        Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
+        Core.extractChannel(YCrCb, Cb, 1);
+        Core.extractChannel(YCrCb, Cr, 1);
+    }
+
+    @Override
+    public Mat processFrame(Mat input) {
+        convImage(input);
+        return input;
     }
 }

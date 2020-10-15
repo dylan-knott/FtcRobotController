@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@TeleOp(name= "TeleOP")
+@TeleOp(name= "TeleOp", group= "TeleOp")
 public class TeleOPMode extends LinearOpMode {
     RobotDrive robot = new RobotDrive();
 
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
         robot.initializeRobot(hardwareMap, telemetry, RobotDrive.allianceColor.blue);
 
 
@@ -30,11 +30,15 @@ public class TeleOPMode extends LinearOpMode {
             robot.mixDrive(forward, strafe, rotate);
 
             //Gamepad 2  ***Gun and intake***
+            robot.enableIntake(gamepad2.right_bumper);
+            robot.setFlywheels(gamepad2.left_trigger);
+            robot.setIndexer(gamepad2.right_trigger);
 
 
-            telemetry.addData("Red: ", robot.colorSensor.red());
-            telemetry.addData("Green: ", robot.colorSensor.green());
-            telemetry.addData("Blue: ", robot.colorSensor.blue());
+
+            telemetry.addData("Red: ", robot.floorColor.red());
+            telemetry.addData("Green: ", robot.floorColor.green());
+            telemetry.addData("Blue: ", robot.floorColor.blue());
             telemetry.addData("Distance: ", robot.dist.getDistance(DistanceUnit.INCH));
             telemetry.update();
         }

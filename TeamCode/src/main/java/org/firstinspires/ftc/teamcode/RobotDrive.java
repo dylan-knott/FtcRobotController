@@ -23,20 +23,31 @@ public class RobotDrive {
     //Proportional Value used in self-correcting gyro code for encoder driving
     private final double TURN_P = 0.005;
 
+    //PID utilities for GyroTurn function
     private final double GYRO_P = 0.01;
     private final double wheelDiameter = 3.93701;
-    //PID utilities for GyroTurn function
+
+    //Servo function constants
+    private final double INDEXER_SPEED = 0.7;
 
 
     //Hardware
     public DcMotorEx leftFront, leftRear, rightFront, rightRear = null;
     private final DcMotorEx[] motors = {leftFront, leftRear, rightFront, rightRear};
+    public DcMotor intake;
+    public DcMotor leftFlywheel, rightFlywheel;
+    public Servo clawServo, wobbleArm;
+    public CRServo indexer, intakeBelt;
     private BNO055IMU imu = null;
     public DistanceSensor dist = null;
-    public ColorSensor colorSensor = null;
+    public ColorSensor floorColor = null;
+    public ColorSensor intakeColor = null;
 
     //Default motor power levels for wheels
-    public double motorPower = 0.5;
+    public double motorPower = 0.6;
+    public double flywheelSpeed = 1;
+    public double intakeSpeed = 1;
+    public int ringCount = 3;
 
     //Debug the error angle in order to get this value, sets the offset to which the robot will turn to meet the required degrees turned
      private final double TURNING_BUFFER = 0;
@@ -55,14 +66,27 @@ public class RobotDrive {
         teamColor = clr;
 
         //Initialize hardware from hardware map
+        //Expansion hub 1 motors
         leftFront = (DcMotorEx)hardwareMap.dcMotor.get("front_left_motor");
         rightFront = (DcMotorEx)hardwareMap.dcMotor.get("front_right_motor");
         leftRear = (DcMotorEx)hardwareMap.dcMotor.get("back_left_motor");
         rightRear = (DcMotorEx)hardwareMap.dcMotor.get("back_right_motor");
+       ///Expansion hub 2 motors
+        intake = hardwareMap.dcMotor.get("intake_motor");
+        leftFlywheel= hardwareMap.dcMotor.get("left_flywheel_motor");
+        rightFlywheel = hardwareMap.dcMotor.get("right_flywheel_motor");
+
+        //Expansion hub 1 servos
+        clawServo = hardwareMap.servo.get("claw_servo");
+        wobbleArm = hardwareMap.servo.get("arm_servo");
+        indexer = hardwareMap.crservo.get("index_servo");
+        intakeBelt = hardwareMap.crservo.get("intake_servo");
+
+        //Expansion hub 1 sensors
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         dist = hardwareMap.get(DistanceSensor.class, "distance");
-        colorSensor = hardwareMap.get(ColorSensor.class, "colorSense");
-
+        floorColor = hardwareMap.get(ColorSensor.class, "floor_color");
+        intakeColor = hardwareMap.get(ColorSensor.class, "intake_color");
 
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -70,8 +94,13 @@ public class RobotDrive {
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //Sensor Initialization
-        if (colorSensor instanceof SwitchableLight) {
-            ((SwitchableLight)colorSensor).enableLight(false);
+        if (floorColor instanceof SwitchableLight) {
+            ((SwitchableLight)floorColor).enableLight(false);
+        }
+
+        //Sensor Initialization
+        if (intakeColor instanceof SwitchableLight) {
+            ((SwitchableLight)intakeColor).enableLight(false);
         }
 
 
@@ -278,19 +307,19 @@ public class RobotDrive {
     }
 
 
-    /******************************************SERVOS********************************************/
+    /******************************************GAME FUNCTIONS********************************************/
 
     /** MOST OF THESE FUNCTIONS ARE FROM SKYSTONE AND NOW DEPRECATED, BUT LEFT AROUND FOR REFERENCE IN CONTROLLING SERVOS**/
 
    //Activates the back servos used to grab the mat, send angle of rotation in degrees as well as the max angle of the servo. Converts to a fraction usable by the servo
    void seekMat() throws InterruptedException {
-       if (colorSensor instanceof SwitchableLight){
-           ((SwitchableLight)colorSensor).enableLight(true);
+       if (floorColor instanceof SwitchableLight){
+           ((SwitchableLight)floorColor).enableLight(true);
        }
 
        mixDrive(0.2, 0, 0);
        if (teamColor == allianceColor.red) {
-           while (colorSensor.red() < 230);
+           while (floorColor.red() < 230);
            mixDrive(0, 0, 0);
            grabMat(90);
            Thread.sleep(500);
@@ -302,14 +331,14 @@ public class RobotDrive {
            mixDrive(0, -0.3, 0);
            //SetSideArm(70,180);
            Thread.sleep(1000);
-           while (colorSensor.red() < 188);
+           while (floorColor.red() < 188);
            mixDrive(0,0,0);
            Thread.sleep(20);
            strafeEncoder(5, direction.right);
            mixDrive(0,0,0);
        }
        else {
-           while (colorSensor.blue() < 205);
+           while (floorColor.blue() < 205);
            mixDrive(0, 0, 0);
            grabMat(90);
            Thread.sleep(500);
@@ -321,15 +350,15 @@ public class RobotDrive {
            mixDrive(0, 0.3, 0);
            //SetSideArm(70,180);
            Thread.sleep(500);
-           while (colorSensor.blue() < 190);
+           while (floorColor.blue() < 190);
            mixDrive(0,0,0);
            Thread.sleep(20);
            strafeEncoder(3, direction.right);
            mixDrive(0,0,0);
        }
 
-       if (colorSensor instanceof SwitchableLight) {
-           ((SwitchableLight)colorSensor).enableLight(false);
+       if (floorColor instanceof SwitchableLight) {
+           ((SwitchableLight)floorColor).enableLight(false);
        }
    }
 
@@ -342,6 +371,41 @@ public class RobotDrive {
        //TopServo.setPosition((desiredRotation + 15) / 180);
    }
 
+   void fireRing(double inputSpeed) throws InterruptedException{
+       if (ringCount > 0) {
+           indexer.setPower(inputSpeed);
+           wait(10);
+           indexer.setPower(0);
+           ringCount -=1;
+       }
+   }
+
+   void setFlywheels(double inputSpeed) {
+       //Remap input to respect the max speed
+       double power = inputSpeed * flywheelSpeed;
+
+       rightFlywheel.setPower(power);
+       leftFlywheel.setPower(power);
+   }
+
+   void setIndexer(double inputSpeed) {
+       indexer.setPower(inputSpeed);
+   }
+
+   void enableIntake(boolean state) {
+       if (state) //Intake is enabled
+       {
+           intake.setPower(intakeSpeed);
+           //TODO: Controlling stacking and inner intake system
+
+
+       } else { // Intake is disabled
+           intake.setPower(0);
+           //TODO: Controlling stacking and inner intake system
+
+
+       }
+   }
     /*******************************************UTILITIES*******************************************/
     //Creating a clamp method for both floats and doubles, used to make sure motor power doesn't go above a certain power level as to saturate the motors
     public static double clamp(double val, double min, double max) {
