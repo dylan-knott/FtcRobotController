@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.robot.Robot;
 public class OpenCVOp extends LinearOpMode {
     OpenCVClass openCV = new OpenCVClass();
     RobotDrive robot = new RobotDrive();
-    RingDeterminationPipeline ringDeterm = new RingDeterminationPipeline(RobotDrive.allianceColor.blue);
+    RingDeterminationPipeline ringDeterm = new RingDeterminationPipeline(RobotDrive.allianceColor.red);
     GoalDeterminationPipeline goalDeterm = new GoalDeterminationPipeline(RobotDrive.allianceColor.red);
 
     public void runOpMode() throws InterruptedException{
@@ -22,7 +22,7 @@ public class OpenCVOp extends LinearOpMode {
             while (opModeIsActive()) {
                 //telemetry.addLine("Yellow Value: " + ringDeterm.getAnalysis());
                 //telemetry.addLine("Ring Position: " + ringDeterm.getPosition());
-                telemetry.addData("Red Values", goalDeterm.getRegionAnalysis().toString());
+                //telemetry.addData("Red Values", goalDeterm.getRegionAnalysis().toString());
                 telemetry.update();
             }
             openCV.stopStream();

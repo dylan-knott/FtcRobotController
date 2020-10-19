@@ -231,7 +231,7 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     int regionWidth;
 
     //Constants for line-segment detection
-    static final int INTENSITY_THRESHOLD = 127;
+    static final int INTENSITY_THRESHOLD = 150;
 
     //Image mats for processing
     private Mat YCrCb = new Mat();
@@ -248,7 +248,7 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
 
     //Used for line-segment style detection of target
     private Mat thresholdMap;
-    private LineSegmentDetector lsd = Imgproc.createLineSegmentDetector();
+    //private LineSegmentDetector lsd = Imgproc.createLineSegmentDetector();
     private MatOfFloat4 lines = new MatOfFloat4();
     private Mat avgs;
     double[] vector;
@@ -269,15 +269,6 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
             CbRegions[i] = Cb.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_Y_ANCHOR + REGION_HEIGHT);
             CrRegions[i] = Cr.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_Y_ANCHOR + REGION_HEIGHT);
         }
-
-        if (teamColor == RobotDrive.allianceColor.blue) {
-            activeMat = Cb;
-            activeRegions = CbRegions;
-        }
-        else{
-            activeMat = Cr;
-            activeRegions = CrRegions;
-        }
     }
 
     // Convert image into the YCrCb color space, and extract channels into their own matrices
@@ -292,6 +283,16 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         convImage(input);
 
+        if (teamColor == RobotDrive.allianceColor.blue) {
+            activeMat = Cb;
+            activeRegions = CbRegions;
+        }
+        else{
+            activeMat = Cr;
+            activeRegions = CrRegions;
+        }
+
+
         //Draw rectangle for region on the screen
         for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) { //Counts through the regions, counting by region widths in terms of pixels
             Point p1 = new Point(i, REGION_Y_ANCHOR);
@@ -299,8 +300,11 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
             Imgproc.rectangle(input, new Rect(p1, p2), GREEN, 2);
         }
 
-        lineDetectFrame();
-        lsd.drawSegments(input, lines);
+        Point midTarget = lineDetectFrame();
+
+        Imgproc.circle(input, midTarget, 0, new Scalar(0, 0, 255), -1);
+
+        //lsd.drawSegments(input, lines);
         return input;
     }
 
@@ -309,7 +313,8 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
         //Apply a binary threshold to the active matrix to differentiate colors better
         Imgproc.threshold(activeMat, thresholdMap, INTENSITY_THRESHOLD, 255, Imgproc.THRESH_BINARY);
         //Detect lines and return a matrix with X1 Y1 X2 Y2 for each line
-        lsd.detect(thresholdMap, lines);
+        //lsd.detect(thresholdMap, lines);
+        Imgproc.HoughLinesP(thresholdMap,lines, 1,Math.PI/180, 150);
 
         if (lines.empty()) { //No lines detected
             //TODO: No lines detected
@@ -328,7 +333,9 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
 
             targetPoint = new Point(xAvg, yAvg);
         }
+        
 
+        targetPoint = new Point(50, 50);
         return targetPoint;
     }
 
