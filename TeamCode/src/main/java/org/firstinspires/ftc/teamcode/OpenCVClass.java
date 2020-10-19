@@ -4,10 +4,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.LineSegmentDetector;
 import org.openftc.easyopencv.*;
-import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.disnodeteam.dogecv.*;
+
+import java.util.*;
 
 
 public class OpenCVClass {
@@ -208,8 +210,6 @@ class RingDeterminationPipeline extends OpenCvPipeline
 }
 
 class GoalDeterminationPipeline extends OpenCvPipeline {
-
-
     //Screen size 320 by 240
 
     //Constructor
@@ -220,25 +220,42 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
 
     RobotDrive.allianceColor teamColor;
 
-    //Some constants regarding sizing of elements
+    //Some constants
     static final int SCREEN_HEIGHT = 240;
     static final int SCREEN_WIDTH = 320;
+
+    //Constants regarding sizing of elements for region detection
     static final int REGION_HEIGHT = 120; //Sensing region will take up middle 50% of the camera's height.
     static final int REGION_COUNT = 8;
     static final int REGION_Y_ANCHOR = 60; //Marks the top of the sensing regions
     int regionWidth;
 
+    //Constants for line-segment detection
+    static final int INTENSITY_THRESHOLD = 127;
+
     //Image mats for processing
-    Mat YCrCb = new Mat();
-    Mat Cb = new Mat();
-    Mat Cr = new Mat();
+    private Mat YCrCb = new Mat();
+    private Mat Cb = new Mat();
+    private Mat Cr = new Mat();
+    private Mat activeMat = new Mat();
+
+
+    //Used for Array-style detection of Target
     Mat[] CbRegions = new Mat[REGION_COUNT];
     Mat[] CrRegions = new Mat[REGION_COUNT];
-    int[] regionAnalysis;
-    Scalar GREEN = new Scalar(0, 255, 0);
+    Mat[] activeRegions = new Mat[REGION_COUNT];
+    int[]regionAvg;
 
-    //Point p1;
-    //Point p2;
+    //Used for line-segment style detection of target
+    private Mat thresholdMap;
+    private LineSegmentDetector lsd = Imgproc.createLineSegmentDetector();
+    private MatOfFloat4 lines = new MatOfFloat4();
+    private Mat avgs;
+    double[] vector;
+    private int xAvg;
+    private int yAvg;
+
+    Scalar GREEN = new Scalar(0, 255, 0);
 
 
     public void init(Mat firstFrame) {
@@ -250,51 +267,78 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
         for (int i = 0; i < REGION_COUNT; i++) {
             regionLeft = i * regionWidth;
             CbRegions[i] = Cb.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_Y_ANCHOR + REGION_HEIGHT);
+            CrRegions[i] = Cr.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_Y_ANCHOR + REGION_HEIGHT);
         }
-        //Draw rectangle on the screen
-        for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) {
-            Point p1 = new Point(i * regionWidth, REGION_Y_ANCHOR);
-            Point p2 = new Point(i * regionWidth + regionWidth, REGION_Y_ANCHOR + REGION_HEIGHT);
-            Imgproc.rectangle(firstFrame, p1, p2, GREEN, 2);
+
+        if (teamColor == RobotDrive.allianceColor.blue) {
+            activeMat = Cb;
+            activeRegions = CbRegions;
+        }
+        else{
+            activeMat = Cr;
+            activeRegions = CrRegions;
         }
     }
 
+    // Convert image into the YCrCb color space, and extract channels into their own matrices
     void convImage(Mat input) {
         Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
         Core.extractChannel(YCrCb, Cb, 1);
         Core.extractChannel(YCrCb, Cr, 1);
     }
 
+    //Runs every frame
     @Override
     public Mat processFrame(Mat input) {
         convImage(input);
 
-        //Draw rectangle on the screen
-        for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) {
+        //Draw rectangle for region on the screen
+        for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) { //Counts through the regions, counting by region widths in terms of pixels
             Point p1 = new Point(i, REGION_Y_ANCHOR);
             Point p2 = new Point(p1.x + regionWidth, REGION_Y_ANCHOR + REGION_HEIGHT);
             Imgproc.rectangle(input, new Rect(p1, p2), GREEN, 2);
         }
+
+        lineDetectFrame();
+        lsd.drawSegments(input, lines);
         return input;
     }
 
-    void analyzeFrame() {
-        int avg;
-        if (teamColor == RobotDrive.allianceColor.blue) {
-            for (int i = 0; i < REGION_COUNT; i ++) { // Loop through regions averaging values and populating the array
-                avg = (int) Core.mean(CbRegions[i]).val[0];
-                regionAnalysis[i] = avg;
-            }
+    Point lineDetectFrame() {
+        Point targetPoint;
+        //Apply a binary threshold to the active matrix to differentiate colors better
+        Imgproc.threshold(activeMat, thresholdMap, INTENSITY_THRESHOLD, 255, Imgproc.THRESH_BINARY);
+        //Detect lines and return a matrix with X1 Y1 X2 Y2 for each line
+        lsd.detect(thresholdMap, lines);
+
+        if (lines.empty()) { //No lines detected
+            //TODO: No lines detected
+        targetPoint = null;
         }
-        else if (teamColor == RobotDrive.allianceColor.red) {
-            for (int i = 0; i < REGION_COUNT; i ++) { // Loop through regions averaging values and populating the array
-                avg = (int) Core.mean(CrRegions[i]).val[0];
-                regionAnalysis[i] = avg;
-            }
+        else {
+            //Average each column of the matrix and store it into a 1 dimensional matrix
+            Core.reduce(lines, avgs, 0, Core.REDUCE_AVG);
+
+            //Turn 1D Matrix into an array of doubles
+            vector = avgs.get(0, 0);
+
+            //Data will always stored as [X1, Y1, X2, Y2] so indices can be hard coded in
+            xAvg = (int) ((vector[0] + vector[2]) / 2);
+            yAvg = (int) ((vector[1] + vector[3]) / 2);//Find midpoints of all lines detected, this will be the center of the target
+
+            targetPoint = new Point(xAvg, yAvg);
         }
 
-
+        return targetPoint;
     }
 
-    public int[] getRegionAnalysis() { return regionAnalysis; }
+    void analyzeFrameArr() {
+        int avg;
+        for (int i = 0; i < REGION_COUNT; i ++) { // Loop through regions calculating average brightness values and populating the array with the averages
+            avg = (int) Core.mean(activeRegions[i]).val[0];
+            regionAvg[i] = avg;
+        }
+    }
+
+    public int[] getRegionAnalysis() { return regionAvg; }
 }

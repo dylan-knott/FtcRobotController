@@ -22,7 +22,7 @@ public class OpenCVOp extends LinearOpMode {
             while (opModeIsActive()) {
                 //telemetry.addLine("Yellow Value: " + ringDeterm.getAnalysis());
                 //telemetry.addLine("Ring Position: " + ringDeterm.getPosition());
-                telemetry.addData("Red Values", goalDeterm.getRegionAnalysis());
+                telemetry.addData("Red Values", goalDeterm.getRegionAnalysis().toString());
                 telemetry.update();
             }
             openCV.stopStream();
