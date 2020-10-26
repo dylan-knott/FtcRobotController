@@ -14,17 +14,16 @@ public class OpenCVOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException{
 
         openCV.initOpenCV(hardwareMap, telemetry, goalDeterm);
-
+        openCV.startStream();
         waitForStart();
-            openCV.startStream();
 
-
+        //openCV.togglePhoneFlash(true);
             while (opModeIsActive()) {
-                //telemetry.addLine("Yellow Value: " + ringDeterm.getAnalysis());
-                //telemetry.addLine("Ring Position: " + ringDeterm.getPosition());
-                //telemetry.addData("Red Values", goalDeterm.getRegionAnalysis().toString());
+                telemetry.addData("Target Point: ", goalDeterm.getTargetPoint());
+                telemetry.addData("Line Matrix: ", goalDeterm.getLineMatrix());
                 telemetry.update();
             }
+            openCV.togglePhoneFlash(false);
             openCV.stopStream();
             openCV.closeCamera();
     }

@@ -4,18 +4,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.LineSegmentDetector;
 import org.openftc.easyopencv.*;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.disnodeteam.dogecv.*;
-
-import java.util.*;
 
 
 public class OpenCVClass {
 
     public OpenCvInternalCamera phoneCam;
-
 
 
     public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, OpenCvPipeline pipeline) {
@@ -38,16 +32,18 @@ public class OpenCVClass {
                 phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
 
-                //Turn on the phone's flash
-                phoneCam.setFlashlightEnabled(true);
             }
+
         });
 
     }
 
+    public void togglePhoneFlash(boolean state) {
+        phoneCam.setFlashlightEnabled(state);
+    }
     public void stopStream() {
         phoneCam.stopStreaming();
-            }
+    }
 
     public void closeCamera() {
         phoneCam.closeCameraDevice();
@@ -221,8 +217,8 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     RobotDrive.allianceColor teamColor;
 
     //Some constants
-    static final int SCREEN_HEIGHT = 240;
-    static final int SCREEN_WIDTH = 320;
+    static final int SCREEN_HEIGHT = 320;
+    static final int SCREEN_WIDTH = 240;
 
     //Constants regarding sizing of elements for region detection
     static final int REGION_HEIGHT = 120; //Sensing region will take up middle 50% of the camera's height.
@@ -231,7 +227,7 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     int regionWidth;
 
     //Constants for line-segment detection
-    static final int INTENSITY_THRESHOLD = 150;
+    static final int INTENSITY_THRESHOLD = 160;
 
     //Image mats for processing
     private Mat YCrCb = new Mat();
@@ -247,13 +243,21 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     int[]regionAvg;
 
     //Used for line-segment style detection of target
-    private Mat thresholdMap;
-    //private LineSegmentDetector lsd = Imgproc.createLineSegmentDetector();
-    private MatOfFloat4 lines = new MatOfFloat4();
-    private Mat avgs;
-    double[] vector;
-    private int xAvg;
-    private int yAvg;
+    private Mat thresholdMap = new Mat();
+    private Mat blurred = new Mat();
+    private Mat edges = new Mat();
+    private Mat lines = new Mat();
+    private Mat X1Mat = new Mat();
+    private Mat X2Mat = new Mat();
+    private Mat Y1Mat = new Mat();
+    private Mat Y2Mat = new Mat();
+    private double[] X1Avgs;
+    private double[] Y1Avgs;
+    private double[] X2Avgs;
+    private double[] Y2Avgs;
+    private Point targetPoint = new Point(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    private double xAvg;
+    private double yAvg;
 
     Scalar GREEN = new Scalar(0, 255, 0);
 
@@ -293,56 +297,144 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
         }
 
 
+        lineDetectFrame();
+
+        Imgproc.circle(input, targetPoint, 2, new Scalar(255+4, 0, 0), -1);
+        return input;
+    }
+
+    void lineDetectFrame() {
+        //Apply a blur to the image
+        Imgproc.GaussianBlur(activeMat, blurred, new Size(5, 5), 0);
+
+        //Apply a binary threshold to the active matrix to differentiate colors better
+        Imgproc.threshold(blurred, thresholdMap, INTENSITY_THRESHOLD, 255, Imgproc.THRESH_BINARY);
+
+        //Detects edges in an image and only highlights those edges
+        Imgproc.Canny(thresholdMap, edges, 100, 200);
+
+        //Returns a matrix with X1 Y1 X2 Y2 for each line detected
+        Imgproc.HoughLinesP(thresholdMap, lines, 2,Math.PI/90, 15, 6);
+
+
+        if (!lines.empty()) { //Line detected
+            //Extract X1, X2, Y1, and Y2 from the lines matrix into seperate mats
+            Core.extractChannel(lines, X1Mat, 0);
+            Core.extractChannel(lines, Y1Mat, 1);
+            Core.extractChannel(lines, X2Mat, 2);
+            Core.extractChannel(lines, Y2Mat, 3);
+
+
+
+            X1Avgs = Core.mean(X1Mat).val;
+            Y1Avgs = Core.mean(Y1Mat).val;
+            X2Avgs = Core.mean(X2Mat).val;
+            Y2Avgs = Core.mean(Y2Mat).val;
+
+            xAvg = (X1Avgs[0] + X2Avgs[0]) / 2;
+            yAvg = (Y1Avgs[0] + Y2Avgs[0]) / 2;
+            //Average each column of the matrix and store it into a 1 dimensional matrix
+
+
+            targetPoint = new Point (xAvg, yAvg);
+        }
+        else {
+            //TODO: No lines detected
+            targetPoint = new Point(0, 0);
+        }
+    }
+
+
+    void analyzeFrameArr() {
+        int avg;
+
         //Draw rectangle for region on the screen
+        for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) { //Counts through the regions, counting by region widths in terms of pixels
+            Point p1 = new Point(i, REGION_Y_ANCHOR);
+            Point p2 = new Point(p1.x + regionWidth, REGION_Y_ANCHOR + REGION_HEIGHT);
+            //Imgproc.rectangle(input, new Rect(p1, p2), GREEN, 2);
+        }
+
+        for (int i = 0; i < REGION_COUNT; i ++) { // Loop through regions calculating average brightness values and populating the array with the averages
+            avg = (int) Core.mean(activeRegions[i]).val[0];
+            regionAvg[i] = avg;
+        }
+    }
+
+    public int[] getRegionAnalysis() { return regionAvg; }
+
+    public String getTargetPoint() { return targetPoint.toString(); }
+
+    public String getLineMatrix() {return lines.toString(); }
+}
+
+class LineFollowingPipeline extends OpenCvPipeline {
+    //Screen size 320 by 240
+
+    //Constructor
+    public LineFollowingPipeline(RobotDrive.allianceColor allianceColor) {
+        int regionLeft;
+        teamColor = allianceColor;
+    }
+
+    RobotDrive.allianceColor teamColor;
+
+    //Some constants
+    static final int SCREEN_HEIGHT = 320;
+    static final int SCREEN_WIDTH = 240;
+
+    //Constants regarding sizing of elements for region detection
+    static final int REGION_HEIGHT = 120; //Sensing region will take up middle 50% of the camera's height.
+    static final int REGION_COUNT = 3;
+    static final int REGION_Y_ANCHOR = 60; //Marks the top of the sensing regions
+    int regionWidth;
+
+
+    //Used for Array-style detection of Target
+    Mat grey = new Mat();
+    Mat thresh = new Mat();
+    Mat[] regions = new Mat[REGION_COUNT];
+    int[]regionAvg;
+
+    Scalar GREEN = new Scalar(0, 255, 0);
+
+
+    public void init(Mat firstFrame) {
+        int regionLeft;
+        regionWidth = SCREEN_WIDTH / REGION_COUNT;
+        convImage(firstFrame);
+
+        //Split original image into submats for processing
+        for (int i = 0; i < REGION_COUNT; i++) {
+            regionLeft = i * regionWidth;
+            regions[i] = grey.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_Y_ANCHOR + REGION_HEIGHT);
+            }
+    }
+
+    // Convert image into the YCrCb color space, and extract channels into their own matrices
+    void convImage(Mat input) {
+        Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGB2GRAY);
+        Imgproc.threshold(grey, thresh, 140, 255, Imgproc.THRESH_BINARY);
+    }
+
+    //Runs every frame
+    @Override
+    public Mat processFrame(Mat input) {
+        convImage(input);
+        analyzeFrameArr();
         for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) { //Counts through the regions, counting by region widths in terms of pixels
             Point p1 = new Point(i, REGION_Y_ANCHOR);
             Point p2 = new Point(p1.x + regionWidth, REGION_Y_ANCHOR + REGION_HEIGHT);
             Imgproc.rectangle(input, new Rect(p1, p2), GREEN, 2);
         }
-
-        Point midTarget = lineDetectFrame();
-
-        Imgproc.circle(input, midTarget, 0, new Scalar(0, 0, 255), -1);
-
-        //lsd.drawSegments(input, lines);
         return input;
     }
-
-    Point lineDetectFrame() {
-        Point targetPoint;
-        //Apply a binary threshold to the active matrix to differentiate colors better
-        Imgproc.threshold(activeMat, thresholdMap, INTENSITY_THRESHOLD, 255, Imgproc.THRESH_BINARY);
-        //Detect lines and return a matrix with X1 Y1 X2 Y2 for each line
-        //lsd.detect(thresholdMap, lines);
-        Imgproc.HoughLinesP(thresholdMap,lines, 1,Math.PI/180, 150);
-
-        if (lines.empty()) { //No lines detected
-            //TODO: No lines detected
-        targetPoint = null;
-        }
-        else {
-            //Average each column of the matrix and store it into a 1 dimensional matrix
-            Core.reduce(lines, avgs, 0, Core.REDUCE_AVG);
-
-            //Turn 1D Matrix into an array of doubles
-            vector = avgs.get(0, 0);
-
-            //Data will always stored as [X1, Y1, X2, Y2] so indices can be hard coded in
-            xAvg = (int) ((vector[0] + vector[2]) / 2);
-            yAvg = (int) ((vector[1] + vector[3]) / 2);//Find midpoints of all lines detected, this will be the center of the target
-
-            targetPoint = new Point(xAvg, yAvg);
-        }
-        
-
-        targetPoint = new Point(50, 50);
-        return targetPoint;
-    }
-
     void analyzeFrameArr() {
         int avg;
+
+        //Draw rectangle for region on the screen
         for (int i = 0; i < REGION_COUNT; i ++) { // Loop through regions calculating average brightness values and populating the array with the averages
-            avg = (int) Core.mean(activeRegions[i]).val[0];
+            avg = (int) Core.mean(regions[i]).val[0];
             regionAvg[i] = avg;
         }
     }

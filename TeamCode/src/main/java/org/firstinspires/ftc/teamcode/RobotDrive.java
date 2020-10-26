@@ -125,6 +125,10 @@ public class RobotDrive {
 
 
     /***************************************FORWARD MOVEMENT***************************************/
+    void setMotors(double motorPower) {
+        for (DcMotor motor: motors) motor.setPower(motorPower);
+    }
+
     //Send this function a value of seconds to drive for and it will drive for that period
     void driveTime(long time) throws InterruptedException {
         for (DcMotor motor: motors) motor.setPower(motorPower);
