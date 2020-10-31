@@ -227,12 +227,13 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     int regionWidth;
 
     //Constants for line-segment detection
-    static final int INTENSITY_THRESHOLD = 160;
+    static final int INTENSITY_THRESHOLD = 150;
 
     //Image mats for processing
     private Mat YCrCb = new Mat();
     private Mat Cb = new Mat();
     private Mat Cr = new Mat();
+    private Mat ringMask = new Mat();
     private Mat activeMat = new Mat();
 
 
@@ -243,8 +244,10 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     int[]regionAvg;
 
     //Used for line-segment style detection of target
+    private final double DETECT_AREA = 0.33; //Ratio of the area of the screen that should be scanned for detecting the goal
     private Mat thresholdMap = new Mat();
     private Mat blurred = new Mat();
+    private Mat resized = new Mat();
     private Mat edges = new Mat();
     private Mat lines = new Mat();
     private Mat X1Mat = new Mat();
@@ -304,18 +307,19 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     }
 
     void lineDetectFrame() {
-        //Apply a blur to the image
-        Imgproc.GaussianBlur(activeMat, blurred, new Size(5, 5), 0);
-
         //Apply a binary threshold to the active matrix to differentiate colors better
-        Imgproc.threshold(blurred, thresholdMap, INTENSITY_THRESHOLD, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(activeMat, thresholdMap, INTENSITY_THRESHOLD, 255, Imgproc.THRESH_BINARY);
+
+        //Apply a blur to the image
+        Imgproc.GaussianBlur(thresholdMap, blurred, new Size(3, 3), 1);
 
         //Detects edges in an image and only highlights those edges
-        Imgproc.Canny(thresholdMap, edges, 100, 200);
+        Imgproc.Canny(blurred, edges, 100, 200);
 
+        //Cut off bottom portion of the image
+        resized = blurred.submat(0, (int)(SCREEN_HEIGHT * DETECT_AREA), 0, SCREEN_WIDTH);
         //Returns a matrix with X1 Y1 X2 Y2 for each line detected
-        Imgproc.HoughLinesP(thresholdMap, lines, 2,Math.PI/90, 15, 6);
-
+        Imgproc.HoughLinesP(resized, lines, 0.5,Math.PI/90, 10, 30, 10);
 
         if (!lines.empty()) { //Line detected
             //Extract X1, X2, Y1, and Y2 from the lines matrix into seperate mats
@@ -323,8 +327,6 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
             Core.extractChannel(lines, Y1Mat, 1);
             Core.extractChannel(lines, X2Mat, 2);
             Core.extractChannel(lines, Y2Mat, 3);
-
-
 
             X1Avgs = Core.mean(X1Mat).val;
             Y1Avgs = Core.mean(Y1Mat).val;
