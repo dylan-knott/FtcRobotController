@@ -50,8 +50,7 @@ public class OpenCVClass {
     }
 }
 
-class SamplePipeline extends OpenCvPipeline
-{
+class SamplePipeline extends OpenCvPipeline {
 
     /*
      * NOTE: if you wish to use additional Mat objects in your processing pipeline, it is
@@ -97,8 +96,7 @@ class SamplePipeline extends OpenCvPipeline
 
 }
 
-class RingDeterminationPipeline extends OpenCvPipeline
-{
+class RingDeterminationPipeline extends OpenCvPipeline {
     public RingDeterminationPipeline(RobotDrive.allianceColor allianceColor) {
         teamColor = allianceColor;
     }
@@ -442,4 +440,27 @@ class LineFollowingPipeline extends OpenCvPipeline {
     }
 
     public int[] getRegionAnalysis() { return regionAvg; }
+}
+
+class IntakePipeline extends OpenCvPipeline {
+
+    //Mats for processing
+    Mat gray = new Mat();
+
+    private void convertFrame(Mat input) {
+        Imgproc.cvtColor(input, gray, Imgproc.COLOR_RGB2GRAY);
+    }
+
+    public void init(Mat firstFrame) {
+        convertFrame(firstFrame);
+
+    }
+
+    public Mat processFrame(Mat input)
+    {
+        convertFrame(input);
+
+        return input;
+    }
+
 }
