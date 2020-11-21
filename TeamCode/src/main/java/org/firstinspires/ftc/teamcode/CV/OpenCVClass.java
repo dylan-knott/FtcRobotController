@@ -1,7 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.CV;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.RobotDrive;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.*;
@@ -9,43 +11,81 @@ import org.openftc.easyopencv.*;
 
 public class OpenCVClass {
 
-    public OpenCvInternalCamera phoneCam;
+    //Values to determine if the active camera will be the webcam or phone camera
+    public final int PHONE_CAM = 0;
+    public final int WEB_CAM = 1;
 
+    public OpenCvCamera activeCam;
+
+    private OpenCvInternalCamera phoneCam;
+    private OpenCvWebcam webCam;
+
+    private Telemetry telemetry;
 
     public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, OpenCvPipeline pipeline) {
         //Initialization code
 
+        telemetry = telem;
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        webCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webCam"), cameraMonitorViewId);
 
-        phoneCam.setPipeline(pipeline);
         // OR...  Do Not Activate the Camera Monitor View
         //phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
 
     }
 
-    public void startStream() {
-        // Start streaming
-        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+    public void startStream(int active) {
+
+        /*webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-
-
+                webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                activeCam = webCam;
             }
+        });*/
 
-        });
-
+        switch (active) {
+            case 0:
+                telemetry.addLine("In switch" + active);
+                telemetry.update();
+                // Start streaming
+                phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+                    @Override
+                    public void onOpened() {
+                        telemetry.addLine("In onOpened");
+                        telemetry.update();
+                        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                        activeCam = phoneCam;
+                    }
+                });
+            break;
+            case 1:
+                // Start streaming
+                webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+                    @Override
+                    public void onOpened() {
+                        webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                        activeCam = webCam;
+                    }
+                });
+            break;
+        }
     }
 
     public void togglePhoneFlash(boolean state) {
-        phoneCam.setFlashlightEnabled(state);
+        if (activeCam == phoneCam) {
+            phoneCam.setFlashlightEnabled(state);
+        }
     }
     public void stopStream() {
+        //activeCam.stopStreaming();
         phoneCam.stopStreaming();
     }
 
     public void closeCamera() {
+        //activeCam.closeCameraDevice();
         phoneCam.closeCameraDevice();
     }
 }
@@ -218,11 +258,6 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     static final int SCREEN_HEIGHT = 320;
     static final int SCREEN_WIDTH = 240;
 
-    //Constants regarding sizing of elements for region detection
-    static final int REGION_HEIGHT = 120; //Sensing region will take up middle 50% of the camera's height.
-    static final int REGION_COUNT = 8;
-    static final int REGION_Y_ANCHOR = 60; //Marks the top of the sensing regions
-    int regionWidth;
 
     //Constants for line-segment detection
     static final int INTENSITY_THRESHOLD = 150;
@@ -234,12 +269,6 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     private Mat ringMask = new Mat();
     private Mat activeMat = new Mat();
 
-
-    //Used for Array-style detection of Target
-    Mat[] CbRegions = new Mat[REGION_COUNT];
-    Mat[] CrRegions = new Mat[REGION_COUNT];
-    Mat[] activeRegions = new Mat[REGION_COUNT];
-    int[]regionAvg;
 
     //Used for line-segment style detection of target
     private final double DETECT_AREA = 0.33; //Ratio of the area of the screen that should be scanned for detecting the goal
@@ -264,16 +293,7 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
 
 
     public void init(Mat firstFrame) {
-        int regionLeft;
-        regionWidth = SCREEN_WIDTH / REGION_COUNT;
         convImage(firstFrame);
-
-        //Split original image into submats for processing
-        for (int i = 0; i < REGION_COUNT; i++) {
-            regionLeft = i * regionWidth;
-            CbRegions[i] = Cb.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_Y_ANCHOR + REGION_HEIGHT);
-            CrRegions[i] = Cr.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_Y_ANCHOR + REGION_HEIGHT);
-        }
     }
 
     // Convert image into the YCrCb color space, and extract channels into their own matrices
@@ -287,19 +307,7 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         convImage(input);
-
-        if (teamColor == RobotDrive.allianceColor.blue) {
-            activeMat = Cb;
-            activeRegions = CbRegions;
-        }
-        else{
-            activeMat = Cr;
-            activeRegions = CrRegions;
-        }
-
-
         lineDetectFrame();
-
         Imgproc.circle(input, targetPoint, 2, new Scalar(255+4, 0, 0), -1);
         return input;
     }
@@ -344,102 +352,9 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
         }
     }
 
-
-    void analyzeFrameArr() {
-        int avg;
-
-        //Draw rectangle for region on the screen
-        for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) { //Counts through the regions, counting by region widths in terms of pixels
-            Point p1 = new Point(i, REGION_Y_ANCHOR);
-            Point p2 = new Point(p1.x + regionWidth, REGION_Y_ANCHOR + REGION_HEIGHT);
-            //Imgproc.rectangle(input, new Rect(p1, p2), GREEN, 2);
-        }
-
-        for (int i = 0; i < REGION_COUNT; i ++) { // Loop through regions calculating average brightness values and populating the array with the averages
-            avg = (int) Core.mean(activeRegions[i]).val[0];
-            regionAvg[i] = avg;
-        }
-    }
-
-    public int[] getRegionAnalysis() { return regionAvg; }
-
     public String getTargetPoint() { return targetPoint.toString(); }
 
     public String getLineMatrix() {return lines.toString(); }
-}
-
-class LineFollowingPipeline extends OpenCvPipeline {
-    //Screen size 320 by 240
-
-    //Constructor
-    public LineFollowingPipeline(RobotDrive.allianceColor allianceColor) {
-        int regionLeft;
-        teamColor = allianceColor;
-    }
-
-    RobotDrive.allianceColor teamColor;
-
-    //Some constants
-    static final int SCREEN_HEIGHT = 320;
-    static final int SCREEN_WIDTH = 240;
-
-    //Constants regarding sizing of elements for region detection
-    static final int REGION_HEIGHT = 120; //Sensing region will take up middle 50% of the camera's height.
-    static final int REGION_COUNT = 3;
-    static final int REGION_Y_ANCHOR = 60; //Marks the top of the sensing regions
-    int regionWidth;
-
-
-    //Used for Array-style detection of Target
-    Mat grey = new Mat();
-    Mat thresh = new Mat();
-    Mat[] regions = new Mat[REGION_COUNT];
-    int[]regionAvg;
-
-    Scalar GREEN = new Scalar(0, 255, 0);
-
-
-    public void init(Mat firstFrame) {
-        int regionLeft;
-        regionWidth = SCREEN_WIDTH / REGION_COUNT;
-        convImage(firstFrame);
-
-        //Split original image into submats for processing
-        for (int i = 0; i < REGION_COUNT; i++) {
-            regionLeft = i * regionWidth;
-            regions[i] = grey.submat(regionLeft, regionLeft + regionWidth, REGION_Y_ANCHOR, REGION_Y_ANCHOR + REGION_HEIGHT);
-            }
-    }
-
-    // Convert image into the YCrCb color space, and extract channels into their own matrices
-    void convImage(Mat input) {
-        Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGB2GRAY);
-        Imgproc.threshold(grey, thresh, 140, 255, Imgproc.THRESH_BINARY);
-    }
-
-    //Runs every frame
-    @Override
-    public Mat processFrame(Mat input) {
-        convImage(input);
-        analyzeFrameArr();
-        for (int i = 0; i < SCREEN_WIDTH; i += regionWidth) { //Counts through the regions, counting by region widths in terms of pixels
-            Point p1 = new Point(i, REGION_Y_ANCHOR);
-            Point p2 = new Point(p1.x + regionWidth, REGION_Y_ANCHOR + REGION_HEIGHT);
-            Imgproc.rectangle(input, new Rect(p1, p2), GREEN, 2);
-        }
-        return input;
-    }
-    void analyzeFrameArr() {
-        int avg;
-
-        //Draw rectangle for region on the screen
-        for (int i = 0; i < REGION_COUNT; i ++) { // Loop through regions calculating average brightness values and populating the array with the averages
-            avg = (int) Core.mean(regions[i]).val[0];
-            regionAvg[i] = avg;
-        }
-    }
-
-    public int[] getRegionAnalysis() { return regionAvg; }
 }
 
 class IntakePipeline extends OpenCvPipeline {

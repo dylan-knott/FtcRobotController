@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.CV;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.robot.Robot;
+import org.firstinspires.ftc.teamcode.RobotDrive;
 
 @Autonomous(name="Test OpenCV", group = "Autonomous")
 public class OpenCVOp extends LinearOpMode {
@@ -11,19 +11,19 @@ public class OpenCVOp extends LinearOpMode {
     RingDeterminationPipeline ringDeterm = new RingDeterminationPipeline(RobotDrive.allianceColor.red);
     GoalDeterminationPipeline goalDeterm = new GoalDeterminationPipeline(RobotDrive.allianceColor.red);
 
-    public void runOpMode() throws InterruptedException{
+    public void runOpMode(){
 
         openCV.initOpenCV(hardwareMap, telemetry, goalDeterm);
-        openCV.startStream();
+
         waitForStart();
+        openCV.startStream(openCV.PHONE_CAM);
 
         //openCV.togglePhoneFlash(true);
             while (opModeIsActive()) {
-                telemetry.addData("Target Point: ", goalDeterm.getTargetPoint());
+                /*telemetry.addData("Target Point: ", goalDeterm.getTargetPoint());
                 telemetry.addData("Line Matrix: ", goalDeterm.getLineMatrix());
-                telemetry.update();
+                telemetry.update();*/
             }
-            openCV.togglePhoneFlash(false);
             openCV.stopStream();
             openCV.closeCamera();
     }

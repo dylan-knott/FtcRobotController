@@ -26,6 +26,7 @@ public class RobotDrive {
     //PID utilities for GyroTurn function
     private final double GYRO_P = 0.01;
     private final double wheelDiameter = 3.93701;
+    final double DEADWHEEL_COUNTS_PER_INCH = 1303.79729381;
 
     //Servo function constants
     private final double INDEXER_SPEED = 0.7;
@@ -52,16 +53,16 @@ public class RobotDrive {
     //Debug the error angle in order to get this value, sets the offset to which the robot will turn to meet the required degrees turned
      private final double TURNING_BUFFER = 0;
 
-    enum direction {
+    public enum direction {
         left, right
     }
 
-    enum allianceColor {
+    public enum allianceColor {
         red, blue
     }
 
     //Assigning software objects to hardware, receives hardwareMap and telemetry objects from the op mode which calls it
-    void initializeRobot(HardwareMap hardwareMap, Telemetry telem, allianceColor clr) {
+    public void initializeRobot(HardwareMap hardwareMap, Telemetry telem, allianceColor clr) {
         telemetry = telem;
         teamColor = clr;
 
@@ -125,12 +126,12 @@ public class RobotDrive {
 
 
     /***************************************FORWARD MOVEMENT***************************************/
-    void setMotors(double motorPower) {
+    public void setMotors(double motorPower) {
         for (DcMotor motor: motors) motor.setPower(motorPower);
     }
 
     //Send this function a value of seconds to drive for and it will drive for that period
-    void driveTime(long time) throws InterruptedException {
+    public void driveTime(long time) throws InterruptedException {
         for (DcMotor motor: motors) motor.setPower(motorPower);
         Thread.sleep(time);
         for (DcMotor motor: motors) motor.setPower(0);
@@ -144,7 +145,7 @@ public class RobotDrive {
     }
 
     //Send this function a number of inches and it will drive that distance using the encoders on the motors.
-    void driveEncoder(double Inches) {
+    public void driveEncoder(double Inches) {
         float initialHeading = getHeading();
         int encoderTicks = 0;
         if (Inches > 0) encoderTicks = (int)(480 * (float)((Inches - 1) / (wheelDiameter * Math.PI)));
@@ -187,7 +188,7 @@ public class RobotDrive {
 
     /*******************************************STRAFING*******************************************/
     //Send this function a time value as well as a direction (Ex: RobotDrive.direction.left) and it will strafe that direction for the specified amount of time
-    void strafeTime(int time, direction strafeDirection) throws InterruptedException {
+    public void strafeTime(int time, direction strafeDirection) throws InterruptedException {
         if (strafeDirection == direction.left) {
             leftFront.setPower(-1 * motorPower);
             leftRear.setPower(motorPower);
@@ -206,7 +207,7 @@ public class RobotDrive {
         rightRear.setPower(0);
     }
     //Send this function a distance in inches as well as a direction (Ex: RobotDrive.direction.right) and it will strafe that direction for the specified distance
-    void strafeEncoder(double Inches, direction direction) {
+    public void strafeEncoder(double Inches, direction direction) {
         float initialHeading = getHeading();
 
         int encoderTicks = (int)(480 * (float)(Inches / (wheelDiameter * Math.PI)));
@@ -256,7 +257,7 @@ public class RobotDrive {
 
     /*******************************************TURNING********************************************/
     //Send this a value of degrees to turn, positive value turns right and negative value turns left, uses IMU gyroscope to precisely turn that distance
-    void gyroTurn(double degrees, long currentMillis) {
+    public void gyroTurn(double degrees, long currentMillis) {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double target_angle = getHeading() - degrees;
         if (degrees < 0) {target_angle += TURNING_BUFFER;} else if (degrees > 0) {target_angle -= TURNING_BUFFER;}
@@ -283,7 +284,7 @@ public class RobotDrive {
         rightRear.setPower(0);
     }
 
-    void gyroTurn(double degrees, double motorClamp, long currentMillis) {
+    public void gyroTurn(double degrees, double motorClamp, long currentMillis) {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double target_angle = getHeading() - degrees;
         if (degrees < 0) {target_angle += TURNING_BUFFER;} else if (degrees > 0) {target_angle -= TURNING_BUFFER;}
@@ -313,69 +314,7 @@ public class RobotDrive {
 
     /******************************************GAME FUNCTIONS********************************************/
 
-    /** MOST OF THESE FUNCTIONS ARE FROM SKYSTONE AND NOW DEPRECATED, BUT LEFT AROUND FOR REFERENCE IN CONTROLLING SERVOS**/
-
-   //Activates the back servos used to grab the mat, send angle of rotation in degrees as well as the max angle of the servo. Converts to a fraction usable by the servo
-   void seekMat() throws InterruptedException {
-       if (floorColor instanceof SwitchableLight){
-           ((SwitchableLight)floorColor).enableLight(true);
-       }
-
-       mixDrive(0.2, 0, 0);
-       if (teamColor == allianceColor.red) {
-           while (floorColor.red() < 230);
-           mixDrive(0, 0, 0);
-           grabMat(90);
-           Thread.sleep(500);
-           mixDrive(-0.4, 0, 0);
-           while (dist.getDistance(DistanceUnit.INCH) > 5);
-           mixDrive(0,0,0);
-           grabMat(0);
-           Thread.sleep(50);
-           mixDrive(0, -0.3, 0);
-           //SetSideArm(70,180);
-           Thread.sleep(1000);
-           while (floorColor.red() < 188);
-           mixDrive(0,0,0);
-           Thread.sleep(20);
-           strafeEncoder(5, direction.right);
-           mixDrive(0,0,0);
-       }
-       else {
-           while (floorColor.blue() < 205);
-           mixDrive(0, 0, 0);
-           grabMat(90);
-           Thread.sleep(500);
-           mixDrive(-0.4, 0, 0);
-           while (dist.getDistance(DistanceUnit.INCH) > 4);
-           mixDrive(0,0,0);
-           grabMat(0);
-           Thread.sleep(50);
-           mixDrive(0, 0.3, 0);
-           //SetSideArm(70,180);
-           Thread.sleep(500);
-           while (floorColor.blue() < 190);
-           mixDrive(0,0,0);
-           Thread.sleep(20);
-           strafeEncoder(3, direction.right);
-           mixDrive(0,0,0);
-       }
-
-       if (floorColor instanceof SwitchableLight) {
-           ((SwitchableLight)floorColor).enableLight(false);
-       }
-   }
-
-    void grabMat(float desiredRotation) {
-    //MatServos.setPosition(desiredRotation / 280);
-   }
-
-   void controlClaw(float desiredRotation) {
-       //BlockGrips.setPosition(desiredRotation / 280);
-       //TopServo.setPosition((desiredRotation + 15) / 180);
-   }
-
-   void fireRing(double inputSpeed) throws InterruptedException{
+   public void fireRing(double inputSpeed) throws InterruptedException{
        if (ringCount > 0) {
            indexer.setPower(inputSpeed);
            wait(10);
@@ -384,7 +323,7 @@ public class RobotDrive {
        }
    }
 
-   void setFlywheels(double inputSpeed) {
+   public void setFlywheels(double inputSpeed) {
        //Remap input to respect the max speed
        double power = inputSpeed * flywheelSpeed;
 
@@ -392,11 +331,11 @@ public class RobotDrive {
        leftFlywheel.setPower(power);
    }
 
-   void setIndexer(double inputSpeed) {
+   public void setIndexer(double inputSpeed) {
        indexer.setPower(inputSpeed);
    }
 
-   void enableIntake(boolean state) {
+   public void enableIntake(boolean state) {
        if (state) //Intake is enabled
        {
            intake.setPower(intakeSpeed);
@@ -412,19 +351,19 @@ public class RobotDrive {
    }
     /*******************************************UTILITIES*******************************************/
     //Creating a clamp method for both floats and doubles, used to make sure motor power doesn't go above a certain power level as to saturate the motors
-    public static double clamp(double val, double min, double max) {
+    private double clamp(double val, double min, double max) {
         return Math.max(min, Math.min(max, val));
     }
 
-    public static float clamp(float val, float min, float max) {
+    private float clamp(float val, float min, float max) {
         return Math.max(min, Math.min(max, val));
     }
 
-    public static int clamp(int val, int min, int max) { return Math.max(min, Math.min(max, val));
+    private int clamp(int val, int min, int max) { return Math.max(min, Math.min(max, val));
     }
 
     //For debugging, displays current encoder values of each wheel
-    void getEncoderVals() {
+    public void getEncoderVals() {
         telemetry.addData("Encoders (LF, RF, LR, RR)", "%d %d %d %d",
                 leftFront.getCurrentPosition(),
                 rightFront.getCurrentPosition(),
@@ -434,12 +373,12 @@ public class RobotDrive {
     }
 
     //Returns the current heading of the robot when it is called, takes reading from the IMU gyroscope
-    float getHeading() {
+    private float getHeading() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
 
-    void resetEncoders() {
+    private void resetEncoders() {
         for (DcMotor motor : motors) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -449,7 +388,7 @@ public class RobotDrive {
     }
 
     //Driving function that accepts three values for forward, strafe, and rotate, then mixes those values into 4 usable motor power outputs and sends to the motors.
-    void mixDrive(double forward, double strafe, double rotate) {
+    public void mixDrive(double forward, double strafe, double rotate) {
         double frontLeftSpeed = clamp((forward + strafe + rotate), -motorPower, motorPower);
         double frontRightSpeed = clamp((forward - strafe - rotate), -motorPower, motorPower);
         double backLeftSpeed = clamp((forward - strafe + rotate ), -motorPower, motorPower);
@@ -462,7 +401,7 @@ public class RobotDrive {
     }
 
     //turning distance measurements into usable motor output via Proportional control)
-    void distanceToDrive(double forward, double right, double turn){
+    public void distanceToDrive(double forward, double right, double turn){
 
         double ForwardOut = forward * P_Forward;
         double RightOut = right * P_Strafe;
@@ -470,10 +409,4 @@ public class RobotDrive {
         mixDrive(ForwardOut, RightOut, TurnOut);
     }
 
-    void liftTime(long time) throws InterruptedException {
-        //armLift.setPower(liftPower);
-        Thread.sleep(time);
-        //armLift.setPower(0);
-
-    }
 }
