@@ -26,7 +26,6 @@ public class RobotDrive {
     //PID utilities for GyroTurn function
     private final double GYRO_P = 0.01;
     private final double wheelDiameter = 3.93701;
-    final double DEADWHEEL_COUNTS_PER_INCH = 1303.79729381;
 
     //Servo function constants
     private final double INDEXER_SPEED = 0.7;

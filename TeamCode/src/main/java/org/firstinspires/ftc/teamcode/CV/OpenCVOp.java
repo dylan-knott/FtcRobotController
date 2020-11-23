@@ -10,13 +10,14 @@ public class OpenCVOp extends LinearOpMode {
     RobotDrive robot = new RobotDrive();
     RingDeterminationPipeline ringDeterm = new RingDeterminationPipeline(RobotDrive.allianceColor.red);
     GoalDeterminationPipeline goalDeterm = new GoalDeterminationPipeline(RobotDrive.allianceColor.red);
+    IntakePipeline intakePipeline = new IntakePipeline();
 
     public void runOpMode(){
 
-        openCV.initOpenCV(hardwareMap, telemetry, goalDeterm);
+        openCV.initOpenCV(hardwareMap, telemetry, intakePipeline, goalDeterm);
 
         waitForStart();
-        openCV.startStream(openCV.PHONE_CAM);
+        //openCV.startStream(openCV.PHONE_CAM);
 
         //openCV.togglePhoneFlash(true);
             while (opModeIsActive()) {

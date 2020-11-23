@@ -7,19 +7,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name= "TeleOp", group= "TeleOp")
 public class TeleOPMode extends LinearOpMode {
-    RobotDrive robot = new RobotDrive();
+    LocalizedRobotDrive robot = new LocalizedRobotDrive();
 
     public void runOpMode() throws InterruptedException{
-        robot.initializeRobot(hardwareMap, telemetry, RobotDrive.allianceColor.blue);
+        robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
 
 
         waitForStart();
 
         while (opModeIsActive()) {
             //Gamepad 1  ***Drivetrain***
-            double forward = gamepad1.left_stick_y * -1; //The y direction on the gamepad is reversed idk why
-            double strafe = gamepad1.left_stick_x;
-            //Using a cube to add exponential growth to the control of rotation
+            double forward = gamepad1.left_stick_y * -robot.motorPower; //The y direction on the gamepad is reversed idk why
+            double strafe = gamepad1.left_stick_x * robot.motorPower;
             double rotate = gamepad1.right_stick_x * robot.motorPower;
 
 
@@ -33,6 +32,7 @@ public class TeleOPMode extends LinearOpMode {
             robot.enableIntake(gamepad2.right_bumper);
             robot.setFlywheels(gamepad2.left_trigger);
             robot.setIndexer(gamepad2.right_trigger);
+            robot.armLift.setPower(gamepad2.left_stick_y * robot.motorPower);
 
 
 

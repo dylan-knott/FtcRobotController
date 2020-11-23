@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.CV;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.MultipleCameraExample;
 import org.firstinspires.ftc.teamcode.RobotDrive;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
@@ -22,30 +23,57 @@ public class OpenCVClass {
 
     private Telemetry telemetry;
 
-    public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, OpenCvPipeline pipeline) {
-        //Initialization code
-
-        telemetry = telem;
-
+    public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, OpenCvPipeline phonePipeline, OpenCvPipeline webcamPipeline) {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        webCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webCam"), cameraMonitorViewId);
 
-        // OR...  Do Not Activate the Camera Monitor View
-        //phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
+        /**
+         * This is the only thing you need to do differently when using multiple cameras.
+         * Instead of obtaining the camera monitor view and directly passing that to the
+         * camera constructor, we invoke {@link OpenCvCameraFactory#splitLayoutForMultipleViewports(int, int, OpenCvCameraFactory.ViewportSplitMethod)}
+         * on that view in order to split that view into multiple equal-sized child views,
+         * and then pass those child views to the constructor.
+         */
+        int[] viewportContainerIds = OpenCvCameraFactory.getInstance()
+                .splitLayoutForMultipleViewports(
+                        cameraMonitorViewId, //The container we're splitting
+                        2, //The number of sub-containers to create
+                        OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY); //Whether to split the container vertically or horizontally
+
+        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[0]);
+        webCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webCam"), viewportContainerIds[1]);
+
+
+        phoneCam.setPipeline(phonePipeline);
+        webCam.setPipeline(webcamPipeline);
+
+        phoneCam.openCameraDevice();
+        webCam.openCameraDevice();
+
+        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
     }
 
     public void startStream(int active) {
 
-        /*webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+
+        webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+
             @Override
             public void onOpened() {
                 webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
                 activeCam = webCam;
             }
-        });*/
+        });
+        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 
+            @Override
+            public void onOpened() {
+                webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                activeCam = webCam;
+            }
+        });
+/*
         switch (active) {
             case 0:
                 telemetry.addLine("In switch" + active);
@@ -71,7 +99,7 @@ public class OpenCVClass {
                     }
                 });
             break;
-        }
+        }*/
     }
 
     public void togglePhoneFlash(boolean state) {
@@ -79,14 +107,17 @@ public class OpenCVClass {
             phoneCam.setFlashlightEnabled(state);
         }
     }
+
     public void stopStream() {
         //activeCam.stopStreaming();
         phoneCam.stopStreaming();
+        webCam.stopStreaming();
     }
 
     public void closeCamera() {
         //activeCam.closeCameraDevice();
         phoneCam.closeCameraDevice();
+        webCam.closeCameraDevice();
     }
 }
 
