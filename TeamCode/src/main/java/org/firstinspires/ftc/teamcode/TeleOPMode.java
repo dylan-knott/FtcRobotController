@@ -17,14 +17,14 @@ public class TeleOPMode extends LinearOpMode {
 
         while (opModeIsActive()) {
             //Gamepad 1  ***Drivetrain***
-            double forward = gamepad1.left_stick_y * -robot.motorPower; //The y direction on the gamepad is reversed idk why
-            double strafe = gamepad1.left_stick_x * robot.motorPower;
-            double rotate = gamepad1.right_stick_x * robot.motorPower;
+            double forward = -gamepad1.left_stick_y; //The y direction on the gamepad is reversed idk why
+            double strafe = gamepad1.left_stick_x;
+            double rotate = gamepad1.right_stick_x;
 
 
             if (gamepad1.left_bumper) robot.motorPower = 0.2;
             else if (gamepad1.right_bumper) robot.motorPower= 0.15;
-            else robot.motorPower = 0.65;
+            else robot.motorPower = 0.8;
             //Wheel control
             robot.mixDrive(forward, strafe, rotate);
 
@@ -32,7 +32,7 @@ public class TeleOPMode extends LinearOpMode {
             robot.enableIntake(gamepad2.right_bumper);
             robot.setFlywheels(gamepad2.left_trigger);
             robot.setIndexer(gamepad2.right_trigger);
-            robot.armLift.setPower(gamepad2.left_stick_y * robot.motorPower);
+            //robot.armLift.setPower(gamepad2.left_stick_y * robot.motorPower);
 
 
 

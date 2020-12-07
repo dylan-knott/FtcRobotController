@@ -39,7 +39,7 @@ public class LocalizedRobotDrive {
     public ColorSensor intakeColor = null;
 
     //Default motor power levels for wheels
-    public double motorPower = 0.6;
+    public double motorPower = 0.8;
     public double flywheelSpeed = 1;
     public double intakeSpeed = 1;
     public int ringCount = 3;
@@ -76,6 +76,11 @@ public class LocalizedRobotDrive {
         floorColor = hardwareMap.get(ColorSensor.class, "floor_color");
         intakeColor = hardwareMap.get(ColorSensor.class, "intake_color");
 
+
+        //Motor Initialization
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFlywheel.setDirection(DcMotor.Direction.REVERSE);
+        rightFlywheel.setDirection(DcMotor.Direction.REVERSE);
 
         //Sensor Initialization
         if (floorColor instanceof SwitchableLight) {
@@ -226,11 +231,12 @@ public class LocalizedRobotDrive {
     public void mixDrive(double forward, double strafe, double rotate) {
         double frontLeftSpeed = clamp((forward + strafe + rotate), -motorPower, motorPower);
         double frontRightSpeed = clamp((forward - strafe - rotate), -motorPower, motorPower);
-        double backLeftSpeed = clamp((forward - strafe + rotate), -motorPower, motorPower);
+        double backLeftSpeed = clamp((forward - strafe + rotate ), -motorPower, motorPower);
         double backRightSpeed = clamp((forward + strafe - rotate), -motorPower, motorPower);
 
-        rrDrive.setMotorPowers(frontLeftSpeed, frontRightSpeed, backLeftSpeed, backRightSpeed);
+        rrDrive.setMotorPowers(frontLeftSpeed, backLeftSpeed, frontRightSpeed, backRightSpeed);
     }
+
 
     //turning distance measurements into usable motor output via Proportional control)
     public void distanceToDrive(double forward, double right, double turn){

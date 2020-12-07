@@ -143,8 +143,8 @@ public class APMecanumDrive extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
         rightRear.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFront.setDirection(DcMotorEx.Direction.REVERSE);
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
@@ -369,8 +369,8 @@ public class APMecanumDrive extends MecanumDrive {
     public void setMotorPowers(double lf, double lr, double rf, double rr) {
         leftFront.setPower(lf);
         leftRear.setPower(lr);
-        rightRear.setPower(rf);
-        rightFront.setPower(rr);
+        rightRear.setPower(rr);
+        rightFront.setPower(rf);
     }
 
     @Override

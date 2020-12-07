@@ -78,7 +78,6 @@ public class RobotDrive {
 
         //Expansion hub 1 servos
         clawServo = hardwareMap.servo.get("claw_servo");
-        wobbleArm = hardwareMap.servo.get("arm_servo");
         indexer = hardwareMap.crservo.get("index_servo");
         intakeBelt = hardwareMap.crservo.get("intake_servo");
 
@@ -88,8 +87,8 @@ public class RobotDrive {
         floorColor = hardwareMap.get(ColorSensor.class, "floor_color");
         intakeColor = hardwareMap.get(ColorSensor.class, "intake_color");
 
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.CV;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.MultipleCameraExample;
 import org.firstinspires.ftc.teamcode.RobotDrive;
 import org.opencv.core.*;
@@ -18,12 +19,37 @@ public class OpenCVClass {
 
     public OpenCvCamera activeCam;
 
-    private OpenCvInternalCamera phoneCam;
-    private OpenCvWebcam webCam;
+    private OpenCvCamera phoneCam;
+    private OpenCvCamera webCam;
 
     private Telemetry telemetry;
 
     public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, OpenCvPipeline phonePipeline, OpenCvPipeline webcamPipeline) {
+        /*int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        int[] viewportContainerIds = OpenCvCameraFactory.getInstance()
+                .splitLayoutForMultipleViewports(
+                        cameraMonitorViewId, //The container we're splitting
+                        2, //The number of sub-containers to create
+                        OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY); //Whether to split the container vertically or horizontally
+
+        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[0]);
+        webCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webCam"), viewportContainerIds[1]);
+
+
+
+        phoneCam.openCameraDevice();
+        webCam.openCameraDevice();
+
+
+        phoneCam.setPipeline(phonePipeline);
+        webCam.setPipeline(webcamPipeline);
+
+        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+
+        //startStream(PHONE_CAM);
+         */
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         /**
@@ -42,22 +68,24 @@ public class OpenCVClass {
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[0]);
         webCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webCam"), viewportContainerIds[1]);
 
+        phoneCam.openCameraDevice();
+        webCam.openCameraDevice();
 
         phoneCam.setPipeline(phonePipeline);
         webCam.setPipeline(webcamPipeline);
 
-        phoneCam.openCameraDevice();
-        webCam.openCameraDevice();
-
         phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
         webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-
     }
+
+
 
     public void startStream(int active) {
 
+        webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
-        webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+       /* webCam.openCameraDevice(new OpenCvCamera.AsyncCameraOpenListener() {
 
             @Override
             public void onOpened() {
@@ -73,7 +101,7 @@ public class OpenCVClass {
                 activeCam = webCam;
             }
         });
-/*
+
         switch (active) {
             case 0:
                 telemetry.addLine("In switch" + active);
@@ -104,7 +132,7 @@ public class OpenCVClass {
 
     public void togglePhoneFlash(boolean state) {
         if (activeCam == phoneCam) {
-            phoneCam.setFlashlightEnabled(state);
+            //phoneCam.setFlashlightEnabled(state);
         }
     }
 
@@ -168,7 +196,7 @@ class SamplePipeline extends OpenCvPipeline {
 }
 
 class RingDeterminationPipeline extends OpenCvPipeline {
-    public RingDeterminationPipeline(RobotDrive.allianceColor allianceColor) {
+    public RingDeterminationPipeline(LocalizedRobotDrive.allianceColor allianceColor) {
         teamColor = allianceColor;
     }
 
@@ -176,7 +204,7 @@ class RingDeterminationPipeline extends OpenCvPipeline {
      * An enum to define the number of rings
      */
 
-    RobotDrive.allianceColor teamColor;
+    LocalizedRobotDrive.allianceColor teamColor;
     public enum RingPosition
     {
         FOUR,
@@ -278,12 +306,12 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     //Screen size 320 by 240
 
     //Constructor
-    public GoalDeterminationPipeline(RobotDrive.allianceColor allianceColor) {
+    public GoalDeterminationPipeline(LocalizedRobotDrive.allianceColor allianceColor) {
         int regionLeft;
         teamColor = allianceColor;
    }
 
-    RobotDrive.allianceColor teamColor;
+    LocalizedRobotDrive.allianceColor teamColor;
 
     //Some constants
     static final int SCREEN_HEIGHT = 320;
