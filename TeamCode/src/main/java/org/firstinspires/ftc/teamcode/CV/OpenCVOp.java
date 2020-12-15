@@ -11,10 +11,11 @@ public class OpenCVOp extends LinearOpMode {
     RingDeterminationPipeline ringDeterm = new RingDeterminationPipeline(LocalizedRobotDrive.allianceColor.red);
     GoalDeterminationPipeline goalDeterm = new GoalDeterminationPipeline(LocalizedRobotDrive.allianceColor.red);
     IntakePipeline intakePipeline = new IntakePipeline();
+    SamplePipeline samplePipeline = new SamplePipeline();
 
     public void runOpMode(){
 
-        openCV.initOpenCV(hardwareMap, telemetry, ringDeterm, goalDeterm);
+        openCV.initOpenCV(hardwareMap, telemetry, ringDeterm, intakePipeline);
 
         waitForStart();
         //openCV.startStream(openCV.PHONE_CAM);

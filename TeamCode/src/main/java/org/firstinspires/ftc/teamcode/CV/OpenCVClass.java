@@ -25,40 +25,8 @@ public class OpenCVClass {
     private Telemetry telemetry;
 
     public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, OpenCvPipeline phonePipeline, OpenCvPipeline webcamPipeline) {
-        /*int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-
-        int[] viewportContainerIds = OpenCvCameraFactory.getInstance()
-                .splitLayoutForMultipleViewports(
-                        cameraMonitorViewId, //The container we're splitting
-                        2, //The number of sub-containers to create
-                        OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY); //Whether to split the container vertically or horizontally
-
-        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[0]);
-        webCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webCam"), viewportContainerIds[1]);
-
-
-
-        phoneCam.openCameraDevice();
-        webCam.openCameraDevice();
-
-
-        phoneCam.setPipeline(phonePipeline);
-        webCam.setPipeline(webcamPipeline);
-
-        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-        webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-
-        //startStream(PHONE_CAM);
-         */
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-        /**
-         * This is the only thing you need to do differently when using multiple cameras.
-         * Instead of obtaining the camera monitor view and directly passing that to the
-         * camera constructor, we invoke {@link OpenCvCameraFactory#splitLayoutForMultipleViewports(int, int, OpenCvCameraFactory.ViewportSplitMethod)}
-         * on that view in order to split that view into multiple equal-sized child views,
-         * and then pass those child views to the constructor.
-         */
         int[] viewportContainerIds = OpenCvCameraFactory.getInstance()
                 .splitLayoutForMultipleViewports(
                         cameraMonitorViewId, //The container we're splitting
@@ -68,24 +36,21 @@ public class OpenCVClass {
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[0]);
         webCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webCam"), viewportContainerIds[1]);
 
-        phoneCam.openCameraDevice();
-        webCam.openCameraDevice();
+        //phoneCam.openCameraDevice();
+        //webCam.openCameraDevice();
 
         phoneCam.setPipeline(phonePipeline);
         webCam.setPipeline(webcamPipeline);
-
-        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-        webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
     }
 
 
 
     public void startStream(int active) {
 
-        webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        //webCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+        //phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
 
-       /* webCam.openCameraDevice(new OpenCvCamera.AsyncCameraOpenListener() {
+        webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 
             @Override
             public void onOpened() {
@@ -93,15 +58,16 @@ public class OpenCVClass {
                 activeCam = webCam;
             }
         });
+
         phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 
             @Override
             public void onOpened() {
-                webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-                activeCam = webCam;
+                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                activeCam = phoneCam;
             }
         });
-
+        /*
         switch (active) {
             case 0:
                 telemetry.addLine("In switch" + active);
@@ -131,9 +97,8 @@ public class OpenCVClass {
     }
 
     public void togglePhoneFlash(boolean state) {
-        if (activeCam == phoneCam) {
             //phoneCam.setFlashlightEnabled(state);
-        }
+
     }
 
     public void stopStream() {
@@ -307,15 +272,14 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
 
     //Constructor
     public GoalDeterminationPipeline(LocalizedRobotDrive.allianceColor allianceColor) {
-        int regionLeft;
         teamColor = allianceColor;
    }
 
     LocalizedRobotDrive.allianceColor teamColor;
 
     //Some constants
-    static final int SCREEN_HEIGHT = 320;
-    static final int SCREEN_WIDTH = 240;
+    static final int SCREEN_HEIGHT = 640;
+    static final int SCREEN_WIDTH = 480;
 
 
     //Constants for line-segment detection
@@ -325,7 +289,6 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     private Mat YCrCb = new Mat();
     private Mat Cb = new Mat();
     private Mat Cr = new Mat();
-    private Mat ringMask = new Mat();
     private Mat activeMat = new Mat();
 
 
