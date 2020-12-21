@@ -31,6 +31,15 @@ public class TeleOPMode extends LinearOpMode {
             robot.mixDrive(forward, strafe, rotate);
 
             //Gamepad 2  ***Gun and intake***
+<<<<<<< Updated upstream
+=======
+            robot.enableIntake(gamepad2.right_bumper);
+            //robot.setFlywheels(gamepad2.left_trigger);
+            robot.setFlywheelRPM();
+            robot.setIndexer(gamepad2.right_trigger);
+            //robot.armLift.setPower(gamepad2.left_stick_y * robot.motorPower);
+
+>>>>>>> Stashed changes
 
 
             telemetry.addData("Red: ", robot.colorSensor.red());
