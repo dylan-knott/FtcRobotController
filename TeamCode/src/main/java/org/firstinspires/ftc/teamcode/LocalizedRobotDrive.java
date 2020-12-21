@@ -31,7 +31,7 @@ public class LocalizedRobotDrive {
 
     //Hardware
     public DcMotor intake;
-    public DcMotor leftFlywheel, rightFlywheel, armLift;
+    public DcMotorEx leftFlywheel, rightFlywheel, armLift;
     public Servo clawServo;
     public CRServo indexer, intakeBelt;
     public DistanceSensor dist = null;
@@ -63,9 +63,9 @@ public class LocalizedRobotDrive {
 
         //Expansion hub 2 motors
         intake = hardwareMap.dcMotor.get("intake_motor");
-        leftFlywheel= hardwareMap.dcMotor.get("left_flywheel_motor");
-        rightFlywheel = hardwareMap.dcMotor.get("right_flywheel_motor");
-        armLift = hardwareMap.dcMotor.get("arm_lift");
+        leftFlywheel= (DcMotorEx) hardwareMap.dcMotor.get("left_flywheel_motor");
+        rightFlywheel = (DcMotorEx) hardwareMap.dcMotor.get("right_flywheel_motor");
+        armLift = (DcMotorEx) hardwareMap.dcMotor.get("arm_lift");
 
         //Expansion hub 1 servos
         clawServo = hardwareMap.servo.get("claw_servo");
@@ -187,6 +187,12 @@ public class LocalizedRobotDrive {
         leftFlywheel.setPower(power);
     }
 
+    public void setFlywheelsRPM()
+    {
+        rightFlywheel.setVelocity(5, AngleUnit.DEGREES);
+        leftFlywheel.setVelocity(5, AngleUnit.DEGREES);
+
+    }
     public void setIndexer(double inputSpeed) {
         indexer.setPower(inputSpeed);
     }
