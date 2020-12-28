@@ -11,21 +11,20 @@ public class OpenCVOp extends LinearOpMode {
     RingDeterminationPipeline ringDeterm = new RingDeterminationPipeline(LocalizedRobotDrive.allianceColor.red);
     GoalDeterminationPipeline goalDeterm = new GoalDeterminationPipeline(LocalizedRobotDrive.allianceColor.red);
     IntakePipeline intakePipeline = new IntakePipeline();
-    SamplePipeline samplePipeline = new SamplePipeline();
 
     public void runOpMode(){
 
-        openCV.initOpenCV(hardwareMap, telemetry, ringDeterm, intakePipeline);
+        openCV.initOpenCV(hardwareMap, telemetry, goalDeterm, intakePipeline);
 
+        openCV.startStream();
         waitForStart();
-        //openCV.startStream(openCV.PHONE_CAM);
-
-        //openCV.togglePhoneFlash(true);
+        openCV.togglePhoneFlash(true);
             while (opModeIsActive()) {
-                /*telemetry.addData("Target Point: ", goalDeterm.getTargetPoint());
+                telemetry.addData("Target Point: ", goalDeterm.getTargetPoint());
                 telemetry.addData("Line Matrix: ", goalDeterm.getLineMatrix());
-                telemetry.update();*/
+                telemetry.update();
             }
+            openCV.togglePhoneFlash(false);
             openCV.stopStream();
             openCV.closeCamera();
     }

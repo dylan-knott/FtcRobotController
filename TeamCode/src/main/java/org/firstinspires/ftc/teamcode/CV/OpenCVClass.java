@@ -19,12 +19,15 @@ public class OpenCVClass {
 
     public OpenCvCamera activeCam;
 
-    private OpenCvCamera phoneCam;
+    public OpenCvPipeline phonePipeline;
+    public OpenCvPipeline webcamPipeline;
+
+    private OpenCvInternalCamera phoneCam;
     private OpenCvCamera webCam;
 
     private Telemetry telemetry;
 
-    public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, OpenCvPipeline phonePipeline, OpenCvPipeline webcamPipeline) {
+    public void initOpenCV(HardwareMap hardwareMap, Telemetry telem, OpenCvPipeline phonePipe, OpenCvPipeline webcamPipe) {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         int[] viewportContainerIds = OpenCvCameraFactory.getInstance()
@@ -39,23 +42,21 @@ public class OpenCVClass {
         //phoneCam.openCameraDevice();
         //webCam.openCameraDevice();
 
-        phoneCam.setPipeline(phonePipeline);
-        webCam.setPipeline(webcamPipeline);
+        phonePipeline = phonePipe;
+        webcamPipeline = webcamPipe;
     }
 
 
 
-    public void startStream(int active) {
+    public void startStream() {
 
-        //webCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-        //phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
 
         webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 
             @Override
             public void onOpened() {
+                webCam.setPipeline(webcamPipeline);
                 webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-                activeCam = webCam;
             }
         });
 
@@ -63,52 +64,24 @@ public class OpenCVClass {
 
             @Override
             public void onOpened() {
+                phoneCam.setPipeline(phonePipeline);
                 phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
                 activeCam = phoneCam;
             }
         });
-        /*
-        switch (active) {
-            case 0:
-                telemetry.addLine("In switch" + active);
-                telemetry.update();
-                // Start streaming
-                phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-                    @Override
-                    public void onOpened() {
-                        telemetry.addLine("In onOpened");
-                        telemetry.update();
-                        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-                        activeCam = phoneCam;
-                    }
-                });
-            break;
-            case 1:
-                // Start streaming
-                webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-                    @Override
-                    public void onOpened() {
-                        webCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-                        activeCam = webCam;
-                    }
-                });
-            break;
-        }*/
     }
 
     public void togglePhoneFlash(boolean state) {
-            //phoneCam.setFlashlightEnabled(state);
+            phoneCam.setFlashlightEnabled(state);
 
     }
 
     public void stopStream() {
-        //activeCam.stopStreaming();
         phoneCam.stopStreaming();
         webCam.stopStreaming();
     }
 
     public void closeCamera() {
-        //activeCam.closeCameraDevice();
         phoneCam.closeCameraDevice();
         webCam.closeCameraDevice();
     }
@@ -278,8 +251,8 @@ class GoalDeterminationPipeline extends OpenCvPipeline {
     LocalizedRobotDrive.allianceColor teamColor;
 
     //Some constants
-    static final int SCREEN_HEIGHT = 640;
-    static final int SCREEN_WIDTH = 480;
+    static final int SCREEN_HEIGHT = 320;
+    static final int SCREEN_WIDTH = 240;
 
 
     //Constants for line-segment detection
