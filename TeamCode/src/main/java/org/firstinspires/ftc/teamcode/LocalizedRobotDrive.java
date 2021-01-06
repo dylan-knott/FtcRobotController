@@ -197,19 +197,8 @@ public class LocalizedRobotDrive {
         indexer.setPower(inputSpeed);
     }
 
-    public void enableIntake(boolean state) {
-        if (state) //Intake is enabled
-        {
-            intake.setPower(intakeSpeed);
-            //TODO: Controlling stacking and inner intake system
-
-
-        } else { // Intake is disabled
-            intake.setPower(0);
-            //TODO: Controlling stacking and inner intake system
-
-
-        }
+    public void enableIntake(float power) {
+            intake.setPower(power * intakeSpeed);
     }
     /*******************************************UTILITIES*******************************************/
     //Creating a clamp method for both floats and doubles, used to make sure motor power doesn't go above a certain power level as to saturate the motors

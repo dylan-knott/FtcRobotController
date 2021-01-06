@@ -121,8 +121,8 @@ public class APMecanumDrive extends MecanumDrive {
 
         leftFront = hardwareMap.get(DcMotorEx.class, "front_left_motor");
         leftRear = hardwareMap.get(DcMotorEx.class, "back_left_motor");
-        rightRear = hardwareMap.get(DcMotorEx.class, "back_right_motor");
-        rightFront = hardwareMap.get(DcMotorEx.class, "front_right_motor");
+        rightRear = hardwareMap.get(DcMotorEx.class, "front_right_motor");
+        rightFront = hardwareMap.get(DcMotorEx.class, "back_right_motor");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -369,8 +369,8 @@ public class APMecanumDrive extends MecanumDrive {
     public void setMotorPowers(double lf, double lr, double rf, double rr) {
         leftFront.setPower(lf);
         leftRear.setPower(lr);
-        rightRear.setPower(rr);
         rightFront.setPower(rf);
+        rightRear.setPower(rr);
     }
 
     @Override

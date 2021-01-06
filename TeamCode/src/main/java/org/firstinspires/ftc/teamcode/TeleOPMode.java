@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -16,22 +17,34 @@ public class TeleOPMode extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            //Gamepad 1  ***Drivetrain***
-            double forward = -gamepad1.left_stick_y; //The y direction on the gamepad is reversed idk why
-            double strafe = gamepad1.left_stick_x;
-            double rotate = gamepad1.right_stick_x;
 
-
+            //This code is not currently active as we are transitioning from old tele-op to a road-runner implemented tele-op
+            /*
             if (gamepad1.left_bumper) robot.motorPower = 0.2;
             else if (gamepad1.right_bumper) robot.motorPower= 0.15;
             else robot.motorPower = 0.8;
-            //Wheel control
-            robot.mixDrive(forward, strafe, rotate);
+            */
+
+            //Roadrunner-based movement code for teleop
+            /*robot.rrDrive.setWeightedDrivePower(
+                    new Pose2d(
+                            -gamepad1.left_stick_y,
+                            -gamepad1.left_stick_x,
+                            -gamepad1.right_stick_x
+                    )
+            );*/
+
+            robot.rrDrive.update();
+
+            Pose2d poseEstimate = robot.rrDrive.getPoseEstimate();
+            telemetry.addData("x", poseEstimate.getX());
+            telemetry.addData("y", poseEstimate.getY());
+            telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.update();
 
             //Gamepad 2  ***Gun and intake***
-            robot.enableIntake(gamepad2.right_bumper);
-            //robot.setFlywheels(gamepad2.left_trigger);
-            robot.setFlywheelsRPM();
+            robot.enableIntake(gamepad2.right_stick_y);
+            robot.setFlywheels(-gamepad2.left_stick_y);
             robot.setIndexer(gamepad2.right_trigger);
             //robot.armLift.setPower(gamepad2.left_stick_y * robot.motorPower);
 
