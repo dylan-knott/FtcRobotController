@@ -55,7 +55,7 @@ public class LocalizedRobotDrive {
 
         //Expansion hub 2 motors
         intake = hardwareMap.dcMotor.get("intake_motor");
-        flywheel = (DcMotorEx) hardwareMap.dcMotor.get("left_flywheel_motor");
+        flywheel = (DcMotorEx) hardwareMap.dcMotor.get("flywheel_motor");
         armLift = hardwareMap.dcMotor.get("arm_lift");
         intakeBelt = hardwareMap.dcMotor.get("conveyor");
 
@@ -64,6 +64,7 @@ public class LocalizedRobotDrive {
         clawServo = hardwareMap.servo.get("claw_servo");
         rampLift = hardwareMap.servo.get("ramp_lift");
         intakeRelease = hardwareMap.servo.get("intake_release");
+
         dist = hardwareMap.get(DistanceSensor.class, "distance");
 
         //Motor Initialization
@@ -169,14 +170,20 @@ public class LocalizedRobotDrive {
        flywheel.setPower(power);
     }
 
-    public void setFlywheelsRPM()
+    public void setFlywheelsRPM(float power)
     {
-        flywheel.setVelocity(5, AngleUnit.DEGREES);
+        double rpmToTps = 28/60;
+
+        flywheel.setVelocity(5 * rpmToTps * power);
 
     }
 
     public void enableIntake(float power) {
             intake.setPower(power * intakeSpeed);
+    }
+
+    public void releaseIntake() {
+        intakeRelease.setPosition(90);
     }
     /*******************************************UTILITIES*******************************************/
     //Creating a clamp method for both floats and doubles, used to make sure motor power doesn't go above a certain power level as to saturate the motors

@@ -34,26 +34,29 @@ public class TeleOPMode extends LinearOpMode {
                     )
             );*/
 
+
+
+
             robot.rrDrive.update();
 
             Pose2d poseEstimate = robot.rrDrive.getPoseEstimate();
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
             telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.addData("Right trigger values ", gamepad2.right_trigger);
             telemetry.update();
 
             //Gamepad 2  ***Gun and intake***
             robot.enableIntake(gamepad2.right_stick_y);
             robot.setFlywheels(-gamepad2.left_stick_y);
-            robot.setIndexer(gamepad2.right_trigger);
+            robot.setFlywheelsRPM(gamepad2.right_trigger);
             //robot.armLift.setPower(gamepad2.left_stick_y * robot.motorPower);
 
+            robot.releaseIntake();
 
 
-            telemetry.addData("Red: ", robot.floorColor.red());
-            telemetry.addData("Green: ", robot.floorColor.green());
-            telemetry.addData("Blue: ", robot.floorColor.blue());
             telemetry.addData("Distance: ", robot.dist.getDistance(DistanceUnit.INCH));
+
             telemetry.update();
         }
         }
