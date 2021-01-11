@@ -11,9 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
-import java.util.Locale;
 
 public class LocalizedRobotDrive {
     //Proportional Processing values for distance to drive function
@@ -26,17 +24,11 @@ public class LocalizedRobotDrive {
     allianceColor teamColor = null;
     public APMecanumDrive rrDrive = null;
 
-    //Servo function constants
-    private final double INDEXER_SPEED = 0.7;
-
     //Hardware
-    public DcMotor intake;
-    public DcMotorEx leftFlywheel, rightFlywheel, armLift;
-    public Servo clawServo;
-    public CRServo indexer, intakeBelt;
+    public DcMotor intake, armLift, intakeBelt;
+    public DcMotorEx flywheel;
+    public Servo clawServo, rampLift,intakeRelease;
     public DistanceSensor dist = null;
-    public ColorSensor floorColor = null;
-    public ColorSensor intakeColor = null;
 
     //Default motor power levels for wheels
     public double motorPower = 0.8;
@@ -63,35 +55,31 @@ public class LocalizedRobotDrive {
 
         //Expansion hub 2 motors
         intake = hardwareMap.dcMotor.get("intake_motor");
-        leftFlywheel= (DcMotorEx) hardwareMap.dcMotor.get("left_flywheel_motor");
-        rightFlywheel = (DcMotorEx) hardwareMap.dcMotor.get("right_flywheel_motor");
-        armLift = (DcMotorEx) hardwareMap.dcMotor.get("arm_lift");
+        flywheel = (DcMotorEx) hardwareMap.dcMotor.get("left_flywheel_motor");
+        armLift = hardwareMap.dcMotor.get("arm_lift");
+        intakeBelt = hardwareMap.dcMotor.get("conveyor");
+
 
         //Expansion hub 1 servos
         clawServo = hardwareMap.servo.get("claw_servo");
-        indexer = hardwareMap.crservo.get("index_servo");
-        intakeBelt = hardwareMap.crservo.get("intake_servo");
-
+        rampLift = hardwareMap.servo.get("ramp_lift");
+        intakeRelease = hardwareMap.servo.get("intake_release");
         dist = hardwareMap.get(DistanceSensor.class, "distance");
-        floorColor = hardwareMap.get(ColorSensor.class, "floor_color");
-        intakeColor = hardwareMap.get(ColorSensor.class, "intake_color");
-
 
         //Motor Initialization
+        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftFlywheel.setDirection(DcMotor.Direction.REVERSE);
-        rightFlywheel.setDirection(DcMotor.Direction.REVERSE);
+        flywheel.setDirection(DcMotor.Direction.REVERSE);
 
+
+        /*
         //Sensor Initialization
         if (floorColor instanceof SwitchableLight) {
             ((SwitchableLight)floorColor).enableLight(false);
         }
-
-        //Sensor Initialization
-        if (intakeColor instanceof SwitchableLight) {
-            ((SwitchableLight)intakeColor).enableLight(false);
-        }
-
+        */
 
     }
 
@@ -171,30 +159,20 @@ public class LocalizedRobotDrive {
     /******************************************GAME FUNCTIONS********************************************/
 
     public void fireRing(double inputSpeed) throws InterruptedException{
-        if (ringCount > 0) {
-            indexer.setPower(inputSpeed);
-            wait(10);
-            indexer.setPower(0);
-            ringCount -=1;
-        }
+
     }
 
-    public void setFlywheels(double inputSpeed) {
-        //Remap input to respect the max speed
-        double power = inputSpeed * flywheelSpeed;
+    public void setFlywheels(double inputPower) {
+        //Remap input to the max power
+        double power = inputPower * flywheelSpeed;
 
-        rightFlywheel.setPower(power);
-        leftFlywheel.setPower(power);
+       flywheel.setPower(power);
     }
 
     public void setFlywheelsRPM()
     {
-        rightFlywheel.setVelocity(5, AngleUnit.DEGREES);
-        leftFlywheel.setVelocity(5, AngleUnit.DEGREES);
+        flywheel.setVelocity(5, AngleUnit.DEGREES);
 
-    }
-    public void setIndexer(double inputSpeed) {
-        indexer.setPower(inputSpeed);
     }
 
     public void enableIntake(float power) {
