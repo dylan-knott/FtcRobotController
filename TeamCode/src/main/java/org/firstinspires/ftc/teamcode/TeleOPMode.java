@@ -48,12 +48,12 @@ public class TeleOPMode extends LinearOpMode {
 
             //Gamepad 2  ***Gun and intake***
             robot.enableIntake(gamepad2.right_stick_y);
-            robot.setFlywheels(-gamepad2.left_stick_y);
+            //robot.setFlywheels(-gamepad2.left_stick_y);
             robot.setFlywheelsRPM(gamepad2.right_trigger);
             //robot.armLift.setPower(gamepad2.left_stick_y * robot.motorPower);
 
-            robot.releaseIntake();
-
+            if (gamepad1.x) robot.releaseIntake();
+            if (gamepad1.y) robot.toggleRamp();
 
             telemetry.addData("Distance: ", robot.dist.getDistance(DistanceUnit.INCH));
 
