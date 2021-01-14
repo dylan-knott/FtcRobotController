@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -69,7 +70,9 @@ public class LocalizedRobotDrive {
 
         //Motor Initialization
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        armLift.setTargetPosition(0);
+        armLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armLift.setPower(motorPower);
         intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
@@ -176,6 +179,14 @@ public class LocalizedRobotDrive {
 
         flywheel.setVelocity(5 * rpmToTps * power);
 
+    }
+
+    public void raiseArm(int pos)
+    {
+        final double _ARM_RATIO_ = (60 * (20/15));
+
+        armLift.setTargetPosition((int)(pos * _ARM_RATIO_));
+        armLift.setPower(motorPower);
     }
 
     public void enableIntake(float power) {

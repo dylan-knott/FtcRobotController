@@ -54,6 +54,8 @@ public class TeleOPMode extends LinearOpMode {
 
             robot.releaseIntake();
 
+            if(gamepad2.dpad_up) robot.raiseArm(14);
+            if(gamepad2.dpad_down) robot.raiseArm(0);
 
             telemetry.addData("Distance: ", robot.dist.getDistance(DistanceUnit.INCH));
 
