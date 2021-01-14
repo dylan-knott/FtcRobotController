@@ -39,6 +39,11 @@ public class LocalizedRobotDrive {
 
     //Debug the error angle in order to get this value, sets the offset to which the robot will turn to meet the required degrees turned
     private final double TURNING_BUFFER = 0;
+    private final double RPM_TO_TPS = 28/60;
+
+    //Up = false, Down = true
+    private boolean rampState = false;
+
 
     public enum direction {
         left, right
@@ -77,6 +82,11 @@ public class LocalizedRobotDrive {
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
 
+        //Initialize servos
+        rampState = false;
+        clawServo.setPosition(0);
+        rampLift.setPosition(0);
+        intakeRelease.setPosition(0);
 
         /*
         //Sensor Initialization
@@ -175,9 +185,7 @@ public class LocalizedRobotDrive {
 
     public void setFlywheelsRPM(float power)
     {
-        double rpmToTps = 28/60;
-
-        flywheel.setVelocity(5 * rpmToTps * power);
+        flywheel.setVelocity(5 * RPM_TO_TPS * power);
 
     }
 
@@ -194,7 +202,19 @@ public class LocalizedRobotDrive {
     }
 
     public void releaseIntake() {
-        intakeRelease.setPosition(90);
+        intakeRelease.setPosition(90.0f / 280);
+    }
+
+    public void toggleRamp() {
+        //Ramp is down
+        if (rampState) {
+            rampLift.setPosition(0);
+            rampState = false;
+        }
+        else{
+            rampLift.setPosition( 30.0f / 270);
+            rampState = true;
+        }
     }
     /*******************************************UTILITIES*******************************************/
     //Creating a clamp method for both floats and doubles, used to make sure motor power doesn't go above a certain power level as to saturate the motors
