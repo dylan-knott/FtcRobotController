@@ -16,22 +16,34 @@ public class TeleOPMode extends LinearOpMode {
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         drive = robot.rrDrive;
 
+        //Values to send to pose2d for driving
+        double forward = 0;
+        double fExpo = 1.96;
+        double strafe = 0;
+        double sExpo = 1.96;
+        double turn = 0;
+        double tExpo = 1.96;
+
+        //Boolean values used in order to stop toggles from activating multiple times for a single button press
+        boolean g1x_state = false;
+        boolean g1y_state = false;
+
+
         waitForStart();
 
         while (opModeIsActive()) {
 
-            //This code is not currently active as we are transitioning from old tele-op to a road-runner implemented tele-op
-            /*
-            if (gamepad1.left_bumper) robot.motorPower = 0.2;
-            else if (gamepad1.right_bumper) robot.motorPower= 0.15;
-            else robot.motorPower = 0.8;
-            */
+            //Movement code
+            forward = Math.pow(-gamepad1.left_stick_y, fExpo);
+            strafe = Math.pow(-gamepad1.left_stick_x, sExpo);
+            turn = Math.pow(-gamepad1.right_stick_x, tExpo);
+
 
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -gamepad1.left_stick_y,
-                            -gamepad1.left_stick_x,
-                            -gamepad1.right_stick_x
+                            forward,
+                            strafe,
+                            turn
                     )
             );
 
@@ -43,23 +55,28 @@ public class TeleOPMode extends LinearOpMode {
             telemetry.addData("heading", poseEstimate.getHeading());
             telemetry.update();
 
+
+
             //Gamepad 1  ***Drivetrain***
-            if (gamepad1.x) robot.releaseIntake();
-            if (gamepad1.y) robot.toggleRamp();
+            if (gamepad1.x && !g1x_state){
+                robot.releaseIntake();
+                g1x_state = true;
+            } else g1x_state = false;
+
+
+            if (gamepad1.y && !g1y_state){
+                robot.toggleRamp();
+                g1y_state = true;
+            } else g1y_state = false;
+
+
 
             //Gamepad 2  ***Gun and intake***
             robot.enableIntake(gamepad2.right_stick_y);
             robot.setFlywheelsRPM(gamepad2.right_trigger);
 
-            robot.releaseIntake();
-
             if(gamepad2.dpad_up) robot.raiseArm(14);
             if(gamepad2.dpad_down) robot.raiseArm(0);
-
-            telemetry.addData("Distance: ", robot.dist.getDistance(DistanceUnit.INCH));
-
-            telemetry.update();
         }
         }
-
     }
