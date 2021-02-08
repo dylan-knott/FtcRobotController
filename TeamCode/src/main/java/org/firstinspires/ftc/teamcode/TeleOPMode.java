@@ -77,6 +77,7 @@ public class TeleOPMode extends LinearOpMode {
 
             if(gamepad2.dpad_up) robot.raiseArm(14);
             if(gamepad2.dpad_down) robot.raiseArm(0);
+            if(gamepad2.right_bumper) robot.toggleClaw();
         }
         }
     }

@@ -30,6 +30,7 @@ public class LocalizedRobotDrive {
     public DcMotorEx flywheel;
     public Servo clawServo, rampLift,intakeRelease;
     public DistanceSensor dist = null;
+    public DigitalChannel armLimit = null;
 
     //Default motor power levels for wheels
     public double motorPower = 0.8;
@@ -43,6 +44,8 @@ public class LocalizedRobotDrive {
 
     //Up = false, Down = true
     private boolean rampState = false;
+    //Open = false, Closed = true
+    private boolean clawState = false;
 
 
     public enum direction {
@@ -65,6 +68,8 @@ public class LocalizedRobotDrive {
         armLift = hardwareMap.dcMotor.get("arm_lift");
         intakeBelt = hardwareMap.dcMotor.get("conveyor");
 
+        //Expansion hub 2 sensors
+        armLimit = hardwareMap.get(DigitalChannel.class, "arm_limit");
 
         //Expansion hub 1 servos
         clawServo = hardwareMap.servo.get("claw_servo");
@@ -75,15 +80,16 @@ public class LocalizedRobotDrive {
 
         //Motor Initialization
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armLift.setTargetPosition(0);
-        armLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armLift.setPower(motorPower);
         intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
 
+        //Initialize Arm
+        initializeArm();
+
         //Initialize servos
         rampState = false;
+        clawState = false;
         clawServo.setPosition(0);
         rampLift.setPosition(0);
         intakeRelease.setPosition(0);
@@ -95,6 +101,18 @@ public class LocalizedRobotDrive {
         }
         */
 
+    }
+
+    public void initializeArm()
+    {
+        //Set motor to run_without_encoder
+        armLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //Run arm back until switch is activated
+        armLift.setPower(-0.4);
+        while (!armLimit.getState());
+        armLift.setPower(0);
+        //Set motor to run_to_position
+        armLift.setMode((DcMotor.RunMode.RUN_TO_POSITION));
     }
 
 
@@ -191,7 +209,7 @@ public class LocalizedRobotDrive {
 
     public void raiseArm(int pos)
     {
-        final double _ARM_RATIO_ = (60 * (20/15));
+        final double _ARM_RATIO_ = (60 * (20.0f / 15));
 
         armLift.setTargetPosition((int)(pos * _ARM_RATIO_));
         armLift.setPower(motorPower);
@@ -212,8 +230,22 @@ public class LocalizedRobotDrive {
             rampState = false;
         }
         else{
-            rampLift.setPosition( 30.0f / 270);
+            rampLift.setPosition(30.0f / 270);
             rampState = true;
+        }
+    }
+
+    public void toggleClaw()
+    {
+        if (clawState == true) //claw is closed
+        {
+            clawServo.setPosition(0); //open claw
+            clawState = false;
+        }
+        else
+        {
+            clawServo.setPosition(60.0f / 270); //close claw
+            clawState = true;
         }
     }
     /*******************************************UTILITIES*******************************************/
