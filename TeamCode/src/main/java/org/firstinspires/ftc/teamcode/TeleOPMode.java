@@ -75,8 +75,8 @@ public class TeleOPMode extends LinearOpMode {
             robot.enableIntake(gamepad2.right_stick_y);
             robot.setFlywheelsRPM(gamepad2.right_trigger);
 
-            if(gamepad2.dpad_up) robot.raiseArm(14);
-            if(gamepad2.dpad_down) robot.raiseArm(0);
+            if(gamepad2.dpad_up) robot.setArm(14);
+            if(gamepad2.dpad_down) robot.setArm(0);
             if(gamepad2.right_bumper) robot.toggleClaw();
         }
         }

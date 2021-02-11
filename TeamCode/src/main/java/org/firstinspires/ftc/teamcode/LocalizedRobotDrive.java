@@ -112,6 +112,7 @@ public class LocalizedRobotDrive {
         while (!armLimit.getState());
         armLift.setPower(0);
         //Set motor to run_to_position
+        armLift.setTargetPosition(0);
         armLift.setMode((DcMotor.RunMode.RUN_TO_POSITION));
     }
 
@@ -207,12 +208,13 @@ public class LocalizedRobotDrive {
 
     }
 
-    public void raiseArm(int pos)
+    public void setArm(int posDegrees)
     {
-        final double _ARM_RATIO_ = (60 * (20.0f / 15));
-
-        armLift.setTargetPosition((int)(pos * _ARM_RATIO_));
+        final double _ARM_RATIO_ = (60 * (20.0f / 15) * (15.0f / 10 ));
+        armLift.setTargetPosition((int)(posDegrees * _ARM_RATIO_));
         armLift.setPower(motorPower);
+        while(armLift.isBusy());
+        armLift.setPower(0);
     }
 
     public void enableIntake(float power) {
@@ -237,7 +239,7 @@ public class LocalizedRobotDrive {
 
     public void toggleClaw()
     {
-        if (clawState == true) //claw is closed
+        if (clawState) //claw is closed
         {
             clawServo.setPosition(0); //open claw
             clawState = false;
