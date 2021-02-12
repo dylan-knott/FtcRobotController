@@ -58,21 +58,25 @@ public class TeleOPMode extends LinearOpMode {
 
 
             //Gamepad 1  ***Drivetrain***
-            if (gamepad1.x && !g1x_state){
-                robot.releaseIntake();
-                g1x_state = true;
+            if (gamepad1.x){
+                if (!g1x_state) {
+                    robot.setIntakeRelease(90);
+                    g1x_state = true;
+                }
             } else g1x_state = false;
 
 
-            if (gamepad1.y && !g1y_state){
-                robot.toggleRamp();
-                g1y_state = true;
+            if (gamepad1.y){
+                if (!g1y_state) {
+                    robot.toggleRamp();
+                    g1y_state = true;
+                }
             } else g1y_state = false;
 
 
 
             //Gamepad 2  ***Gun and intake***
-            robot.enableIntake(gamepad2.right_stick_y);
+            robot.setIntake(gamepad2.right_stick_y);
             robot.setFlywheelsRPM(gamepad2.right_trigger);
 
             if(gamepad2.dpad_up) robot.setArm(14);

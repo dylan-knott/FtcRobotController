@@ -2,15 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.qualcomm.hardware.ams.AMSColorSensor;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 
 
@@ -28,19 +21,20 @@ public class LocalizedRobotDrive {
     //Hardware
     public DcMotor intake, armLift, intakeBelt;
     public DcMotorEx flywheel;
-    public Servo clawServo, rampLift,intakeRelease;
+    public Servo clawServo, rampLift, intakeRelease, indexer;
     public DistanceSensor dist = null;
     public DigitalChannel armLimit = null;
 
     //Default motor power levels for wheels
     public double motorPower = 0.8;
-    public double flywheelSpeed = 1;
-    public double intakeSpeed = 1;
+    public double flywheelPower = 1;
+    public double intakePower = 1;
+    public double armPower = 0.4;
     public int ringCount = 3;
 
     //Debug the error angle in order to get this value, sets the offset to which the robot will turn to meet the required degrees turned
     private final double TURNING_BUFFER = 0;
-    private final double RPM_TO_TPS = 28/60;
+    private final double RPM_TO_TPS = 28.0f /60;
 
     //Up = false, Down = true
     private boolean rampState = false;
@@ -75,6 +69,7 @@ public class LocalizedRobotDrive {
         clawServo = hardwareMap.servo.get("claw_servo");
         rampLift = hardwareMap.servo.get("ramp_lift");
         intakeRelease = hardwareMap.servo.get("intake_release");
+        indexer = hardwareMap.servo.get("indexer");
 
         dist = hardwareMap.get(DistanceSensor.class, "distance");
 
@@ -82,6 +77,7 @@ public class LocalizedRobotDrive {
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         flywheel.setDirection(DcMotor.Direction.REVERSE);
 
         //Initialize Arm
@@ -94,12 +90,13 @@ public class LocalizedRobotDrive {
         rampLift.setPosition(0);
         intakeRelease.setPosition(0);
 
-        /*
+
         //Sensor Initialization
-        if (floorColor instanceof SwitchableLight) {
+        /*if (floorColor instanceof SwitchableLight) {
             ((SwitchableLight)floorColor).enableLight(false);
-        }
-        */
+        }*/
+        armLimit.setMode(DigitalChannel.Mode.INPUT);
+
 
     }
 
@@ -108,9 +105,9 @@ public class LocalizedRobotDrive {
         //Set motor to run_without_encoder
         armLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //Run arm back until switch is activated
-        armLift.setPower(-0.4);
+        armLift.setPower(-armPower);
         while (!armLimit.getState());
-        armLift.setPower(0);
+
         //Set motor to run_to_position
         armLift.setTargetPosition(0);
         armLift.setMode((DcMotor.RunMode.RUN_TO_POSITION));
@@ -197,14 +194,16 @@ public class LocalizedRobotDrive {
 
     public void setFlywheels(double inputPower) {
         //Remap input to the max power
-        double power = inputPower * flywheelSpeed;
+        double power = inputPower * flywheelPower;
 
        flywheel.setPower(power);
     }
 
     public void setFlywheelsRPM(float power)
     {
-        flywheel.setVelocity(5 * RPM_TO_TPS * power);
+        double flywheelAngularVelocity = 5 * RPM_TO_TPS * power;
+        flywheel.setVelocity(flywheelAngularVelocity);
+        telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
 
     }
 
@@ -212,17 +211,14 @@ public class LocalizedRobotDrive {
     {
         final double _ARM_RATIO_ = (60 * (20.0f / 15) * (15.0f / 10 ));
         armLift.setTargetPosition((int)(posDegrees * _ARM_RATIO_));
-        armLift.setPower(motorPower);
-        while(armLift.isBusy());
-        armLift.setPower(0);
     }
 
-    public void enableIntake(float power) {
-            intake.setPower(power * intakeSpeed);
+    public void setIntake(float power) {
+            intake.setPower(power * intakePower);
     }
 
-    public void releaseIntake() {
-        intakeRelease.setPosition(90.0f / 280);
+    public void setIntakeRelease(float degrees) {
+        intakeRelease.setPosition(degrees / 280);
     }
 
     public void toggleRamp() {
