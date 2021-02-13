@@ -19,22 +19,19 @@ public class LocalizedRobotDrive {
     public APMecanumDrive rrDrive = null;
 
     //Hardware
-    public DcMotor intake, armLift, intakeBelt;
-    public DcMotorEx flywheel;
-    public Servo clawServo, rampLift, intakeRelease, indexer;
+    public DcMotor intake, armLift;
+    public Servo clawServo, intakeRelease;
     public DistanceSensor dist = null;
     public DigitalChannel armLimit = null;
 
     //Default motor power levels for wheels
     public double motorPower = 0.8;
-    public double flywheelPower = 1;
     public double intakePower = 1;
     public double armPower = 0.4;
     public int ringCount = 3;
 
     //Debug the error angle in order to get this value, sets the offset to which the robot will turn to meet the required degrees turned
     private final double TURNING_BUFFER = 0;
-    private final double RPM_TO_TPS = 28.0f /60;
 
     //Up = false, Down = true
     private boolean rampState = false;
@@ -58,27 +55,21 @@ public class LocalizedRobotDrive {
 
         //Expansion hub 2 motors
         intake = hardwareMap.dcMotor.get("intake_motor");
-        flywheel = (DcMotorEx) hardwareMap.dcMotor.get("flywheel_motor");
         armLift = hardwareMap.dcMotor.get("arm_lift");
-        intakeBelt = hardwareMap.dcMotor.get("conveyor");
 
         //Expansion hub 2 sensors
         armLimit = hardwareMap.get(DigitalChannel.class, "arm_limit");
 
         //Expansion hub 1 servos
         clawServo = hardwareMap.servo.get("claw_servo");
-        rampLift = hardwareMap.servo.get("ramp_lift");
         intakeRelease = hardwareMap.servo.get("intake_release");
-        indexer = hardwareMap.servo.get("indexer");
+
 
         dist = hardwareMap.get(DistanceSensor.class, "distance");
 
         //Motor Initialization
-        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        flywheel.setDirection(DcMotor.Direction.REVERSE);
 
         //Initialize Arm
         initializeArm();
@@ -87,7 +78,6 @@ public class LocalizedRobotDrive {
         rampState = false;
         clawState = false;
         clawServo.setPosition(0);
-        rampLift.setPosition(0);
         intakeRelease.setPosition(0);
 
 
@@ -96,8 +86,6 @@ public class LocalizedRobotDrive {
             ((SwitchableLight)floorColor).enableLight(false);
         }*/
         armLimit.setMode(DigitalChannel.Mode.INPUT);
-
-
     }
 
     public void initializeArm()
@@ -188,24 +176,6 @@ public class LocalizedRobotDrive {
 
     /******************************************GAME FUNCTIONS********************************************/
 
-    public void fireRing(double inputSpeed) throws InterruptedException{
-
-    }
-
-    public void setFlywheels(double inputPower) {
-        //Remap input to the max power
-        double power = inputPower * flywheelPower;
-
-       flywheel.setPower(power);
-    }
-
-    public void setFlywheelsRPM(float power)
-    {
-        double flywheelAngularVelocity = 5 * RPM_TO_TPS * power;
-        flywheel.setVelocity(flywheelAngularVelocity);
-        telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
-
-    }
 
     public void setArm(int posDegrees)
     {
@@ -219,18 +189,6 @@ public class LocalizedRobotDrive {
 
     public void setIntakeRelease(float degrees) {
         intakeRelease.setPosition(degrees / 280);
-    }
-
-    public void toggleRamp() {
-        //Ramp is down
-        if (rampState) {
-            rampLift.setPosition(0);
-            rampState = false;
-        }
-        else{
-            rampLift.setPosition(30.0f / 270);
-            rampState = true;
-        }
     }
 
     public void toggleClaw()

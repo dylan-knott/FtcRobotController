@@ -6,14 +6,19 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
 @TeleOp(name= "TeleOp", group= "TeleOp")
 public class TeleOPMode extends LinearOpMode {
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
+    ProjectileSystems shooter = new ProjectileSystems();
     APMecanumDrive drive = null;
 
     public void runOpMode() throws InterruptedException{
+
+        //init for robot and shooter
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
+        shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         drive = robot.rrDrive;
 
         //Values to send to pose2d for driving
@@ -48,6 +53,7 @@ public class TeleOPMode extends LinearOpMode {
             );
 
             drive.update();
+            shooter.update();
 
             Pose2d poseEstimate = drive.getPoseEstimate();
             telemetry.addData("x", poseEstimate.getX());
@@ -66,18 +72,9 @@ public class TeleOPMode extends LinearOpMode {
             } else g1x_state = false;
 
 
-            if (gamepad1.y){
-                if (!g1y_state) {
-                    robot.toggleRamp();
-                    g1y_state = true;
-                }
-            } else g1y_state = false;
-
-
-
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y);
-            robot.setFlywheelsRPM(gamepad2.right_trigger);
+            shooter.setFlywheelsRPM(gamepad2.right_trigger);
 
             if(gamepad2.dpad_up) robot.setArm(14);
             if(gamepad2.dpad_down) robot.setArm(0);
