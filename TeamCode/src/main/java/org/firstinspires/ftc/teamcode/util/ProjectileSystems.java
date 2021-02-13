@@ -103,8 +103,8 @@ public class ProjectileSystems
                 //reloader.setPosition(0);
                 break;
             case PRIME:
-                Thread.sleep(5000)
-                intakeBelt.
+                //Thread.sleep(5000)
+                //intakeBelt.
                 break;
         }
 
