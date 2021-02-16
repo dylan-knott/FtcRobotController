@@ -176,6 +176,28 @@ public class LocalizedRobotDrive {
 
     /******************************************GAME FUNCTIONS********************************************/
 
+<<<<<<< Updated upstream
+=======
+    public void fireRing(double inputSpeed) throws InterruptedException{
+
+    }
+
+    public void setFlywheels(double inputPower) {
+        //Remap input to the max power
+        double power = inputPower * flywheelPower;
+
+       flywheel.setPower(power);
+    }
+
+    public void setFlywheelsRPM(float power)
+    {
+        double flywheelAngularVelocity = 5 * RPM_TO_TPS * power;
+        flywheel.setVelocity(flywheelAngularVelocity);
+        telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
+        telemetry.update();
+
+    }
+>>>>>>> Stashed changes
 
     public void setArm(int posDegrees)
     {
@@ -185,6 +207,10 @@ public class LocalizedRobotDrive {
 
     public void setIntake(float power) {
             intake.setPower(power * intakePower);
+    }
+
+    public void setClaw(float position) {
+            clawServo.setPosition(position);
     }
 
     public void setIntakeRelease(float degrees) {

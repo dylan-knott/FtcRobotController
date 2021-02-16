@@ -72,6 +72,20 @@ public class TeleOPMode extends LinearOpMode {
             } else g1x_state = false;
 
 
+<<<<<<< Updated upstream
+=======
+            if (gamepad1.y){
+                if (!g1y_state) {
+                    robot.toggleRamp();
+                    g1y_state = true;
+                }
+            } else g1y_state = false;
+
+            robot.setClaw(gamepad1.right_trigger);
+
+
+
+>>>>>>> Stashed changes
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y);
             //shooter.setFlywheelsRPM(gamepad2.right_trigger);
