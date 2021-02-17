@@ -22,12 +22,13 @@ public class TeleOPMode extends LinearOpMode {
         drive = robot.rrDrive;
 
         //Values to send to pose2d for driving
-        double forward = 0;
-        double fExpo = 1.96;
+        final double fExpo = 1.96;
+        final double sExpo = 1.96;
+        final double tExpo = 1.96;
+
         double strafe = 0;
-        double sExpo = 1.96;
+        double forward = 0;
         double turn = 0;
-        double tExpo = 1.96;
 
         //Boolean values used in order to stop toggles from activating multiple times for a single button press
         boolean g1x_state = false;
@@ -39,9 +40,9 @@ public class TeleOPMode extends LinearOpMode {
         while (opModeIsActive()) {
 
             //Movement code
-            forward = Math.pow(-gamepad1.left_stick_y, fExpo);
-            strafe = Math.pow(-gamepad1.left_stick_x, sExpo);
-            turn = Math.pow(-gamepad1.right_stick_x, tExpo);
+            forward = 0.6 * Math.tan(-gamepad1.left_stick_y * 1.0304);
+            strafe = 0.6 * Math.tan(-gamepad1.left_stick_x * 1.0304);
+            turn = 0.6 * Math.tan(-gamepad1.right_stick_x * 1.0304);
 
 
             drive.setWeightedDrivePower(
@@ -66,7 +67,7 @@ public class TeleOPMode extends LinearOpMode {
             //Gamepad 1  ***Drivetrain***
             if (gamepad1.x){
                 if (!g1x_state) {
-                    robot.setIntakeRelease(90);
+                    robot.toggleIntakeRelease();
                     g1x_state = true;
                 }
             } else g1x_state = false;

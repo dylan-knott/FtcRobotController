@@ -186,12 +186,23 @@ public class LocalizedRobotDrive {
             intake.setPower(power * intakePower);
     }
 
+    public void toggleIntakeRelease() {
+        if (intakeRelease.getPosition() == 90.0f / 280) { // Servo is down
+            setIntakeRelease(0);
+        }
+        else if (intakeRelease.getPosition() == 0) {
+            setIntakeRelease(90);
+
+        }
+
+    }
+
     public void setClaw(float position) {
             clawServo.setPosition(position);
     }
 
     public void setIntakeRelease(float degrees) {
-        intakeRelease.setPosition(degrees / 280);
+        intakeRelease.setPosition(degrees / 280.0f);
     }
 
     public void toggleClaw()

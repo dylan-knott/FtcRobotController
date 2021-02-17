@@ -59,6 +59,17 @@ public class APMecanumDrive extends MecanumDrive {
         FOLLOW_TRAJECTORY
     }
 
+    //Targets to aim at
+    public enum Target {
+        BLUE_TOWER,
+        RED_TOWER,
+        BLUE_POWERSHOT,
+        RED_POWERSHOT
+
+    }
+    //Positions for Game Elements
+    
+
     private FtcDashboard dashboard;
     private NanoClock clock;
 
@@ -205,6 +216,38 @@ public class APMecanumDrive extends MecanumDrive {
                 return new Pose2d();
         }
         throw new AssertionError();
+    }
+
+    //Returns straight line distance from current position to a given target
+    public double getDistanceToTarget(Target target){
+        switch(target) {
+            case RED_TOWER:
+                break;
+            case BLUE_TOWER:
+                break;
+            case BLUE_POWERSHOT:
+                break;
+            case RED_POWERSHOT:
+                break;
+
+        }
+
+    }
+
+    //Returns angle in radians from current position to a given target
+    public double getRadiansToTarget(Target target){
+        switch(target) {
+            case RED_TOWER:
+                break;
+            case BLUE_TOWER:
+                break;
+            case BLUE_POWERSHOT:
+                break;
+            case RED_POWERSHOT:
+                break;
+
+        }
+
     }
 
     public void update() {
