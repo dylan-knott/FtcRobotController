@@ -14,7 +14,7 @@ public class TeleOPMode extends LinearOpMode {
     ProjectileSystems shooter = new ProjectileSystems();
     APMecanumDrive drive = null;
 
-    public void runOpMode() throws InterruptedException{
+    public void runOpMode() throws InterruptedException {
 
         //init for robot and shooter
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
@@ -22,12 +22,13 @@ public class TeleOPMode extends LinearOpMode {
         drive = robot.rrDrive;
 
         //Values to send to pose2d for driving
-        double forward = 0;
-        double fExpo = 1.96;
+        final double fExpo = 1.96;
+        final double sExpo = 1.96;
+        final double tExpo = 1.96;
+
         double strafe = 0;
-        double sExpo = 1.96;
+        double forward = 0;
         double turn = 0;
-        double tExpo = 1.96;
 
         //Boolean values used in order to stop toggles from activating multiple times for a single button press
         boolean g1x_state = false;
@@ -39,9 +40,9 @@ public class TeleOPMode extends LinearOpMode {
         while (opModeIsActive()) {
 
             //Movement code
-            forward = Math.pow(-gamepad1.left_stick_y, fExpo);
-            strafe = Math.pow(-gamepad1.left_stick_x, sExpo);
-            turn = Math.pow(-gamepad1.right_stick_x, tExpo);
+            forward = 0.6 * Math.tan(-gamepad1.left_stick_y * 1.0304);
+            strafe = 0.6 * Math.tan(-gamepad1.left_stick_x * 1.0304);
+            turn = 0.6 * Math.tan(-gamepad1.right_stick_x * 1.0304);
 
 
             drive.setWeightedDrivePower(
@@ -62,21 +63,20 @@ public class TeleOPMode extends LinearOpMode {
             telemetry.update();
 
 
-
             //Gamepad 1  ***Drivetrain***
-            if (gamepad1.x){
-                if (!g1x_state) {
-                    robot.setIntakeRelease(90);
-                    g1x_state = true;
-                }
-            } else g1x_state = false;
-
+            if (gamepad1.x) robot.releaseIntake();
+            if (gamepad1.right_bumper) robot.toggleClaw();
 
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y);
-            if(gamepad2.dpad_up) robot.setArm(14);
-            if(gamepad2.dpad_down) robot.setArm(0);
-            if(gamepad2.right_bumper) robot.toggleClaw();
-        }
+            //shooter.setFlywheelsRPM(gamepad2.right_trigger);
+
+            if (gamepad2.dpad_up) robot.setArm(14);
+            if (gamepad2.dpad_down) robot.setArm(0);
+
+            if (isStopRequested()){
+                robot.stop();
+            }
         }
     }
+}
