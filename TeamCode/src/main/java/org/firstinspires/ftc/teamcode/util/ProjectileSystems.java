@@ -9,6 +9,9 @@ import com.vuforia.Device;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class ProjectileSystems
 {
     //Hardware declaration, need color sensers
@@ -24,6 +27,8 @@ public class ProjectileSystems
     LocalizedRobotDrive.allianceColor teamColor = null;
 
     private final double RPM_TO_TPS = 28.0f /60;
+
+    Timer timer = new Timer();
 
     private enum Mode
     {
@@ -95,19 +100,43 @@ public class ProjectileSystems
             case HOLDING:
                 flywheel.setVelocity(5 * RPM_TO_TPS * 0);
                 indexer.setPosition(0);
+                intakeBelt.setPower(0);
                 //reloader.setPosition(0);
                 break;
+
             case CHAMBER:
                 //TODO: TEST IF THIS WORKS, MAY NOT COMPLETE. FIGURE OUT HOW TO OPEN, THEN WAIT FOR CLOSE TO START INTAKE MAY BE IDIOT
+                //Used to specify how long to wait to close chambering servo TODO: Find correct value
+                int reloaderDelay = 500;
                 //reloader.setPosition(reloadPOS);
                 //reloader.setPosition(0);
+                TimerTask servoClose = new TimerTask() {
+                    @Override
+                    public void run() {
+                        mode = Mode.PRIME;
+                    }
+                };
+                timer.schedule(servoClose, reloaderDelay);
                 break;
+
             case PRIME:
-                //Thread.sleep(5000)
-                //intakeBelt.
+                //Used to specify how long to run belt for TODO: Find correct Value
+                int beltDelay = 500;
+                intakeBelt.setPower(1);
+                TimerTask runBelt = new TimerTask() {
+                    @Override
+                    public void run() {
+                        mode = Mode.HOLDING;
+                    }
+                };
+                timer.schedule(runBelt, beltDelay);
                 break;
+
+            case INTAKE:
+                intakeBelt.setPower(1);
         }
 
     }
 
 }
+
