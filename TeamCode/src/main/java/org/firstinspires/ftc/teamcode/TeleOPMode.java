@@ -14,7 +14,7 @@ public class TeleOPMode extends LinearOpMode {
     ProjectileSystems shooter = new ProjectileSystems();
     APMecanumDrive drive = null;
 
-    public void runOpMode() throws InterruptedException{
+    public void runOpMode() throws InterruptedException {
 
         //init for robot and shooter
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
@@ -63,24 +63,20 @@ public class TeleOPMode extends LinearOpMode {
             telemetry.update();
 
 
-
             //Gamepad 1  ***Drivetrain***
-            if (gamepad1.x){
-                if (!g1x_state) {
-                    robot.toggleIntakeRelease();
-                    g1x_state = true;
-                }
-            } else g1x_state = false;
-
-            robot.setClaw(gamepad1.right_trigger);
+            if (gamepad1.x) robot.releaseIntake();
+            if (gamepad1.right_bumper) robot.toggleClaw();
 
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y);
             //shooter.setFlywheelsRPM(gamepad2.right_trigger);
 
-            if(gamepad2.dpad_up) robot.setArm(14);
-            if(gamepad2.dpad_down) robot.setArm(0);
-            if(gamepad2.right_bumper) robot.toggleClaw();
-        }
+            if (gamepad2.dpad_up) robot.setArm(14);
+            if (gamepad2.dpad_down) robot.setArm(0);
+
+            if (isStopRequested()){
+                robot.stop();
+            }
         }
     }
+}

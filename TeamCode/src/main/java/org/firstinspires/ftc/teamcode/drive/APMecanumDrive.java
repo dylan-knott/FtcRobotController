@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
@@ -64,11 +65,25 @@ public class APMecanumDrive extends MecanumDrive {
         BLUE_TOWER,
         RED_TOWER,
         BLUE_POWERSHOT,
-        RED_POWERSHOT
-
+        RED_POWERSHOT,
     }
-    //Positions for Game Elements
-    
+    //Coordinates for Game Elements
+    //Blue Targets
+    public final Vector2d BLUE_TOWER_POS = new Vector2d(72, 36);
+    public final Vector2d BLUE_POWERSHOT_POS = new Vector2d(72,12);
+    public final Vector2d BLUE_A_POS = new Vector2d(60, 60);
+    public final Vector2d BLUE_B_POS = new Vector2d(36, 36);
+    public final Vector2d BLUE_C_POS = new Vector2d(12, 60);
+    public final Vector2d BLUE_LEFT_START = new Vector2d(-60, 48);
+    public final Vector2d BLUE_RIGHT_START = new Vector2d(-60, 24);
+    //Red Targets
+    public final Vector2d RED_TOWER_POS = new Vector2d(72,-36);
+    public final Vector2d RED_POWERSHOT_POS = new Vector2d(72, -12);
+    public final Vector2d RED_A_POS = new Vector2d(60, -60);
+    public final Vector2d RED_B_POS = new Vector2d(36, -36);
+    public final Vector2d RED_C_POS = new Vector2d(12, -60);
+    public final Vector2d RED_LEFT_START = new Vector2d(-60, -24);
+    public final Vector2d RED_RIGHT_START = new Vector2d(-60, -48);
 
     private FtcDashboard dashboard;
     private NanoClock clock;
@@ -220,34 +235,37 @@ public class APMecanumDrive extends MecanumDrive {
 
     //Returns straight line distance from current position to a given target
     public double getDistanceToTarget(Target target){
+        Vector2d currentPos = getPoseEstimate().vec();
         switch(target) {
             case RED_TOWER:
-                break;
+                return currentPos.distTo(RED_TOWER_POS);
             case BLUE_TOWER:
-                break;
+                return currentPos.distTo(BLUE_TOWER_POS);
             case BLUE_POWERSHOT:
-                break;
+                return currentPos.distTo(BLUE_POWERSHOT_POS);
             case RED_POWERSHOT:
-                break;
+                return currentPos.distTo(RED_POWERSHOT_POS);
 
         }
+        return -1;
 
     }
 
     //Returns angle in radians from current position to a given target
     public double getRadiansToTarget(Target target){
+        Vector2d currentPos = getPoseEstimate().vec();
         switch(target) {
             case RED_TOWER:
-                break;
+                return currentPos.angleBetween(RED_TOWER_POS);
             case BLUE_TOWER:
-                break;
+                return currentPos.angleBetween(BLUE_TOWER_POS);
             case BLUE_POWERSHOT:
-                break;
+                return currentPos.angleBetween(BLUE_POWERSHOT_POS);
             case RED_POWERSHOT:
-                break;
+                return currentPos.angleBetween(RED_POWERSHOT_POS);
 
         }
-
+        return 0;
     }
 
     public void update() {

@@ -6,8 +6,15 @@ import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class LocalizedRobotDrive {
+    public final double CHASSIS_WIDTH = 18;
+    public final double CHASSIS_LENGTH = 18;
+    public final double ARM_REACH = 16;
+
     //Proportional Processing values for distance to drive function
     private final double P_Forward = 0.05;
     private final double P_Strafe = 0.025;
@@ -17,6 +24,7 @@ public class LocalizedRobotDrive {
     Telemetry telemetry = null;
     allianceColor teamColor = null;
     public APMecanumDrive rrDrive = null;
+    Timer timer = new Timer();
 
     //Hardware
     public DcMotor intake, armLift;
@@ -28,15 +36,9 @@ public class LocalizedRobotDrive {
     public double motorPower = 0.8;
     public double intakePower = 1;
     public double armPower = 0.4;
-    public int ringCount = 3;
 
-    //Debug the error angle in order to get this value, sets the offset to which the robot will turn to meet the required degrees turned
-    private final double TURNING_BUFFER = 0;
 
-    //Up = false, Down = true
-    private boolean rampState = false;
-    //Open = false, Closed = true
-    private boolean clawState = false;
+    private boolean timerRunning = false;
 
 
     public enum direction {
@@ -75,8 +77,6 @@ public class LocalizedRobotDrive {
         initializeArm();
 
         //Initialize servos
-        rampState = false;
-        clawState = false;
         clawServo.setPosition(0);
         intakeRelease.setPosition(0);
 
@@ -186,46 +186,42 @@ public class LocalizedRobotDrive {
             intake.setPower(power * intakePower);
     }
 
-    public void toggleIntakeRelease() {
-        if (intakeRelease.getPosition() == 90.0f / 280) { // Servo is down
-            setIntakeRelease(0);
+    public void releaseIntake() {
+        intakeRelease.setPosition(90 / 280.0f);
+        if (!timerRunning) {
+            timer.schedule(lockIntake, 1000L);
+            timerRunning = true;
         }
-        else if (intakeRelease.getPosition() == 0) {
-            setIntakeRelease(90);
-
-        }
-
     }
 
     public void setClaw(float position) {
             clawServo.setPosition(position);
     }
 
-    public void setIntakeRelease(float degrees) {
-        intakeRelease.setPosition(degrees / 280.0f);
-    }
-
     public void toggleClaw()
     {
-        if (clawState) //claw is closed
+        if (clawServo.getPosition() == 0) //claw is closed
         {
-            clawServo.setPosition(0); //open claw
-            clawState = false;
+            setClaw(275.0f / 280); //open claw
         }
         else
         {
-            clawServo.setPosition(60.0f / 270); //close claw
-            clawState = true;
+            clawServo.setPosition(0); //close claw
         }
     }
     /*******************************************UTILITIES*******************************************/
     //Creating a clamp method for both floats and doubles, used to make sure motor power doesn't go above a certain power level as to saturate the motors
-    private double clamp(double val, double min, double max) {
-        return Math.max(min, Math.min(max, val));
+    private double clamp(double val, double min, double max) { return Math.max(min, Math.min(max, val));
     }
 
-    private float clamp(float val, float min, float max) {
-        return Math.max(min, Math.min(max, val));
+    TimerTask lockIntake = new TimerTask() {
+        public void run() {
+            intakeRelease.setPosition(-50.0f / 280);
+            timerRunning = false;
+        }
+    };
+
+    private float clamp(float val, float min, float max) { return Math.max(min, Math.min(max, val));
     }
 
     private int clamp(int val, int min, int max) { return Math.max(min, Math.min(max, val));
@@ -258,6 +254,13 @@ public class LocalizedRobotDrive {
         double RightOut = right * P_Strafe;
         double TurnOut = turn * P_Turn;
         mixDrive(ForwardOut, RightOut, TurnOut);
+    }
+
+    public void stop() {
+        rrDrive.setMotorPowers(0, 0, 0, 0);
+        timer.cancel();
+        timer.purge();
+
     }
 
 }
