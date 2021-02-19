@@ -57,9 +57,10 @@ public class TeleOPMode extends LinearOpMode {
             shooter.update();
 
             Pose2d poseEstimate = drive.getPoseEstimate();
-            telemetry.addData("x", poseEstimate.getX());
-            telemetry.addData("y", poseEstimate.getY());
-            telemetry.addData("heading", poseEstimate.getHeading());
+            //telemetry.addData("x", poseEstimate.getX());
+            //telemetry.addData("y", poseEstimate.getY());
+            //telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.addData("Release Position", robot.intakeRelease.getPosition());
             telemetry.update();
 
 

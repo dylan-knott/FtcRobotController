@@ -77,8 +77,9 @@ public class LocalizedRobotDrive {
         initializeArm();
 
         //Initialize servos
+        intakeRelease.setDirection(Servo.Direction.REVERSE);
         clawServo.setPosition(0);
-        intakeRelease.setPosition(0);
+        intakeRelease.setPosition(90 / 280f);
 
 
         //Sensor Initialization
@@ -187,15 +188,19 @@ public class LocalizedRobotDrive {
     }
 
     public void releaseIntake() {
-        intakeRelease.setPosition(90 / 280.0f);
+        intakeRelease.setPosition(0 / 280f);
         if (!timerRunning) {
-            timer.schedule(lockIntake, 1000L);
+            timer.schedule(lockIntake, 2000L);
             timerRunning = true;
         }
     }
 
     public void setClaw(float position) {
             clawServo.setPosition(position);
+    }
+
+    public void setIntakeRelease(float position) {
+        intakeRelease.setPosition(position / 280f);
     }
 
     public void toggleClaw()
@@ -216,7 +221,7 @@ public class LocalizedRobotDrive {
 
     TimerTask lockIntake = new TimerTask() {
         public void run() {
-            intakeRelease.setPosition(-50.0f / 280);
+            setIntakeRelease(152);
             timerRunning = false;
         }
     };

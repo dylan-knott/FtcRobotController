@@ -32,8 +32,8 @@ public class Blue1WobbleLeft extends LinearOpMode {
         drive.turn(Math.toRadians(30));
 
         //TODO: Look for Ring Stack
-        if (/*4 rings*/) dropPose = new Pose2d(48 - robot.ARM_REACH, 60);
-        else if (/*1 ring*/) dropPose = new Pose2d(36 - robot.ARM_REACH, 36);
+        if (true) dropPose = new Pose2d(48 - robot.ARM_REACH, 60);
+        else if (true) dropPose = new Pose2d(36 - robot.ARM_REACH, 36);
         else /*no rings*/ new Pose2d(12 - robot.ARM_REACH, 60);
         //While the ring stack is being looked for, build the trajectory
         Trajectory trajA = drive.trajectoryBuilder(drive.getPoseEstimate())
