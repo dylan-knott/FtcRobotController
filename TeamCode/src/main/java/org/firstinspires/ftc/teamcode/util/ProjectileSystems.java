@@ -14,7 +14,7 @@ import java.util.TimerTask;
 
 public class ProjectileSystems
 {
-    //Hardware declaration, need color sensers
+    //Hardware declaration, need color sensors
     public DcMotor intakeBelt;
     public DcMotorEx flywheel;
     public Servo indexer, reloader;
@@ -57,8 +57,6 @@ public class ProjectileSystems
         intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-        flywheel.setDirection(DcMotor.Direction.REVERSE);
-
         indexer.setPosition(0);
         //reloader.setPosition(0);
 
@@ -66,13 +64,13 @@ public class ProjectileSystems
     }
 
     /*******************************************UNUSED*******************************************/
-    /*
+
     public void fireRing(double inputSpeed) throws InterruptedException
     {
 
     }
 
-    public void setFlywheels(double inputPower)
+    public void setFlywheel(double inputPower)
     {
         //Remap input to the max power
         double power = inputPower * flywheelPower;
@@ -80,7 +78,7 @@ public class ProjectileSystems
         flywheel.setPower(power);
     }
 
-    public void setFlywheelsRPM(float power)
+    public void setFlywheelRPM(double power)
     {
 
         double flywheelAngularVelocity = 5 * RPM_TO_TPS * power;
@@ -88,7 +86,10 @@ public class ProjectileSystems
         telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
 
     }
-    */
+    public void setIndexer(double pos){
+        indexer.setPosition(pos / 280.0f);
+    }
+
     public void update()
     {
         //placeholder, need to figure out once build
@@ -99,7 +100,7 @@ public class ProjectileSystems
         {
             case HOLDING:
                 flywheel.setVelocity(5 * RPM_TO_TPS * 0);
-                indexer.setPosition(0);
+                //indexer.setPosition(0);
                 intakeBelt.setPower(0);
                 //reloader.setPosition(0);
                 break;

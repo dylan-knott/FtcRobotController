@@ -36,8 +36,8 @@ public class RobotDrive {
     private final DcMotorEx[] motors = {leftFront, leftRear, rightFront, rightRear};
     public DcMotor intake;
     public DcMotor leftFlywheel, rightFlywheel;
-    public Servo clawServo, wobbleArm;
-    public CRServo indexer, intakeBelt;
+    public Servo clawServo;
+    public CRServo intakeBelt;
     private BNO055IMU imu = null;
     public DistanceSensor dist = null;
     public ColorSensor floorColor = null;
@@ -78,7 +78,6 @@ public class RobotDrive {
 
         //Expansion hub 1 servos
         clawServo = hardwareMap.servo.get("claw_servo");
-        indexer = hardwareMap.crservo.get("index_servo");
         intakeBelt = hardwareMap.crservo.get("intake_servo");
 
         //Expansion hub 1 sensors
@@ -312,25 +311,12 @@ public class RobotDrive {
 
     /******************************************GAME FUNCTIONS********************************************/
 
-   public void fireRing(double inputSpeed) throws InterruptedException{
-       if (ringCount > 0) {
-           indexer.setPower(inputSpeed);
-           wait(10);
-           indexer.setPower(0);
-           ringCount -=1;
-       }
-   }
-
    public void setFlywheels(double inputSpeed) {
        //Remap input to respect the max speed
        double power = inputSpeed * flywheelSpeed;
 
        rightFlywheel.setPower(power);
        leftFlywheel.setPower(power);
-   }
-
-   public void setIndexer(double inputSpeed) {
-       indexer.setPower(inputSpeed);
    }
 
    public void enableIntake(boolean state) {

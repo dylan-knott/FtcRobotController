@@ -54,14 +54,13 @@ public class TeleOPMode extends LinearOpMode {
             );
 
             drive.update();
-            shooter.update();
+            //shooter.update();
 
             Pose2d poseEstimate = drive.getPoseEstimate();
             //telemetry.addData("x", poseEstimate.getX());
             //telemetry.addData("y", poseEstimate.getY());
             //telemetry.addData("heading", poseEstimate.getHeading());
             telemetry.addData("Release Position", robot.intakeRelease.getPosition());
-            telemetry.update();
 
 
             //Gamepad 1  ***Drivetrain***
@@ -70,6 +69,9 @@ public class TeleOPMode extends LinearOpMode {
 
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y);
+            shooter.setFlywheel(gamepad2.right_trigger);
+            shooter.indexer.setPosition((double)gamepad2.left_trigger);
+            telemetry.addData("G2 Left Trigger", gamepad2.left_trigger);
             //shooter.setFlywheelsRPM(gamepad2.right_trigger);
 
             if (gamepad2.dpad_up) robot.setArm(14);
@@ -78,6 +80,7 @@ public class TeleOPMode extends LinearOpMode {
             if (isStopRequested()){
                 robot.stop();
             }
+            telemetry.update();
         }
     }
 }
