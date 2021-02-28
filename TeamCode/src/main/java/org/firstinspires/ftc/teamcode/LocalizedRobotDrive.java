@@ -21,10 +21,10 @@ public class LocalizedRobotDrive {
     private final double P_Turn = 0.005;
 
 
-    Telemetry telemetry = null;
-    allianceColor teamColor = null;
+    private Telemetry telemetry = null;
+    private allianceColor teamColor = null;
     public APMecanumDrive rrDrive = null;
-    Timer timer = new Timer();
+    private Timer timer = new Timer();
 
     //Hardware
     public DcMotor intake, armLift;

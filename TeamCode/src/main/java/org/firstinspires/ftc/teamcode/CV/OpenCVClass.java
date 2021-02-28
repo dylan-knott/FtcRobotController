@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
-import org.firstinspires.ftc.teamcode.MultipleCameraExample;
-import org.firstinspires.ftc.teamcode.RobotDrive;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.*;

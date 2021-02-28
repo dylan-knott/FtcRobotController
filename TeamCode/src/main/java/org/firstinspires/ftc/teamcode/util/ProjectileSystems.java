@@ -9,6 +9,8 @@ import com.vuforia.Device;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,6 +29,7 @@ public class ProjectileSystems
     LocalizedRobotDrive.allianceColor teamColor = null;
 
     private final double RPM_TO_TPS = 28.0f /60;
+    private Map<Float, Integer> distToRPM = new HashMap<>();
 
     Timer timer = new Timer();
 

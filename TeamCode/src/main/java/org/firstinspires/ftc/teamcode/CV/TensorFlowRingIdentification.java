@@ -32,7 +32,9 @@ package org.firstinspires.ftc.teamcode.CV;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -50,8 +52,10 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
-public class TensorFlowRingIdentification extends LinearOpMode {
+
+public class TensorFlowRingIdentification {
+    private Telemetry telem;
+    private HardwareMap hardwareMap;
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";
@@ -83,8 +87,7 @@ public class TensorFlowRingIdentification extends LinearOpMode {
      */
     private TFObjectDetector tfod;
 
-    @Override
-    public void runOpMode() {
+    public void initObjectDetector(HardwareMap hm, Telemetry t) {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
@@ -107,40 +110,8 @@ public class TensorFlowRingIdentification extends LinearOpMode {
             // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
             //tfod.setZoom(2.5, 1.78);
         }
-
-        /** Wait for the game to begin */
-        telemetry.addData(">", "Press Play to start op mode");
-        telemetry.update();
-        waitForStart();
-
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                      telemetry.addData("# Object Detected", updatedRecognitions.size());
-
-                      // step through the list of recognitions and display boundary info.
-                      int i = 0;
-                      for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                          recognition.getLeft(), recognition.getTop());
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight(), recognition.getBottom());
-                      }
-                      telemetry.update();
-                    }
-                }
-            }
-        }
-
-        if (tfod != null) {
-            tfod.shutdown();
-        }
     }
+
 
     /**
      * Initialize the Vuforia localization engine.
@@ -165,10 +136,46 @@ public class TensorFlowRingIdentification extends LinearOpMode {
      */
     private void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-            "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minResultConfidence = 0.8f;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
-}
+
+
+    public char runDetect(float timeoutSeconds) {
+        char targetZone = 'a'; // a, b, c
+        //Run detection with a timeout of timeoutSeconds, then return the number of rings found
+        long end = System.currentTimeMillis() + (int)(timeoutSeconds * 1000);
+        //Loop to find the ring stack
+        while(System.currentTimeMillis() < end) {
+                if (tfod != null) {
+                    // getUpdatedRecognitions() will return null if no new information is available since
+                    // the last time that call was made.
+                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                    if (updatedRecognitions != null) {
+                        //Object is detected
+
+                        // step through the list of recognitions
+                        for (Recognition recognition : updatedRecognitions) {
+                            // check label to see which target zone to go after.
+                            if (recognition.getLabel().equals("Single")) {
+                                targetZone = 'b';
+                            } else if (recognition.getLabel().equals("Quad")) {
+                                targetZone = 'c';
+                            } else {
+                                targetZone = 'a';
+                            }
+                        }
+                    }
+                }
+        }
+        return targetZone;
+    }
+
+    public void closeTfod() {
+        if (tfod != null) {
+            tfod.shutdown();
+        }
+    }}
