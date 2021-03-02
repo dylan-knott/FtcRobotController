@@ -31,18 +31,18 @@ public class Blue1WobbleLeft extends LinearOpMode {
         tf.initObjectDetector(hardwareMap, telemetry);
         drive = robot.rrDrive;
 
-        drive.setPoseEstimate(new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , 48 + robot.CHASSIS_WIDTH / 2 ,Math.toRadians(90)));
+        drive.setPoseEstimate(new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , 48 + robot.CHASSIS_WIDTH / 2 , 0));
 
 
         waitForStart();
 
-        drive.turn(Math.toRadians(INITIAL_TURN);
+        drive.turn(Math.toRadians(INITIAL_TURN));
 
         //TODO: Look for Ring Stack
         char dropZone = tf.runDetect(5);
-        if (dropZone == 'c') dropPose = new Pose2d(48 - robot.ARM_REACH, 60);
-        else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, 36);
-        else new Pose2d(12 - robot.ARM_REACH, 60, );
+        if (dropZone == 'c') dropPose = new Pose2d(48 - robot.ARM_REACH, 60, 0);
+        else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, 36, 0);
+        else new Pose2d(12 - robot.ARM_REACH, 60, 0);
         //While the ring stack is being looked for, build the trajectory
         Trajectory trajA = drive.trajectoryBuilder(drive.getPoseEstimate().plus(new Pose2d(0, 0, Math.toRadians(INITIAL_TURN))))
                 .splineToLinearHeading(dropPose, Math.toRadians(-90)) //Move to zone A
