@@ -31,22 +31,24 @@ public class Blue1WobbleLeft extends LinearOpMode {
         tf.initObjectDetector(hardwareMap, telemetry);
         drive = robot.rrDrive;
 
+        //Tell roadrunner where the robot is initially placed
         drive.setPoseEstimate(new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , 48 + robot.CHASSIS_WIDTH / 2 , 0));
 
-
+        //Wait for start button to be pressed
         waitForStart();
 
+        //Turn 15 degrees to look at ring stack
         drive.turn(Math.toRadians(INITIAL_TURN));
 
         //TODO: Look for Ring Stack
         char dropZone = tf.runDetect(5);
         if (dropZone == 'c') dropPose = new Pose2d(48 - robot.ARM_REACH, 60, 0);
         else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, 36, 0);
-        else new Pose2d(12 - robot.ARM_REACH, 60, 0);
+        else dropPose = new Pose2d(12 - robot.ARM_REACH, 60, 0);
         //While the ring stack is being looked for, build the trajectory
         //This trajectory is for delivering the wobble goal, and driving up until rings are shot
         Trajectory trajA = drive.trajectoryBuilder(drive.getPoseEstimate().plus(new Pose2d(0, 0, Math.toRadians(INITIAL_TURN))))
-                .splineToLinearHeading(dropPose, Math.toRadians(-90)) //Move to zone A
+                .splineToLinearHeading(dropPose, Math.toRadians(-90)) //Move to targeted drop zone
                 .addDisplacementMarker(() -> { //Runs after the first spline is completed
                     //DO NOT CALL ANY SLEEP FUNCTIONS/FREEZE INTERPRETER INSIDE OF DISPLACEMENT MARKERS.
                     //TODO: Drop wobble goal
@@ -64,10 +66,13 @@ public class Blue1WobbleLeft extends LinearOpMode {
                 })
                 .build();
 
+
+        //ROBOT ACTUALLY MOVES
         drive.followTrajectory(trajA);
         //TODO: Shoot Rings (for now, a sleep will emulate the time to shoot 3 rings
         sleep(2000);
         //TODO: Intake additional rings?
+        drive.followTrajectory(trajB);
 
     }
 }
