@@ -44,22 +44,29 @@ public class Blue1WobbleLeft extends LinearOpMode {
         else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, 36, 0);
         else new Pose2d(12 - robot.ARM_REACH, 60, 0);
         //While the ring stack is being looked for, build the trajectory
+        //This trajectory is for delivering the wobble goal, and driving up until rings are shot
         Trajectory trajA = drive.trajectoryBuilder(drive.getPoseEstimate().plus(new Pose2d(0, 0, Math.toRadians(INITIAL_TURN))))
                 .splineToLinearHeading(dropPose, Math.toRadians(-90)) //Move to zone A
                 .addDisplacementMarker(() -> { //Runs after the first spline is completed
+                    //DO NOT CALL ANY SLEEP FUNCTIONS/FREEZE INTERPRETER INSIDE OF DISPLACEMENT MARKERS.
                     //TODO: Drop wobble goal
                     robot.setArm(90);
-                    robot.toggleClaw();
+                    robot.setClaw(0);
                 })
                 .splineToLinearHeading(new Pose2d(-18, 60, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER)), Math.toRadians(-90))
+                .build();
+
+        Trajectory trajB = drive.trajectoryBuilder(trajA.end())
+                .splineToConstantHeading(new Vector2d(12 - robot.ARM_REACH  + 3, 60), Math.toRadians(-90))
                 .addDisplacementMarker(() -> {
-                    //TODO: SHOOT 3 RINGS
-
-
+                    //Set Arm out to reach over the
+                    robot.setArm(90);
                 })
                 .build();
 
         drive.followTrajectory(trajA);
+        //TODO: Shoot Rings (for now, a sleep will emulate the time to shoot 3 rings
+        sleep(2000);
         //TODO: Intake additional rings?
 
     }

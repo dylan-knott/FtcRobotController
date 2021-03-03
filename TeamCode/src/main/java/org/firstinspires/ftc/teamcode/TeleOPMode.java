@@ -70,7 +70,9 @@ public class TeleOPMode extends LinearOpMode {
             robot.setIntake(gamepad2.right_stick_y);
             shooter.setFlywheel(gamepad2.right_trigger);
             shooter.indexer.setPosition((double)gamepad2.left_trigger);
-            telemetry.addData("G2 Left Trigger", gamepad2.left_trigger);
+            if (gamepad2.a) shooter.intakeBelt.setPower(1);
+            else shooter.intakeBelt.setPower(0);
+
             //shooter.setFlywheelsRPM(gamepad2.right_trigger);
 
             if (gamepad2.dpad_up) robot.setArm(14);
