@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.*;
 import com.vuforia.Device;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -58,6 +55,7 @@ public class ProjectileSystems
         //Motor Initialization
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeBelt.setDirection(DcMotor.Direction.REVERSE);
 
 
         indexer.setPosition(0);
