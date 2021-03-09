@@ -77,6 +77,9 @@ public class TeleOPMode extends LinearOpMode {
             if (gamepad2.dpad_up) robot.setArm(14);
             if (gamepad2.dpad_down) robot.setArm(0);
 
+            //testing
+            if(gamepad2.dpad_left) shooter.mode = ProjectileSystems.Mode.FIRING;
+
             if (isStopRequested()){
                 robot.stop();
             }

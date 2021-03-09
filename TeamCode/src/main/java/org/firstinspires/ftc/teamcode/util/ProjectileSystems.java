@@ -30,13 +30,14 @@ public class ProjectileSystems
 
     Timer timer = new Timer();
 
-    private enum Mode
+    public enum Mode
     {
         HOLDING,
         FIRING,
         INTAKE,
         CHAMBER,
-        PRIME
+        PRIME,
+        IDLE,
     }
     public Mode mode;
 
@@ -59,9 +60,9 @@ public class ProjectileSystems
 
 
         indexer.setPosition(0);
-        //reloader.setPosition(0);
+        reloader.setPosition(0);
 
-        mode = Mode.HOLDING;
+        mode = Mode.IDLE;
     }
 
     /*******************************************UNUSED*******************************************/
@@ -71,10 +72,10 @@ public class ProjectileSystems
 
     }
 
-    public void setFlywheel(double inputPower)
+    public void setFlywheel(float inputPower)
     {
         //Remap input to the max power
-        double power = inputPower * flywheelPower;
+        float power = (float) (inputPower * flywheelPower);
 
         flywheel.setPower(power);
     }
@@ -101,17 +102,18 @@ public class ProjectileSystems
         {
             case HOLDING:
                 flywheel.setVelocity(5 * RPM_TO_TPS * 0);
-                //indexer.setPosition(0);
+                indexer.setPosition(0);
                 intakeBelt.setPower(0);
-                //reloader.setPosition(0);
+                reloader.setPosition(0);
+                mode = Mode.IDLE;
                 break;
 
             case CHAMBER:
                 //TODO: TEST IF THIS WORKS, MAY NOT COMPLETE. FIGURE OUT HOW TO OPEN, THEN WAIT FOR CLOSE TO START INTAKE MAY BE IDIOT
                 //Used to specify how long to wait to close chambering servo TODO: Find correct value
                 int reloaderDelay = 500;
-                //reloader.setPosition(reloadPOS);
-                //reloader.setPosition(0);
+                reloader.setPosition(reloadPOS);
+                reloader.setPosition(0);
                 TimerTask servoClose = new TimerTask() {
                     @Override
                     public void run() {
@@ -119,7 +121,25 @@ public class ProjectileSystems
                     }
                 };
                 timer.schedule(servoClose, reloaderDelay);
+                mode = Mode.IDLE;
                 break;
+                //TODO: This is what I want you to look at dylan. I was getting no response from robot. I think think the problem was in teleop or this. I would get no motor spinup or sevomovemtn, even tlem
+            case FIRING:
+                telemetry.addData("In firing mode", flywheelPower);
+                //time to fire value in ms
+                int timeTF = 500;
+                //value may change
+                setFlywheel(1.0f);
+                indexer.setPosition(30.0/280.0f);
+                //TimerTask endFire = new TimerTask() {
+                   // @Override
+                  //  public void run() {
+                        //mode = Mode.HOLDING;
+                   // }
+                //};
+                //timer.schedule(endFire, timeTF);
+                break;
+
 
             case PRIME:
                 //Used to specify how long to run belt for TODO: Find correct Value
@@ -128,7 +148,7 @@ public class ProjectileSystems
                 TimerTask runBelt = new TimerTask() {
                     @Override
                     public void run() {
-                        mode = Mode.HOLDING;
+                        //mode = Mode.HOLDING;
                     }
                 };
                 timer.schedule(runBelt, beltDelay);
@@ -136,6 +156,11 @@ public class ProjectileSystems
 
             case INTAKE:
                 intakeBelt.setPower(1);
+                mode = Mode.IDLE;
+                break;
+
+            case IDLE:
+                break;
         }
 
     }
