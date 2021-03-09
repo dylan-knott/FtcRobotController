@@ -21,9 +21,6 @@ public class TeleOPMode extends LinearOpMode {
         drive = robot.rrDrive;
 
         //Values to send to pose2d for driving
-        final double fExpo = 1.96;
-        final double sExpo = 1.96;
-        final double tExpo = 1.96;
         final double stickDeadzone = 0.05;
 
         double strafe = 0;
@@ -40,9 +37,10 @@ public class TeleOPMode extends LinearOpMode {
         while (opModeIsActive()) {
 
             //Movement code
-            if (Math.abs(gamepad1.left_stick_y) < stickDeadzone) forward = 0; else forward = 0.6 * Math.tan(-gamepad1.left_stick_y * 1.0304);
-            if (Math.abs(gamepad1.left_stick_x) < stickDeadzone) strafe = 0; else strafe = 0.6 * Math.tan(-gamepad1.left_stick_x * 1.0304);
-            if (Math.abs(gamepad1.right_stick_x) < stickDeadzone) turn = 0; else turn = 0.6 * Math.tan(-gamepad1.right_stick_x * 1.0304);
+            //0.971 tan 0.8x
+            if (Math.abs(gamepad1.left_stick_y) < stickDeadzone) forward = 0; else forward = 0.971 * Math.tan(-gamepad1.left_stick_y * 0.8);
+            if (Math.abs(gamepad1.left_stick_x) < stickDeadzone) strafe = 0; else strafe = 0.971 * Math.tan(-gamepad1.left_stick_x * 0.8);
+            if (Math.abs(gamepad1.right_stick_x) < stickDeadzone) turn = 0; else turn = 0.971 * Math.tan(-gamepad1.right_stick_x * 0.8);
 
 
             drive.setWeightedDrivePower(
