@@ -3,18 +3,15 @@ package org.firstinspires.ftc.teamcode.drive.opmode.competition;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.CV.TensorFlowRingIdentification;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
-import org.firstinspires.ftc.teamcode.RobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
-@Autonomous(name="Blue 1 Wobble Left")
-public class Blue1WobbleLeft extends LinearOpMode {
+@Autonomous(name="Red 1 Wobble Left")
+public class Red1WobbleLeft extends LinearOpMode {
 
     private final int INITIAL_TURN = 15;
 
@@ -32,7 +29,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
         drive = robot.rrDrive;
 
         //Tell roadrunner where the robot is initially placed
-        drive.setPoseEstimate(new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , 48 + robot.CHASSIS_WIDTH / 2 , 0));
+        drive.setPoseEstimate(new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , robot.CHASSIS_WIDTH / 2 , 0));
 
         //Wait for start button to be pressed
         waitForStart();
@@ -42,9 +39,9 @@ public class Blue1WobbleLeft extends LinearOpMode {
 
         //TODO: Look for Ring Stack
         char dropZone = tf.runDetect(5);
-        if (dropZone == 'c') dropPose = new Pose2d(48 - robot.ARM_REACH, 60, 0);
-        else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, 36, 0);
-        else dropPose = new Pose2d(12 - robot.ARM_REACH, 60, 0);
+        if (dropZone == 'c') dropPose = new Pose2d(48 - robot.ARM_REACH, -60, 0);
+        else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, -36, 0);
+        else dropPose = new Pose2d(12 - robot.ARM_REACH, -60, 0);
         //While the ring stack is being looked for, build the trajectory
         //This trajectory is for delivering the wobble goal, and driving up until rings are shot
         Trajectory trajA = drive.trajectoryBuilder(drive.getPoseEstimate().plus(new Pose2d(0, 0, Math.toRadians(INITIAL_TURN))))
@@ -55,11 +52,11 @@ public class Blue1WobbleLeft extends LinearOpMode {
                     robot.setArm(90);
                     robot.setClaw(0);
                 })
-                .splineToLinearHeading(new Pose2d(-18, 60, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER)).plus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(-18, -18, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER)).plus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(0))
                 .build();
 
         Trajectory trajB = drive.trajectoryBuilder(trajA.end())
-                .splineToConstantHeading(new Vector2d(12 - robot.ARM_REACH  + 3, 60), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(12 - robot.ARM_REACH  + 3, -60), Math.toRadians(0))
                 .addDisplacementMarker(() -> {
                     //Set Arm out to reach over the
                     robot.setArm(90);

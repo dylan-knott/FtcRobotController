@@ -11,15 +11,14 @@ import java.util.TimerTask;
 
 
 public class LocalizedRobotDrive {
+    //Width of the robot chassis
     public final double CHASSIS_WIDTH = 18;
+    //Width of the robot length
     public final double CHASSIS_LENGTH = 18;
+    //Compensate for reach of the wobble arm, measured from the center of the bot
     public final double ARM_REACH = 16;
-
-    //Proportional Processing values for distance to drive function
-    private final double P_Forward = 0.05;
-    private final double P_Strafe = 0.025;
-    private final double P_Turn = 0.005;
-
+    //Compensate for angled trajectory of ring out of the shooter
+    public final double SHOOTER_ANGLE_ERROR = Math.toRadians(0);
 
     private Telemetry telemetry = null;
     private allianceColor teamColor = null;
@@ -96,44 +95,10 @@ public class LocalizedRobotDrive {
         //Run arm back until switch is activated
         armLift.setPower(-armPower);
         while (!armLimit.getState());
-
         //Set motor to run_to_position
         armLift.setTargetPosition(0);
         armLift.setMode((DcMotor.RunMode.RUN_TO_POSITION));
     }
-
-
-    /***************************************FORWARD MOVEMENT***************************************/
-    public void setMotorPowers(double mp) {
-        rrDrive.setMotorPowers(mp, mp, mp, mp);
-    }
-
-    public void setMotorPowers(double lf, double lr, double rf, double rr) {
-        rrDrive.setMotorPowers(lf, lr, rf, rr);
-    }
-
-    public void driveEncoder(double inches) {
-        Trajectory driveTrajectory = null;
-        if (inches >= 0) {
-            driveTrajectory = rrDrive.trajectoryBuilder(new Pose2d())
-                    .forward(inches)
-                    .build();
-        }
-        else {
-            driveTrajectory = rrDrive.trajectoryBuilder(new Pose2d())
-                    .back(inches)
-                    .build();
-        }
-        rrDrive.followTrajectory(driveTrajectory);
-    }
-
-    //Send this function a value of seconds to drive for and it will drive for that period
-    public void driveTime(long time) throws InterruptedException {
-        setMotorPowers(motorPower);
-        Thread.sleep(time);
-        setMotorPowers(0);
-    }
-
 
 
     /*******************************************STRAFING*******************************************/
@@ -154,26 +119,10 @@ public class LocalizedRobotDrive {
         rrDrive.followTrajectory(strafeTrajectory);
     }
 
-    public void strafeTime(int time, direction strafeDirection) throws InterruptedException {
-        if (strafeDirection == direction.left) {
-            setMotorPowers(-motorPower, motorPower, -motorPower, motorPower);
-        } else if (strafeDirection == direction.right) {
-            setMotorPowers(motorPower, -motorPower, motorPower, -motorPower);
-        }
-        Thread.sleep(time);
-        setMotorPowers(0);
-    }
-
     /*******************************************STRAFING*******************************************/
     public void turn(double degrees) {
         rrDrive.turn(degrees * (Math.PI / 180));
     }
-
-    public void turnAsync(double degrees) {
-        rrDrive.turnAsync(degrees * (Math.PI / 180));
-    }
-
-
 
     /******************************************GAME FUNCTIONS********************************************/
 
@@ -251,17 +200,7 @@ public class LocalizedRobotDrive {
         rrDrive.setMotorPowers(frontLeftSpeed, backLeftSpeed, frontRightSpeed, backRightSpeed);
     }
 
-
-    //turning distance measurements into usable motor output via Proportional control)
-    public void distanceToDrive(double forward, double right, double turn){
-
-        double ForwardOut = forward * P_Forward;
-        double RightOut = right * P_Strafe;
-        double TurnOut = turn * P_Turn;
-        mixDrive(ForwardOut, RightOut, TurnOut);
-    }
-
-    public void stop() {
+  public void stop() {
         rrDrive.setMotorPowers(0, 0, 0, 0);
         timer.cancel();
         timer.purge();
