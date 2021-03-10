@@ -1,9 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.drive.opmode.competition;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
@@ -33,7 +34,7 @@ public class TeleOPMode extends LinearOpMode {
 
 
         waitForStart();
-
+        shooter.mode = ProjectileSystems.Mode.IDLE;
         while (opModeIsActive()) {
 
             //Movement code
@@ -67,8 +68,8 @@ public class TeleOPMode extends LinearOpMode {
 
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y);
-            //shooter.setFlywheel(gamepad2.right_trigger);
-            //shooter.indexer.setPosition((double)gamepad2.left_trigger);
+            shooter.setFlywheel(gamepad2.right_trigger);
+            shooter.indexer.setPosition((double)gamepad2.left_trigger / 2.0f);
             if (gamepad2.a) shooter.intakeBelt.setPower(1);
             else shooter.intakeBelt.setPower(0);
 
