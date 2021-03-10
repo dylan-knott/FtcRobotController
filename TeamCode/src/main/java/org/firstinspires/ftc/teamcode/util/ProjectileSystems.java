@@ -133,23 +133,27 @@ public class ProjectileSystems
                 //Fire the current ring, and set mode to reset
 
                 //time alloted for spinup before firing-may be remove-TODO: test if flywheel.getVelcity works
-                int timeTF = 1500;
-
+                int timeTF = 500;
+                double flywheelRPM = 4500;
                 //Turn on flywheel to set RPM -Find correct rpm, make it changeable?
-                setFlywheelRPM(1200);
+                setFlywheelRPM(flywheelRPM);
 
-                telemetry.addData("In firing mode", flywheelPower);
+                telemetry.addData("In firing mode", flywheel.getVelocity() * TPS_TO_RPM);
 
                 //Mix of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
-                if (flywheel.getVelocity() * TPS_TO_RPM == 1200) indexer.setPosition(50.0/280.0f);
-                else {
+                if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 20 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM - 20 )
+                {
+                    indexer.setPosition(50.0/280.0f);
+
                     TimerTask endFire = new TimerTask() {
                         @Override
                         public void run() {
                             mode = Mode.RESET;
                         }
                     };
+
                     timer.schedule(endFire, timeTF);
+
                 }
                 break;
 
