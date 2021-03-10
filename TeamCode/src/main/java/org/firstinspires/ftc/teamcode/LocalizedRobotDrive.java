@@ -27,7 +27,7 @@ public class LocalizedRobotDrive {
 
     //Hardware
     public DcMotor intake, armLift;
-    public Servo clawServo, intakeRelease;
+    public Servo clawServo, intakeRelease, deflectorServo;
     public DistanceSensor dist = null;
     public DigitalChannel armLimit = null;
 
@@ -63,6 +63,7 @@ public class LocalizedRobotDrive {
 
         //Expansion hub 1 servos
         clawServo = hardwareMap.servo.get("claw_servo");
+        deflectorServo = hardwareMap.servo.get("deflector");
         intakeRelease = hardwareMap.servo.get("intake_release");
 
 
@@ -78,6 +79,7 @@ public class LocalizedRobotDrive {
         //Initialize servos
         intakeRelease.setDirection(Servo.Direction.REVERSE);
         clawServo.setPosition(0);
+        deflectorServo.setPosition(0);
         intakeRelease.setPosition(90 / 280f);
 
 
@@ -152,6 +154,8 @@ public class LocalizedRobotDrive {
         intakeRelease.setPosition(position / 280f);
     }
 
+    public void setDeflector(float position){ deflectorServo.setPosition(position / 280.0f); }
+
     public void toggleClaw()
     {
         if (clawServo.getPosition() == 0) //claw is closed
@@ -170,7 +174,7 @@ public class LocalizedRobotDrive {
 
     TimerTask lockIntake = new TimerTask() {
         public void run() {
-            setIntakeRelease(152);
+            setIntakeRelease(90);
             timerRunning = false;
         }
     };
