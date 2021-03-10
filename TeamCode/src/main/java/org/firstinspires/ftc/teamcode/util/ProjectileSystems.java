@@ -26,13 +26,14 @@ public class ProjectileSystems
     LocalizedRobotDrive.allianceColor teamColor = null;
 
     private final double RPM_TO_TPS = 28.0f /60;
+    private final double TPS_TO_RPM = 60/28.0f;
     private Map<Float, Integer> distToRPM = new HashMap<>();
 
     Timer timer = new Timer();
 
     public enum Mode
     {
-        HOLDING,
+        RESET,
         FIRING,
         INTAKE,
         CHAMBER,
@@ -80,10 +81,10 @@ public class ProjectileSystems
         flywheel.setPower(power);
     }
 
-    public void setFlywheelRPM(double power)
+    public void setFlywheelRPM(double rpm)
     {
 
-        double flywheelAngularVelocity = 5 * RPM_TO_TPS * power;
+        double flywheelAngularVelocity = RPM_TO_TPS * rpm;
         flywheel.setVelocity(flywheelAngularVelocity);
         telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
 
@@ -94,16 +95,16 @@ public class ProjectileSystems
 
     public void update()
     {
-        //placeholder, need to figure out once build
+        //placeholder, need to figure out once built
         double firePOS = 180;
         double reloadPOS = 180;
 
-        switch (mode)
-        {
-            case HOLDING:
-                flywheel.setVelocity(5 * RPM_TO_TPS * 0);
+        switch (mode) {
+            case RESET:
+                //set all moving system to default position/off
+                setFlywheelRPM(0);
                 indexer.setPosition(0);
-                intakeBelt.setPower(0);
+                intakeBelt.setPower(0);//Set Velo instead?
                 reloader.setPosition(0);
                 mode = Mode.IDLE;
                 break;
@@ -112,8 +113,12 @@ public class ProjectileSystems
                 //TODO: TEST IF THIS WORKS, MAY NOT COMPLETE. FIGURE OUT HOW TO OPEN, THEN WAIT FOR CLOSE TO START INTAKE MAY BE IDIOT
                 //Used to specify how long to wait to close chambering servo TODO: Find correct value
                 int reloaderDelay = 500;
+
+                //needs testing
                 reloader.setPosition(reloadPOS);
                 reloader.setPosition(0);
+
+                //after
                 TimerTask servoClose = new TimerTask() {
                     @Override
                     public void run() {
@@ -123,44 +128,54 @@ public class ProjectileSystems
                 timer.schedule(servoClose, reloaderDelay);
                 mode = Mode.IDLE;
                 break;
-                //TODO: This is what I want you to look at dylan. I was getting no response from robot. I think think the problem was in teleop or this. I would get no motor spinup or sevomovemtn, even tlem
+
             case FIRING:
-                telemetry.addData("In firing mode", flywheelPower);
-                //time to fire value in ms
+                //Fire the current ring, and set mode to reset
+
+                //time alloted for spinup before firing-may be remove-TODO: test if flywheel.getVelcity works
                 int timeTF = 1500;
-                //value may change
-                setFlywheel(1.0f);
 
-                TimerTask endFire = new TimerTask() {
-                    @Override
-                    public void run() {
-                        indexer.setPosition(50.0/280.0f);
-                        mode = Mode.HOLDING;
-                   }
-                };
-                timer.schedule(endFire, timeTF);
+                //Turn on flywheel to set RPM -Find correct rpm, make it changeable?
+                setFlywheelRPM(1200);
+
+                telemetry.addData("In firing mode", flywheelPower);
+
+                //Mix of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
+                if (flywheel.getVelocity() * TPS_TO_RPM == 1200) indexer.setPosition(50.0/280.0f);
+                else {
+                    TimerTask endFire = new TimerTask() {
+                        @Override
+                        public void run() {
+                            mode = Mode.RESET;
+                        }
+                    };
+                    timer.schedule(endFire, timeTF);
+                }
                 break;
-
 
             case PRIME:
                 //Used to specify how long to run belt for TODO: Find correct Value
+                //Desnigned to load the next ring into the chamber - needs dev- runs after CHAMBER
                 int beltDelay = 500;
                 intakeBelt.setPower(1);
+
                 TimerTask runBelt = new TimerTask() {
                     @Override
                     public void run() {
-                        //mode = Mode.HOLDING;
+                        mode = Mode.RESET;
                     }
                 };
                 timer.schedule(runBelt, beltDelay);
                 break;
 
             case INTAKE:
+                //Moving rings up to the chamber
                 intakeBelt.setPower(1);
                 mode = Mode.IDLE;
                 break;
 
             case IDLE:
+                //idle state, no commands being given
                 break;
         }
 
