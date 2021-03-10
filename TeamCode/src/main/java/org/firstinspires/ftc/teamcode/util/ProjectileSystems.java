@@ -127,17 +127,18 @@ public class ProjectileSystems
             case FIRING:
                 telemetry.addData("In firing mode", flywheelPower);
                 //time to fire value in ms
-                int timeTF = 500;
+                int timeTF = 1500;
                 //value may change
                 setFlywheel(1.0f);
-                indexer.setPosition(30.0/280.0f);
-                //TimerTask endFire = new TimerTask() {
-                   // @Override
-                  //  public void run() {
-                        //mode = Mode.HOLDING;
-                   // }
-                //};
-                //timer.schedule(endFire, timeTF);
+
+                TimerTask endFire = new TimerTask() {
+                    @Override
+                    public void run() {
+                        indexer.setPosition(50.0/280.0f);
+                        mode = Mode.HOLDING;
+                   }
+                };
+                timer.schedule(endFire, timeTF);
                 break;
 
 

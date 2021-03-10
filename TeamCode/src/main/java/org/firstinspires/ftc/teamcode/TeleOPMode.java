@@ -52,7 +52,7 @@ public class TeleOPMode extends LinearOpMode {
             );
 
             drive.update();
-            //shooter.update();
+            shooter.update();
 
             Pose2d poseEstimate = drive.getPoseEstimate();
             //telemetry.addData("x", poseEstimate.getX());
@@ -67,8 +67,8 @@ public class TeleOPMode extends LinearOpMode {
 
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y);
-            shooter.setFlywheel(gamepad2.right_trigger);
-            shooter.indexer.setPosition((double)gamepad2.left_trigger);
+            //shooter.setFlywheel(gamepad2.right_trigger);
+            //shooter.indexer.setPosition((double)gamepad2.left_trigger);
             if (gamepad2.a) shooter.intakeBelt.setPower(1);
             else shooter.intakeBelt.setPower(0);
 
@@ -78,7 +78,7 @@ public class TeleOPMode extends LinearOpMode {
             if (gamepad2.dpad_down) robot.setArm(0);
 
             //testing
-            if(gamepad2.dpad_left) shooter.mode = ProjectileSystems.Mode.FIRING;
+            if(gamepad2.y) shooter.mode = ProjectileSystems.Mode.FIRING;
 
             if (isStopRequested()){
                 robot.stop();
