@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.*;
-import com.vuforia.Device;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
@@ -16,7 +15,7 @@ public class ProjectileSystems
     //Hardware declaration, need color sensors
     public DcMotor intakeBelt;
     public DcMotorEx flywheel;
-    public Servo indexer, reloader;
+    public Servo indexer, reloader, deflector;
 
 
     public double flywheelPower = 1;
@@ -51,6 +50,8 @@ public class ProjectileSystems
         flywheel = (DcMotorEx) hardwareMap.dcMotor.get("flywheel_motor");
         intakeBelt = hardwareMap.dcMotor.get("conveyor");
         indexer = hardwareMap.servo.get("indexer");
+        deflector = hardwareMap.servo.get("deflector");
+        deflector.setDirection(Servo.Direction.REVERSE);
         reloader = hardwareMap.servo.get("reloader");
 
 
@@ -59,7 +60,7 @@ public class ProjectileSystems
         intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeBelt.setDirection(DcMotor.Direction.REVERSE);
 
-
+        deflector.setPosition(0);
         indexer.setPosition(0);
         reloader.setPosition(0);
 
@@ -68,9 +69,11 @@ public class ProjectileSystems
 
     /*******************************************UNUSED*******************************************/
 
-    public void fireRing(double inputSpeed) throws InterruptedException
+    public void fireRing(float dist)
     {
-
+        //TODO: connection of distance to deflector angle
+        deflector.setPosition(1.0f);
+        mode = ProjectileSystems.Mode.FIRING;
     }
 
     public void setFlywheel(float inputPower)
@@ -80,6 +83,9 @@ public class ProjectileSystems
 
         flywheel.setPower(power);
     }
+
+
+    public void setDeflector(float position){ deflector.setPosition(position / 280.0f); }
 
     public void setFlywheelRPM(double rpm)
     {
@@ -106,6 +112,7 @@ public class ProjectileSystems
                 indexer.setPosition(0);
                 intakeBelt.setPower(0);//Set Velo instead?
                 reloader.setPosition(0);
+                deflector.setPosition(0);
                 mode = Mode.IDLE;
                 break;
 
@@ -132,7 +139,7 @@ public class ProjectileSystems
             case FIRING:
                 //Fire the current ring, and set mode to reset
 
-                //time alloted for spinup before firing-may be remove-TODO: test if flywheel.getVelcity works
+                //time alloted for spinup before firing-may be remove
                 int timeTF = 500;
                 double flywheelRPM = 4500;
                 //Turn on flywheel to set RPM -Find correct rpm, make it changeable?
