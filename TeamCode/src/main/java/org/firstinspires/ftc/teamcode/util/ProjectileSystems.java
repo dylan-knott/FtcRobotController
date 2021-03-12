@@ -97,7 +97,7 @@ public class ProjectileSystems
 
     }
     public void setIndexer(double pos){
-        indexer.setPosition(pos / 280.0f);
+        indexer.setPosition(pos / 200.0f);
     }
 
     //Returns if the shooter is Idle or busy

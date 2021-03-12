@@ -60,6 +60,7 @@ public class LocalizedRobotDrive {
 
         //Expansion hub 2 sensors
         armLimit = hardwareMap.get(DigitalChannel.class, "arm_limit");
+        armLimit.setMode(DigitalChannel.Mode.INPUT);
 
         //Expansion hub 1 servos
         clawServo = hardwareMap.servo.get("claw_servo");
@@ -80,12 +81,6 @@ public class LocalizedRobotDrive {
         clawServo.setPosition(0);
         intakeRelease.setPosition(90 / 280f);
 
-
-        //Sensor Initialization
-        /*if (floorColor instanceof SwitchableLight) {
-            ((SwitchableLight)floorColor).enableLight(false);
-        }*/
-        armLimit.setMode(DigitalChannel.Mode.INPUT);
     }
 
     public void initializeArm()
@@ -95,10 +90,10 @@ public class LocalizedRobotDrive {
         //Run arm back until switch is activated
         armLift.setPower(-armPower);
         while (!armLimit.getState());
+        armLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //Set motor to run_to_position
         armLift.setTargetPosition(0);
         armLift.setMode((DcMotor.RunMode.RUN_TO_POSITION));
-        armLift.setPower(0);
     }
 
 
@@ -120,7 +115,7 @@ public class LocalizedRobotDrive {
         rrDrive.followTrajectory(strafeTrajectory);
     }
 
-    /*******************************************STRAFING*******************************************/
+    /*******************************************TURNING*******************************************/
     public void turn(double degrees) {
         rrDrive.turn(degrees * (Math.PI / 180));
     }
