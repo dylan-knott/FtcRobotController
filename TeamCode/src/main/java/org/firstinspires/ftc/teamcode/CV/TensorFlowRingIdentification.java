@@ -90,6 +90,8 @@ public class TensorFlowRingIdentification {
     public void initObjectDetector(HardwareMap hm, Telemetry t) {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
+        hardwareMap = hm;
+        telem = t;
         initVuforia();
         initTfod();
 
@@ -108,7 +110,7 @@ public class TensorFlowRingIdentification {
             // (typically 1.78 or 16/9).
 
             // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
-            //tfod.setZoom(2.5, 1.78);
+            tfod.setZoom(2.5, 1.78);
         }
     }
 

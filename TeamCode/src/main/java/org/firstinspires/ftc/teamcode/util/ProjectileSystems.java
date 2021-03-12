@@ -72,7 +72,7 @@ public class ProjectileSystems
     public void fireRing(float dist)
     {
         //TODO: connection of distance to deflector angle
-        deflector.setPosition(1.0f);
+        setDeflector(90);
         mode = ProjectileSystems.Mode.FIRING;
     }
 
@@ -84,8 +84,9 @@ public class ProjectileSystems
         flywheel.setPower(power);
     }
 
-
-    public void setDeflector(float position){ deflector.setPosition(position / 280.0f); }
+    public void setDeflector(double position){
+        deflector.setPosition(position / 270.0f);
+    }
 
     public void setFlywheelRPM(double rpm)
     {
@@ -97,6 +98,12 @@ public class ProjectileSystems
     }
     public void setIndexer(double pos){
         indexer.setPosition(pos / 280.0f);
+    }
+
+    //Returns if the shooter is Idle or busy
+    public boolean isBusy() {
+        if (mode == Mode.IDLE) return false;
+        else return true;
     }
 
     public void update()
@@ -189,7 +196,6 @@ public class ProjectileSystems
                 //idle state, no commands being given
                 break;
         }
-
     }
 
 }

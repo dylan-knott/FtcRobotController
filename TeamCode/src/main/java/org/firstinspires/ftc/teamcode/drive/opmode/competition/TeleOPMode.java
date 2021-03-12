@@ -59,7 +59,7 @@ public class TeleOPMode extends LinearOpMode {
             //telemetry.addData("x", poseEstimate.getX());
             //telemetry.addData("y", poseEstimate.getY());
             //telemetry.addData("heading", poseEstimate.getHeading());
-            telemetry.addData("Release Position", robot.intakeRelease.getPosition());
+            telemetry.addData("Shooter Is Busy", shooter.isBusy());
 
 
             //Gamepad 1  ***Drivetrain***
@@ -67,7 +67,7 @@ public class TeleOPMode extends LinearOpMode {
             if (gamepad1.right_bumper) robot.toggleClaw();
 
             //Gamepad 2  ***Gun and intake***
-            robot.setIntake(gamepad2.right_stick_y);
+            robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
             //shooter.setFlywheel(gamepad2.right_trigger);
             //shooter.indexer.setPosition((double)gamepad2.left_trigger / 2.0f);
             if (gamepad2.a) shooter.intakeBelt.setPower(1);

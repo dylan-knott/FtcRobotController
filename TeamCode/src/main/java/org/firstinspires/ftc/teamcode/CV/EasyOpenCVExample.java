@@ -21,6 +21,7 @@
 
 package org.firstinspires.ftc.teamcode.CV;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -34,6 +35,7 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.*;
 
 @TeleOp
+@Disabled
 public class EasyOpenCVExample extends LinearOpMode
 {
     OpenCvInternalCamera phoneCam;

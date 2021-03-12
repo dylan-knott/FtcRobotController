@@ -13,7 +13,8 @@ public class TFTest extends LinearOpMode {
         waitForStart();
 
         while (!isStopRequested()){
-            tf.runDetect(30);
+            tf.runDetect(10);
+            tf.closeTfod();
         }
 
     }

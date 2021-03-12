@@ -33,7 +33,7 @@ public class LocalizedRobotDrive {
 
     //Default motor power levels for wheels
     public double motorPower = 0.8;
-    public double intakePower = 1;
+    public double intakePower = 0.7;
     public double armPower = 0.4;
 
 
@@ -98,6 +98,7 @@ public class LocalizedRobotDrive {
         //Set motor to run_to_position
         armLift.setTargetPosition(0);
         armLift.setMode((DcMotor.RunMode.RUN_TO_POSITION));
+        armLift.setPower(0);
     }
 
 
@@ -132,7 +133,7 @@ public class LocalizedRobotDrive {
         armLift.setTargetPosition((int)(posDegrees * _ARM_RATIO_));
     }
 
-    public void setIntake(float power) {
+    public void setIntake(double power) {
             intake.setPower(power * intakePower);
     }
 
@@ -144,11 +145,11 @@ public class LocalizedRobotDrive {
         }
     }
 
-    public void setClaw(float position) {
+    public void setClaw(double position) {
             clawServo.setPosition(position);
     }
 
-    public void setIntakeRelease(float position) {
+    public void setIntakeRelease(double position) {
         intakeRelease.setPosition(position / 280f);
     }
 

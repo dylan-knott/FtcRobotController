@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.CV;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 
 @Autonomous(name="Test OpenCV", group = "Autonomous")
+@Disabled
 public class OpenCVOp extends LinearOpMode {
     OpenCVClass openCV = new OpenCVClass();
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
