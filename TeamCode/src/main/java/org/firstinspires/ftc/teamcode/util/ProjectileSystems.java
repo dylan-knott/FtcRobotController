@@ -119,26 +119,6 @@ public class ProjectileSystems
                 mode = Mode.IDLE;
                 break;
 
-            case CHAMBER:
-                //TODO: TEST IF THIS WORKS, MAY NOT COMPLETE. FIGURE OUT HOW TO OPEN, THEN WAIT FOR CLOSE TO START INTAKE MAY BE IDIOT
-                //Used to specify how long to wait to close chambering servo TODO: Find correct value
-                int reloaderDelay = 500;
-
-                //needs testing
-                reloader.setPosition(reloadPOS);
-                reloader.setPosition(0);
-
-                //after
-                TimerTask servoClose = new TimerTask() {
-                    @Override
-                    public void run() {
-                        mode = Mode.PRIME;
-                    }
-                };
-                timer.schedule(servoClose, reloaderDelay);
-                mode = Mode.IDLE;
-                break;
-
             case FIRING:
                 //Fire the current ring, and set mode to reset
 
@@ -169,7 +149,7 @@ public class ProjectileSystems
 
             case PRIME:
                 //Used to specify how long to run belt for TODO: Find correct Value
-                //Desnigned to load the next ring into the chamber - needs dev- runs after CHAMBER
+                //Desnigned to load the next ring into the chamber - needs dev- runs after
                 int beltDelay = 500;
                 intakeBelt.setPower(1);
 
@@ -184,7 +164,19 @@ public class ProjectileSystems
 
             case INTAKE:
                 //Moving rings up to the chamber
-                intakeBelt.setPower(1);
+
+                //delay before intake belt is turned off, should be time that it takes ring to move
+                int turnoffDelay = 4000;
+
+                intakeBelt.setPower(1); //I do it this way so the intake can run while the robot is doing other things, then automatically turns off
+
+                TimerTask turnoffIntake = new TimerTask() {
+                    @Override
+                    public void run() {
+                        intakeBelt.setPower(0);
+                    }
+                };
+                timer.schedule(turnoffIntake, turnoffDelay);
                 mode = Mode.IDLE;
                 break;
 
