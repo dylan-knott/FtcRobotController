@@ -26,7 +26,7 @@ public class ProjectileSystems
 
     private final double RPM_TO_TPS = 28.0f /60;
     private final double TPS_TO_RPM = 60/28.0f;
-    private Map<Float, Integer> distToRPM = new HashMap<>();
+    private Map<Float, Integer> distToAngle4500  = new HashMap<>();;
 
     Timer timer = new Timer();
 
@@ -60,10 +60,17 @@ public class ProjectileSystems
         intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeBelt.setDirection(DcMotor.Direction.REVERSE);
 
+
+        //Servo Initialization
         deflector.setPosition(0);
         indexer.setPosition(0);
         reloader.setPosition(0);
 
+        //TODO: Hashmap
+        //Distance to angle Hashmap Initalization
+        //distToAngle4500.put();
+
+        //Default robot init mode
         mode = Mode.IDLE;
     }
 
@@ -74,14 +81,6 @@ public class ProjectileSystems
         //TODO: connection of distance to deflector angle
         setDeflector(90);
         mode = ProjectileSystems.Mode.FIRING;
-    }
-
-    public void setFlywheel(float inputPower)
-    {
-        //Remap input to the max power
-        float power = (float) (inputPower * flywheelPower);
-
-        flywheel.setPower(power);
     }
 
     public void setDeflector(double position){
@@ -95,9 +94,6 @@ public class ProjectileSystems
         flywheel.setVelocity(flywheelAngularVelocity);
         telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
 
-    }
-    public void setIndexer(double pos){
-        indexer.setPosition(pos / 200.0f);
     }
 
     //Returns if the shooter is Idle or busy
