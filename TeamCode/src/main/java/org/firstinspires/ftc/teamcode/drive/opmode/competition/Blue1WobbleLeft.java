@@ -42,7 +42,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
         drive.turn(Math.toRadians(INITIAL_TURN));
 
         //TODO: Look for Ring Stack
-        char dropZone = tf.runDetect(5);
+        char dropZone = tf.runDetect(3);
         tf.closeTfod();
         if (dropZone == 'c') dropPose = new Pose2d(48 - robot.ARM_REACH, 60, 0);
         else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, 36, 0);

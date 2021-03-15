@@ -32,7 +32,7 @@ public class TeleOPMode extends LinearOpMode {
         //Boolean values used in order to stop toggles from activating multiple times for a single button press
         boolean g1x_state = false;
         boolean g1y_state = false;
-        
+
         drive.setPoseEstimate(PoseStorage.currentPose);
 
         waitForStart();
@@ -57,11 +57,11 @@ public class TeleOPMode extends LinearOpMode {
             drive.update();
             shooter.update();
 
-            Pose2d poseEstimate = drive.getPoseEstimate();
             //telemetry.addData("x", poseEstimate.getX());
             //telemetry.addData("y", poseEstimate.getY());
             //telemetry.addData("heading", poseEstimate.getHeading());
-            telemetry.addData("Shooter Is Busy", shooter.isBusy());
+            telemetry.addData("Arm Encoder Pos", robot.armLift.getCurrentPosition());
+            telemetry.addData("Distance reading", 0);
 
 
             //Gamepad 1  ***Drivetrain***
@@ -77,7 +77,7 @@ public class TeleOPMode extends LinearOpMode {
 
             //shooter.setFlywheelsRPM(gamepad2.right_trigger);
 
-            if (gamepad2.dpad_up) robot.setArm(14);
+            if (gamepad2.dpad_up) robot.setArm(180);
             if (gamepad2.dpad_down) robot.setArm(0);
 
             //testing

@@ -28,6 +28,7 @@ public class ProjectileSystems
     private final double TPS_TO_RPM = 60/28.0f;
     private Map<Float, Integer> distToAngle4500  = new HashMap<>();;
 
+
     Timer timer = new Timer();
 
     public enum Mode
@@ -84,7 +85,7 @@ public class ProjectileSystems
     }
 
     public void setDeflector(double position){
-        deflector.setPosition(position / 270.0f);
+        deflector.setPosition(position / 170.0f);
     }
 
     public void setFlywheelRPM(double rpm)

@@ -28,8 +28,7 @@ public class LocalizedRobotDrive {
     //Hardware
     public DcMotor intake, armLift;
     public Servo clawServo, intakeRelease;
-    public DistanceSensor dist = null;
-    public DigitalChannel armLimit = null;
+    public TouchSensor armLimit = null;
 
     //Default motor power levels for wheels
     public double motorPower = 0.8;
@@ -59,15 +58,11 @@ public class LocalizedRobotDrive {
         armLift = hardwareMap.dcMotor.get("arm_lift");
 
         //Expansion hub 2 sensors
-        armLimit = hardwareMap.get(DigitalChannel.class, "arm_limit");
-        armLimit.setMode(DigitalChannel.Mode.INPUT);
+        armLimit = hardwareMap.touchSensor.get("arm_limit");
 
         //Expansion hub 1 servos
         clawServo = hardwareMap.servo.get("claw_servo");
         intakeRelease = hardwareMap.servo.get("intake_release");
-
-
-        dist = hardwareMap.get(DistanceSensor.class, "distance");
 
         //Motor Initialization
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -80,18 +75,13 @@ public class LocalizedRobotDrive {
         intakeRelease.setDirection(Servo.Direction.REVERSE);
         clawServo.setPosition(0);
         intakeRelease.setPosition(90 / 280f);
+        armLift.setDirection(DcMotor.Direction.REVERSE);
 
     }
 
     public void initializeArm()
     {
-        //Set motor to run_without_encoder
-        armLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //Run arm back until switch is activated
-        armLift.setPower(-armPower);
-        while (!armLimit.getState());
         armLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //Set motor to run_to_position
         armLift.setTargetPosition(0);
         armLift.setMode((DcMotor.RunMode.RUN_TO_POSITION));
     }
@@ -124,7 +114,8 @@ public class LocalizedRobotDrive {
 
     public void setArm(int posDegrees)
     {
-        final double _ARM_RATIO_ = (60 * (20.0f / 15) * (15.0f / 10 ));
+        //Need to figure out this ratio. Gear ratio is 120 to 1. Ticks per Revolution at the motor is 28
+        final double _ARM_RATIO_ = 120 * 28;
         armLift.setTargetPosition((int)(posDegrees * _ARM_RATIO_));
     }
 
@@ -152,7 +143,7 @@ public class LocalizedRobotDrive {
     {
         if (clawServo.getPosition() == 0) //claw is closed
         {
-            setClaw(275.0f / 280); //open claw
+            setClaw(90.0f / 280); //open claw
         }
         else
         {
