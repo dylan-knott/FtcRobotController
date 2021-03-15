@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
 @TeleOp(name= "TeleOp", group= "TeleOp")
@@ -31,7 +32,8 @@ public class TeleOPMode extends LinearOpMode {
         //Boolean values used in order to stop toggles from activating multiple times for a single button press
         boolean g1x_state = false;
         boolean g1y_state = false;
-
+        
+        drive.setPoseEstimate(PoseStorage.currentPose);
 
         waitForStart();
         shooter.mode = ProjectileSystems.Mode.IDLE;

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.CV.TensorFlowRingIdentification;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
 @Autonomous(name="Red 1 Wobble Left")
@@ -40,24 +41,25 @@ public class Red1WobbleLeft extends LinearOpMode {
         //TODO: Look for Ring Stack
         char dropZone = tf.runDetect(5);
         tf.closeTfod();
-        if (dropZone == 'c') dropPose = new Pose2d(48 - robot.ARM_REACH, -60, 0);
-        else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, -36, 0);
-        else dropPose = new Pose2d(12 - robot.ARM_REACH, -60, 0);
+        if (dropZone == 'c') dropPose = new Pose2d(48 - robot.ARM_REACH, -60, Math.toRadians(-90));
+        else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, -36, Math.toRadians(-90));
+        else dropPose = new Pose2d(12 - robot.ARM_REACH, -60, Math.toRadians(-90));
         //While the ring stack is being looked for, build the trajectory
         //This trajectory is for delivering the wobble goal, and driving up until rings are shot
         Trajectory trajA = drive.trajectoryBuilder(drive.getPoseEstimate().plus(new Pose2d(0, 0, Math.toRadians(INITIAL_TURN))))
-                .splineToLinearHeading(dropPose, Math.toRadians(0)) //Move to targeted drop zone
+                .splineToLinearHeading(dropPose, Math.toRadians(-90)) //Move to targeted drop zone
                 .addDisplacementMarker(() -> { //Runs after the first spline is completed
                     //DO NOT CALL ANY SLEEP FUNCTIONS/FREEZE INTERPRETER INSIDE OF DISPLACEMENT MARKERS.
                     //TODO: Drop wobble goal
                     robot.setArm(90);
                     robot.setClaw(0);
+                    robot.setArm(0);
                 })
                 .splineToLinearHeading(new Pose2d(-18, -18, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER)).plus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(0))
                 .build();
 
         Trajectory trajB = drive.trajectoryBuilder(trajA.end())
-                .splineToConstantHeading(new Vector2d(12 - robot.ARM_REACH  + 3, -60), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(12 - robot.ARM_REACH  + 3, -12, 0), Math.toRadians(0))
                 .addDisplacementMarker(() -> {
                     //Set Arm out to reach over the
                     robot.setArm(90);
@@ -71,6 +73,9 @@ public class Red1WobbleLeft extends LinearOpMode {
         sleep(2000);
         //TODO: Intake additional rings?
         drive.followTrajectory(trajB);
+
+        //At the end, store the pose
+        PoseStorage.currentPose = drive.getPoseEstimate();
 
     }
 }

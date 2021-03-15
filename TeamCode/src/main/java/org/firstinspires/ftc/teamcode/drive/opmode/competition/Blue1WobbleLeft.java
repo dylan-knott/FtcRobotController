@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.CV.TensorFlowRingIdentification;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.RobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
 @Autonomous(name="Blue 1 Wobble Left")
@@ -60,7 +61,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
                 .build();
 
         Trajectory trajB = drive.trajectoryBuilder(trajA.end())
-                .splineToConstantHeading(new Vector2d(12 - robot.ARM_REACH  + 3, 60), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(12 - robot.ARM_REACH  + 3, 60, 0), Math.toRadians(0))
                 .addDisplacementMarker(() -> {
                     //Set Arm out to reach over the
                     robot.setArm(90);
@@ -75,5 +76,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
         //TODO: Intake additional rings?
         drive.followTrajectory(trajB);
 
+        //At the end, store the pose
+        PoseStorage.currentPose = drive.getPoseEstimate();
     }
 }
