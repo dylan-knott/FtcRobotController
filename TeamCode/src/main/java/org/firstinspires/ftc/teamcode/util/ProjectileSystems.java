@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ProjectileSystems
+public class ProjectileSystems extends Thread
 {
     //Hardware declaration, need color sensors
     public DcMotor intakeBelt;
@@ -36,6 +36,14 @@ public class ProjectileSystems
 
     private Map<Float, Integer> distToAngle4500  = new HashMap<>();;
 
+    public void run() {
+        while (true) {
+            try {
+                update();
+            } catch (InterruptedException e) {
+            }
+        }
+    }
 
     Timer timer = new Timer();
 
@@ -92,11 +100,11 @@ public class ProjectileSystems
         //TODO: connection of distance to deflector angle
         if (mode == Mode.IDLE) {
             setDeflector(98);
-            mode = ProjectileSystems.Mode.FIRING;
             queuedRings += numQueued;
             if (queuedRings > 3) {
                 queuedRings = 3;
             }
+            mode = ProjectileSystems.Mode.FIRING;
         }
     }
 
@@ -136,8 +144,7 @@ public class ProjectileSystems
         }
     }
 
-    public void update()
-    {
+    public void update() throws InterruptedException {
         //placeholder, need to figure out once built
         double firePOS = 180;
         double reloadPOS = 180;
@@ -155,11 +162,14 @@ public class ProjectileSystems
                 indexer.setPosition(0);
                 intakeBelt.setPower(0);//Set Velo instead?
                 reloader.setPosition(0);
-                if (queuedRings > 0)
+                if (queuedRings > 0) {
                     mode = Mode.FIRING;
-                else
+                    wait(500);
+                }
+                else {
                     mode = Mode.IDLE;
-                break;
+                    break;
+                }
 
             case FIRING:
                 //Fire the current ring, and set mode to reset
@@ -225,6 +235,8 @@ public class ProjectileSystems
                 //idle state, no commands being given
                 break;
         }
+        telemetry.addData("Shooter Runtime", System.currentTimeMillis());
+        telemetry.update();
     }
 
 }

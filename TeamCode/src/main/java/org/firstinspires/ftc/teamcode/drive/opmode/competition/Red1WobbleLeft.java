@@ -37,6 +37,7 @@ public class Red1WobbleLeft extends LinearOpMode {
         //Wait for start button to be pressed
         waitForStart();
 
+        shooter.start();
         //Turn 15 degrees to look at ring stack
         drive.turn(Math.toRadians(INITIAL_TURN));
 
@@ -81,14 +82,11 @@ public class Red1WobbleLeft extends LinearOpMode {
         //Shoot Rings
         long end = System.currentTimeMillis() + (int)(SHOOTER_TIMEOUT_SECONDS * 1000);
         shooter.fireRing(69, 3);
-        while (shooter.getRingCount() > 0 && System.currentTimeMillis() < end) {
-            shooter.update();
-        }
-        shooter.mode = ProjectileSystems.Mode.RESET;
-        shooter.update();
+        while(shooter.getRingCount() > 0);
         drive.followTrajectory(trajC);
 
-        //At the end, store the pose
+        //At the end, kill the shooting thread and store the pose
+        shooter.interrupt();
         PoseStorage.currentPose = drive.getPoseEstimate();
 
     }
