@@ -34,6 +34,7 @@ public class TeleOPMode extends LinearOpMode {
         boolean g1x_state = false;
         boolean g1y_state = false;
 
+        shooter.start();
         drive.setPoseEstimate(PoseStorage.currentPose);
 
         waitForStart();
@@ -56,7 +57,6 @@ public class TeleOPMode extends LinearOpMode {
             );
 
             drive.update();
-            shooter.update();
 
             //telemetry.addData("x", poseEstimate.getX());
             //telemetry.addData("y", poseEstimate.getY());

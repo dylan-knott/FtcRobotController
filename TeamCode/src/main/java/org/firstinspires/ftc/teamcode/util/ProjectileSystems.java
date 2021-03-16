@@ -58,6 +58,8 @@ public class ProjectileSystems extends Thread
     }
     public Mode mode;
 
+
+    public boolean readyToFire =true;
     public void initializeShooter(HardwareMap hardwareMap, Telemetry telem, LocalizedRobotDrive.allianceColor clr)
     {
         telemetry = telem;
@@ -163,8 +165,10 @@ public class ProjectileSystems extends Thread
                 intakeBelt.setPower(0);//Set Velo instead?
                 reloader.setPosition(0);
                 if (queuedRings > 0) {
+                    readyToFire = true;
+                    queuedRings--;
                     mode = Mode.FIRING;
-                    wait(500);
+
                 }
                 else {
                     mode = Mode.IDLE;
@@ -185,15 +189,18 @@ public class ProjectileSystems extends Thread
 
                 //Mix of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
                 if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 20 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM - 20 ) {
+                    sleep(100);
                     indexer.setPosition(50.0 / 280.0f);
                     TimerTask endFire = new TimerTask() {
                         @Override
                         public void run() {
-                            queuedRings--;
                             mode = Mode.RESET;
                         }
                     };
-                    timer.schedule(endFire, timeTF);
+                    if (readyToFire == true) {
+                        timer.schedule(endFire, timeTF);
+                        readyToFire = false;
+                    }
                 }
                 }
                 break;

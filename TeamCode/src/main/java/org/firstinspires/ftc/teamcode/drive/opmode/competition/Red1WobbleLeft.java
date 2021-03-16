@@ -80,13 +80,13 @@ public class Red1WobbleLeft extends LinearOpMode {
         robot.setArm(0);
         drive.followTrajectory(trajB);
         //Shoot Rings
-        long end = System.currentTimeMillis() + (int)(SHOOTER_TIMEOUT_SECONDS * 1000);
+        long end = System.currentTimeMillis() + (int)(SHOOTER_TIMEOUT_SECONDS * 10000);
         shooter.fireRing(69, 3);
         while(shooter.getRingCount() > 0);
         drive.followTrajectory(trajC);
 
         //At the end, kill the shooting thread and store the pose
-        shooter.interrupt();
+        //TODO: Kill shooting thread correctly
         PoseStorage.currentPose = drive.getPoseEstimate();
 
     }
