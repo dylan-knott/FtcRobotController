@@ -235,37 +235,36 @@ public class APMecanumDrive extends MecanumDrive {
 
     //Returns straight line distance from current position to a given target
     public double getDistanceToTarget(Target target){
+        Vector2d targetPos = new Vector2d(0, 0);
         Vector2d currentPos = getPoseEstimate().vec();
-        switch(target) {
+        switch(target){
             case RED_TOWER:
-                return currentPos.distTo(RED_TOWER_POS);
+                targetPos = RED_TOWER_POS;
             case BLUE_TOWER:
-                return currentPos.distTo(BLUE_TOWER_POS);
+                targetPos = BLUE_TOWER_POS;
             case BLUE_POWERSHOT:
-                return currentPos.distTo(BLUE_POWERSHOT_POS);
+                targetPos = BLUE_POWERSHOT_POS;
             case RED_POWERSHOT:
-                return currentPos.distTo(RED_POWERSHOT_POS);
-
+                targetPos = RED_POWERSHOT_POS;
         }
-        return -1;
-
+        return Math.hypot(targetPos.getX() - currentPos.getX(), targetPos.getY() - currentPos.getY());
     }
 
     //Returns angle in radians from current position to a given target
     public double getRadiansToTarget(Target target){
+        Vector2d targetPos = new Vector2d(0, 0);
         Vector2d currentPos = getPoseEstimate().vec();
-        switch(target) {
+        switch(target){
             case RED_TOWER:
-                return currentPos.angleBetween(RED_TOWER_POS);
+                targetPos = RED_TOWER_POS;
             case BLUE_TOWER:
-                return currentPos.angleBetween(BLUE_TOWER_POS);
+                targetPos = BLUE_TOWER_POS;
             case BLUE_POWERSHOT:
-                return currentPos.angleBetween(BLUE_POWERSHOT_POS);
+                targetPos = BLUE_POWERSHOT_POS;
             case RED_POWERSHOT:
-                return currentPos.angleBetween(RED_POWERSHOT_POS);
-
+                targetPos = RED_POWERSHOT_POS;
         }
-        return 0;
+        return Math.atan2(targetPos.getY() - currentPos.getY(), targetPos.getX() - currentPos.getX());
     }
 
     public void update() {

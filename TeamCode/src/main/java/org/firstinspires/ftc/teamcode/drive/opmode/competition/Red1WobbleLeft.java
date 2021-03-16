@@ -14,7 +14,8 @@ import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 @Autonomous(name="Red 1 Wobble Left")
 public class Red1WobbleLeft extends LinearOpMode {
 
-    private final int INITIAL_TURN = 15;
+    private final int INITIAL_TURN = -35;
+    private final int SHOOTER_TIMEOUT_SECONDS = 7;
 
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
     ProjectileSystems shooter = new ProjectileSystems();
@@ -30,7 +31,8 @@ public class Red1WobbleLeft extends LinearOpMode {
         drive = robot.rrDrive;
 
         //Tell roadrunner where the robot is initially placed
-        drive.setPoseEstimate(new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , robot.CHASSIS_WIDTH / 2 , 0));
+        //Tell the shooter how many rings are in by default
+        drive.setPoseEstimate(new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , -24 + robot.CHASSIS_WIDTH / 2 , 0));
 
         //Wait for start button to be pressed
         waitForStart();
@@ -39,40 +41,52 @@ public class Red1WobbleLeft extends LinearOpMode {
         drive.turn(Math.toRadians(INITIAL_TURN));
 
         //TODO: Look for Ring Stack
-        char dropZone = tf.runDetect(3);
+        char dropZone = tf.runDetect(2);
         tf.closeTfod();
-        if (dropZone == 'c') dropPose = new Pose2d(48 - robot.ARM_REACH, -60, Math.toRadians(-90));
-        else if (dropZone == 'b') dropPose = new Pose2d(36 - robot.ARM_REACH, -36, Math.toRadians(-90));
-        else dropPose = new Pose2d(12 - robot.ARM_REACH, -60, Math.toRadians(-90));
+        if (dropZone == 'c') dropPose = new Pose2d(52, -65 + robot.ARM_REACH, Math.toRadians(-90));
+        else if (dropZone == 'b') dropPose = new Pose2d(36, -38 + robot.ARM_REACH, Math.toRadians(-90));
+        else dropPose = new Pose2d(12, -64 + robot.ARM_REACH, Math.toRadians(-90));
+        telemetry.addData("Drop Zone", dropZone);
+        telemetry.update();
         //While the ring stack is being looked for, build the trajectory
         //This trajectory is for delivering the wobble goal, and driving up until rings are shot
         Trajectory trajA = drive.trajectoryBuilder(drive.getPoseEstimate().plus(new Pose2d(0, 0, Math.toRadians(INITIAL_TURN))))
-                .splineToLinearHeading(dropPose, Math.toRadians(-90)) //Move to targeted drop zone
-                .addDisplacementMarker(() -> { //Runs after the first spline is completed
-                    //DO NOT CALL ANY SLEEP FUNCTIONS/FREEZE INTERPRETER INSIDE OF DISPLACEMENT MARKERS.
-                    //TODO: Drop wobble goal
-                    robot.setArm(90);
-                    robot.setClaw(0);
-                    robot.setArm(0);
-                })
-                .splineToLinearHeading(new Pose2d(-18, -18, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER)).plus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(0))
+                .splineTo(new Vector2d(-36, -12),0)
                 .build();
 
-        Trajectory trajB = drive.trajectoryBuilder(trajA.end())
-                .splineToLinearHeading(new Pose2d(12 - robot.ARM_REACH  + 3, -12, 0), Math.toRadians(0))
-                .addDisplacementMarker(() -> {
-                    //Set Arm out to reach over the
-                    robot.setArm(90);
-                })
+        Trajectory trajAB = drive.trajectoryBuilder(trajA.end())
+                    .splineToLinearHeading(dropPose, Math.toRadians(-90)) //Move to targeted drop zone
+                    .build();
+
+
+        Trajectory trajB = drive.trajectoryBuilder(trajAB.end(), true)
+                .splineToLinearHeading(new Pose2d(-18, -18,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(0))
+                .build();
+
+
+        Trajectory trajC = drive.trajectoryBuilder(trajB.end())
+                .splineToLinearHeading(new Pose2d(4,  -12, 0), Math.toRadians(0))
                 .build();
 
 
         //ROBOT ACTUALLY MOVES
         drive.followTrajectory(trajA);
-        //TODO: Shoot Rings (for now, a sleep will emulate the time to shoot 3 rings
-        sleep(2000);
-        //TODO: Intake additional rings?
+        drive.followTrajectory(trajAB);
+        robot.setArm(110);
+        sleep(800);
+        robot.setClaw(0);
+        sleep(200);
+        robot.setArm(0);
         drive.followTrajectory(trajB);
+        //Shoot Rings
+        long end = System.currentTimeMillis() + (int)(SHOOTER_TIMEOUT_SECONDS * 1000);
+        shooter.fireRing(69, 3);
+        while (shooter.getRingCount() > 0 && System.currentTimeMillis() < end) {
+            shooter.update();
+        }
+        shooter.mode = ProjectileSystems.Mode.RESET;
+        shooter.update();
+        drive.followTrajectory(trajC);
 
         //At the end, store the pose
         PoseStorage.currentPose = drive.getPoseEstimate();

@@ -16,9 +16,9 @@ public class LocalizedRobotDrive {
     //Width of the robot length
     public final double CHASSIS_LENGTH = 18;
     //Compensate for reach of the wobble arm, measured from the center of the bot
-    public final double ARM_REACH = 16;
+    public final double ARM_REACH = 20;
     //Compensate for angled trajectory of ring out of the shooter
-    public final double SHOOTER_ANGLE_ERROR = Math.toRadians(0);
+    public final double SHOOTER_ANGLE_ERROR = Math.toRadians(12);
 
     private Telemetry telemetry = null;
     private allianceColor teamColor = null;
@@ -33,7 +33,6 @@ public class LocalizedRobotDrive {
     //Default motor power levels for wheels
     public double motorPower = 0.8;
     public double intakePower = 0.7;
-    public double armPower = 0.4;
 
 
     private boolean timerRunning = false;
@@ -66,6 +65,7 @@ public class LocalizedRobotDrive {
 
         //Motor Initialization
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         //Initialize Arm
@@ -73,7 +73,6 @@ public class LocalizedRobotDrive {
 
         //Initialize servos
         intakeRelease.setDirection(Servo.Direction.REVERSE);
-        clawServo.setPosition(0);
         intakeRelease.setPosition(90 / 280f);
         armLift.setDirection(DcMotor.Direction.REVERSE);
 
@@ -84,6 +83,7 @@ public class LocalizedRobotDrive {
         armLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armLift.setTargetPosition(0);
         armLift.setMode((DcMotor.RunMode.RUN_TO_POSITION));
+        setClaw(90);
     }
 
 
@@ -115,7 +115,8 @@ public class LocalizedRobotDrive {
     public void setArm(int posDegrees)
     {
         //Need to figure out this ratio. Gear ratio is 120 to 1. Ticks per Revolution at the motor is 28
-        final double _ARM_RATIO_ = 120 * 28;
+        final double _ARM_RATIO_ = (120.0f * 28) / 360.0f;
+        armLift.setPower(1);
         armLift.setTargetPosition((int)(posDegrees * _ARM_RATIO_));
     }
 
@@ -125,29 +126,25 @@ public class LocalizedRobotDrive {
 
     public void releaseIntake() {
         intakeRelease.setPosition(0 / 280f);
-        if (!timerRunning) {
-            timer.schedule(lockIntake, 2000L);
-            timerRunning = true;
-        }
     }
 
     public void setClaw(double position) {
-            clawServo.setPosition(position);
+            clawServo.setPosition(position / 280.0f);
     }
 
     public void setIntakeRelease(double position) {
-        intakeRelease.setPosition(position / 280f);
+        intakeRelease.setPosition(position / 280.0f);
     }
 
     public void toggleClaw()
     {
-        if (clawServo.getPosition() == 0) //claw is closed
+        if (clawServo.getPosition() == 0) //claw is open
         {
-            setClaw(90.0f / 280); //open claw
+            setClaw(90.0f / 280); //close claw
         }
         else
         {
-            clawServo.setPosition(0); //close claw
+            clawServo.setPosition(0); //open claw
         }
     }
     /*******************************************UTILITIES*******************************************/

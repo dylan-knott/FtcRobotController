@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.PoseStorage;
@@ -61,27 +62,28 @@ public class TeleOPMode extends LinearOpMode {
             //telemetry.addData("y", poseEstimate.getY());
             //telemetry.addData("heading", poseEstimate.getHeading());
             telemetry.addData("Arm Encoder Pos", robot.armLift.getCurrentPosition());
-            telemetry.addData("Distance reading", 0);
+            telemetry.addData("Ring Count", shooter.getRingCount());
+            telemetry.addData("Angle to Red Tower", drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER));
+            telemetry.addData("Distance to Red Tower", drive.getDistanceToTarget(APMecanumDrive.Target.RED_TOWER));
 
 
             //Gamepad 1  ***Drivetrain***
             if (gamepad1.x) robot.releaseIntake();
             if (gamepad1.right_bumper) robot.toggleClaw();
+            if (gamepad1.dpad_up) robot.setArm(110);
+            if (gamepad1.dpad_down) robot.setArm(0);
+
 
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
-            //shooter.setFlywheel(gamepad2.right_trigger);
-            //shooter.indexer.setPosition((double)gamepad2.left_trigger / 2.0f);
             if (gamepad2.a) shooter.intakeBelt.setPower(1);
             else shooter.intakeBelt.setPower(0);
 
             //shooter.setFlywheelsRPM(gamepad2.right_trigger);
 
-            if (gamepad2.dpad_up) robot.setArm(180);
-            if (gamepad2.dpad_down) robot.setArm(0);
 
             //testing
-            if(gamepad2.y) shooter.fireRing(69);
+            if(gamepad2.y) shooter.fireRing(69, 1);
 
             if (isStopRequested()){
                 robot.stop();

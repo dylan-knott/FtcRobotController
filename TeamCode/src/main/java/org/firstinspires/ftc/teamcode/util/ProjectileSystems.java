@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode.util;
-
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.*;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 
 import java.util.HashMap;
@@ -16,6 +17,7 @@ public class ProjectileSystems
     public DcMotor intakeBelt;
     public DcMotorEx flywheel;
     public Servo indexer, reloader, deflector;
+    public RevColorSensorV3 dist;
 
 
     public double flywheelPower = 1;
@@ -26,6 +28,12 @@ public class ProjectileSystems
 
     private final double RPM_TO_TPS = 28.0f /60;
     private final double TPS_TO_RPM = 60/28.0f;
+    private final double NO_RING_DIST = 7.5;
+    private final double ONE_RING_DIST = 6.1;
+    private final double TWO_RING_DIST = 4;
+    private int ringCount = 0;
+    private int queuedRings;
+
     private Map<Float, Integer> distToAngle4500  = new HashMap<>();;
 
 
@@ -54,6 +62,7 @@ public class ProjectileSystems
         deflector = hardwareMap.servo.get("deflector");
         deflector.setDirection(Servo.Direction.REVERSE);
         reloader = hardwareMap.servo.get("reloader");
+        dist = hardwareMap.get(RevColorSensorV3.class, "distColor");
 
 
         //Motor Initialization
@@ -72,20 +81,27 @@ public class ProjectileSystems
         //distToAngle4500.put();
 
         //Default robot init mode
+        countRings();
         mode = Mode.IDLE;
     }
 
     /*******************************************UNUSED*******************************************/
 
-    public void fireRing(float dist)
+    public void fireRing(float dist, int numQueued)
     {
         //TODO: connection of distance to deflector angle
-        setDeflector(90);
-        mode = ProjectileSystems.Mode.FIRING;
+        if (mode == Mode.IDLE) {
+            setDeflector(98);
+            mode = ProjectileSystems.Mode.FIRING;
+            queuedRings += numQueued;
+            if (queuedRings > 3) {
+                queuedRings = 3;
+            }
+        }
     }
 
     public void setDeflector(double position){
-        deflector.setPosition(position / 170.0f);
+        deflector.setPosition(position / 165.0f);
     }
 
     public void setFlywheelRPM(double rpm)
@@ -96,11 +112,28 @@ public class ProjectileSystems
         telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
 
     }
+    public int getRingCount (){
+        return ringCount;
+    }
 
     //Returns if the shooter is Idle or busy
     public boolean isBusy() {
         if (mode == Mode.IDLE) return false;
         else return true;
+    }
+
+    //Code for ring count
+    private void countRings() {
+        double ringDist = dist.getDistance(DistanceUnit.CM);
+        if (ringDist > NO_RING_DIST) {
+            ringCount = 0;
+        } else if (ringDist > ONE_RING_DIST) {
+            ringCount = 1;
+        } else if (ringDist > TWO_RING_DIST) {
+            ringCount = 2;
+        } else {
+            ringCount = 3;
+        }
     }
 
     public void update()
@@ -109,15 +142,23 @@ public class ProjectileSystems
         double firePOS = 180;
         double reloadPOS = 180;
 
+        telemetry.addData("Rings Queued", queuedRings);
+        countRings();
+
         switch (mode) {
             case RESET:
                 //set all moving system to default position/off
-                setFlywheelRPM(0);
+                if (queuedRings <= 0) {
+                    setFlywheelRPM(0);
+                    deflector.setPosition(0);
+                }
                 indexer.setPosition(0);
                 intakeBelt.setPower(0);//Set Velo instead?
                 reloader.setPosition(0);
-                deflector.setPosition(0);
-                mode = Mode.IDLE;
+                if (queuedRings > 0)
+                    mode = Mode.FIRING;
+                else
+                    mode = Mode.IDLE;
                 break;
 
             case FIRING:
@@ -127,24 +168,23 @@ public class ProjectileSystems
                 int timeTF = 500;
                 double flywheelRPM = 4500;
                 //Turn on flywheel to set RPM -Find correct rpm, make it changeable?
+                if (queuedRings > 0) {
                 setFlywheelRPM(flywheelRPM);
 
                 telemetry.addData("In firing mode", flywheel.getVelocity() * TPS_TO_RPM);
 
                 //Mix of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
-                if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 20 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM - 20 )
-                {
-                    indexer.setPosition(50.0/280.0f);
-
+                if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 20 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM - 20 ) {
+                    indexer.setPosition(50.0 / 280.0f);
                     TimerTask endFire = new TimerTask() {
                         @Override
                         public void run() {
+                            queuedRings--;
                             mode = Mode.RESET;
                         }
                     };
-
                     timer.schedule(endFire, timeTF);
-
+                }
                 }
                 break;
 
