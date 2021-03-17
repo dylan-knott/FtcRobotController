@@ -154,7 +154,7 @@ public class LocalizedRobotDrive {
 
     TimerTask lockIntake = new TimerTask() {
         public void run() {
-            setIntakeRelease(90);
+            setIntakeRelease(99);
             timerRunning = false;
         }
     };
