@@ -18,6 +18,10 @@ public class TeleOPMode extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
 
+        if (shooter.isAlive()) {
+            shooter.stop();
+        }
+
         //init for robot and shooter
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
@@ -61,11 +65,11 @@ public class TeleOPMode extends LinearOpMode {
             //telemetry.addData("x", poseEstimate.getX());
             //telemetry.addData("y", poseEstimate.getY());
             //telemetry.addData("heading", poseEstimate.getHeading());
-            telemetry.addData("Arm Encoder Pos", robot.armLift.getCurrentPosition());
+           /* telemetry.addData("Arm Encoder Pos", robot.armLift.getCurrentPosition());
             telemetry.addData("Ring Count", shooter.getRingCount());
             telemetry.addData("Angle to Red Tower", drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER));
             telemetry.addData("Distance to Red Tower", drive.getDistanceToTarget(APMecanumDrive.Target.RED_TOWER));
-
+*/
 
             //Gamepad 1  ***Drivetrain***
             if (gamepad1.x) robot.releaseIntake();
@@ -87,8 +91,9 @@ public class TeleOPMode extends LinearOpMode {
 
             if (isStopRequested()){
                 robot.stop();
+                shooter.stop();
             }
-            telemetry.update();
+            PoseStorage.currentPose = drive.getPoseEstimate();
         }
     }
 }

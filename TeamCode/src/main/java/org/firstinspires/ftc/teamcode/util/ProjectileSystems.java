@@ -101,7 +101,7 @@ public class ProjectileSystems extends Thread
     {
         //TODO: connection of distance to deflector angle
         if (mode == Mode.IDLE) {
-            setDeflector(98);
+            setDeflector(97);
             queuedRings += numQueued;
             if (queuedRings > 3) {
                 queuedRings = 3;
@@ -123,6 +123,7 @@ public class ProjectileSystems extends Thread
 
     }
     public int getRingCount (){
+        countRings();
         return ringCount;
     }
 
@@ -151,26 +152,26 @@ public class ProjectileSystems extends Thread
         double firePOS = 180;
         double reloadPOS = 180;
 
-        telemetry.addData("Rings Queued", queuedRings);
+        //telemetry.addData("Rings Queued", getRingCount());
         countRings();
 
         switch (mode) {
             case RESET:
                 //set all moving system to default position/off
-                if (queuedRings <= 0) {
+                if (getRingCount() <= 0) {
+                    readyToFire = true;
                     setFlywheelRPM(0);
                     deflector.setPosition(0);
                 }
                 indexer.setPosition(0);
                 intakeBelt.setPower(0);//Set Velo instead?
                 reloader.setPosition(0);
-                if (queuedRings > 0) {
+                if (getRingCount() > 0) {
                     readyToFire = true;
-                    queuedRings--;
+                    //queuedRings--;
                     mode = Mode.FIRING;
 
-                }
-                else {
+                } else {
                     mode = Mode.IDLE;
                     break;
                 }
@@ -182,26 +183,29 @@ public class ProjectileSystems extends Thread
                 int timeTF = 500;
                 double flywheelRPM = 4500;
                 //Turn on flywheel to set RPM -Find correct rpm, make it changeable?
-                if (queuedRings > 0) {
-                setFlywheelRPM(flywheelRPM);
+                if (getRingCount() > 0) {
+                    setFlywheelRPM(flywheelRPM);
 
-                telemetry.addData("In firing mode", flywheel.getVelocity() * TPS_TO_RPM);
 
-                //Mix of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
-                if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 20 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM - 20 ) {
-                    sleep(100);
-                    indexer.setPosition(50.0 / 280.0f);
-                    TimerTask endFire = new TimerTask() {
-                        @Override
-                        public void run() {
-                            mode = Mode.RESET;
+                    //Mix of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
+                    if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 25 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM) {
+                        //sleep(100);
+                        indexer.setPosition(50.0 / 280.0f);
+                        TimerTask endFire = new TimerTask() {
+                            @Override
+                            public void run() {
+                                mode = Mode.RESET;
+                            }
+                        };
+                        if (readyToFire == true) {
+                            timer.schedule(endFire, timeTF);
+                            readyToFire = false;
                         }
-                    };
-                    if (readyToFire == true) {
-                        timer.schedule(endFire, timeTF);
-                        readyToFire = false;
                     }
-                }
+                } else
+                {
+                    readyToFire = false;
+                    mode= Mode.RESET;
                 }
                 break;
 
@@ -242,6 +246,7 @@ public class ProjectileSystems extends Thread
                 //idle state, no commands being given
                 break;
         }
+        telemetry.addData("In firing mode", flywheel.getVelocity() * TPS_TO_RPM);
         telemetry.addData("Shooter Runtime", System.currentTimeMillis());
         telemetry.update();
     }
