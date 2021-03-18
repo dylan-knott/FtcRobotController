@@ -189,7 +189,7 @@ public class ProjectileSystems extends Thread
 
 
                     //Mix of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
-                    if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 35 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM) {
+                    if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 40 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM - 10) {
                         //sleep(100);
                         indexer.setPosition(30.0 / 280.0f);
                         TimerTask endFire = new TimerTask() {

@@ -69,7 +69,7 @@ public class Red1WobbleLeft extends LinearOpMode {
 
         //Look for ring stack with tensorflow
         drive.followTrajectory(traj0);
-        char dropZone =  tf.runDetect(2);
+        char dropZone =  tf.runDetect(1);
         tf.closeTfod();
 
         telemetry.addData("Drop Zone", dropZone);
