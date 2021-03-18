@@ -18,6 +18,7 @@ public class TeleOPMode extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
 
+        shooter.setDaemon(true);
         if (shooter.isAlive()) {
             shooter.stop();
         }
@@ -33,10 +34,6 @@ public class TeleOPMode extends LinearOpMode {
         double strafe = 0;
         double forward = 0;
         double turn = 0;
-
-        //Boolean values used in order to stop toggles from activating multiple times for a single button press
-        boolean g1x_state = false;
-        boolean g1y_state = false;
 
         shooter.start();
         drive.setPoseEstimate(PoseStorage.currentPose);
@@ -76,8 +73,6 @@ public class TeleOPMode extends LinearOpMode {
             robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
             shooter.intakeBelt.setPower(gamepad2.right_stick_y);
 
-            //shooter.setFlywheelsRPM(gamepad2.right_trigger);
-
 
             //testing
             if(gamepad2.y) shooter.fireRing(97, 1);
@@ -88,5 +83,6 @@ public class TeleOPMode extends LinearOpMode {
             }
             PoseStorage.currentPose = drive.getPoseEstimate();
         }
+        shooter.parentTerminated = true;
     }
 }

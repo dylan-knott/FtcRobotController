@@ -133,7 +133,7 @@ public class APMecanumDrive extends MecanumDrive {
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-
+        /*
         // TODO: adjust the names of the following hardware devices to match your configuration
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -143,7 +143,7 @@ public class APMecanumDrive extends MecanumDrive {
         // if your hub is mounted vertically, remap the IMU axes so that the z-axis points
         // upward (normal to the floor) using a command like the following:
         BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
-
+        */
 
         leftFront = hardwareMap.get(DcMotorEx.class, "front_left_motor");
         leftRear = hardwareMap.get(DcMotorEx.class, "back_left_motor");
@@ -234,7 +234,7 @@ public class APMecanumDrive extends MecanumDrive {
     }
 
     //Returns straight line distance from current position to a given target
-    public double getDistanceToTarget(Target target){
+    public double getDistanceToTarget(Target target, double currX, double currY){
         Vector2d targetPos = new Vector2d(0, 0);
         Vector2d currentPos = getPoseEstimate().vec();
         switch(target){
@@ -251,7 +251,7 @@ public class APMecanumDrive extends MecanumDrive {
     }
 
     //Returns angle in radians from current position to a given target
-    public double getRadiansToTarget(Target target, int currX, int currY){
+    public double getRadiansToTarget(Target target, double currX, double currY){
         Vector2d targetPos = new Vector2d(0, 0);
         Vector2d currentPos = new Vector2d(currX, currY);
         switch(target){
@@ -435,6 +435,7 @@ public class APMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return imu.getAngularOrientation().firstAngle;
+        return 0;
+        //return imu.getAngularOrientation().firstAngle;
     }
 }
