@@ -43,8 +43,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.*;
  */
 @Config
 public class APMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(3, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(1, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1.5, 0.05, 0.03);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(1.0, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 60 / 38.875;
 
@@ -251,9 +251,9 @@ public class APMecanumDrive extends MecanumDrive {
     }
 
     //Returns angle in radians from current position to a given target
-    public double getRadiansToTarget(Target target){
+    public double getRadiansToTarget(Target target, int currX, int currY){
         Vector2d targetPos = new Vector2d(0, 0);
-        Vector2d currentPos = getPoseEstimate().vec();
+        Vector2d currentPos = new Vector2d(currX, currY);
         switch(target){
             case RED_TOWER:
                 targetPos = RED_TOWER_POS;

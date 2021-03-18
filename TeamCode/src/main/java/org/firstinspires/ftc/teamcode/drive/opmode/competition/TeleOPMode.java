@@ -42,6 +42,7 @@ public class TeleOPMode extends LinearOpMode {
         drive.setPoseEstimate(PoseStorage.currentPose);
 
         waitForStart();
+        robot.setIntakeRelease(0);
         shooter.mode = ProjectileSystems.Mode.IDLE;
         while (opModeIsActive()) {
 
@@ -62,32 +63,24 @@ public class TeleOPMode extends LinearOpMode {
 
             drive.update();
 
-            //telemetry.addData("x", poseEstimate.getX());
-            //telemetry.addData("y", poseEstimate.getY());
-            //telemetry.addData("heading", poseEstimate.getHeading());
-           /* telemetry.addData("Arm Encoder Pos", robot.armLift.getCurrentPosition());
-            telemetry.addData("Ring Count", shooter.getRingCount());
-            telemetry.addData("Angle to Red Tower", drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER));
-            telemetry.addData("Distance to Red Tower", drive.getDistanceToTarget(APMecanumDrive.Target.RED_TOWER));
-*/
 
             //Gamepad 1  ***Drivetrain***
             if (gamepad1.x) robot.releaseIntake();
-            if (gamepad1.right_bumper) robot.toggleClaw();
+            if (gamepad1.right_bumper) robot.setClaw(90);
+            if (gamepad1.left_bumper) robot.setClaw(100);
             if (gamepad1.dpad_up) robot.setArm(110);
             if (gamepad1.dpad_down) robot.setArm(0);
 
 
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
-            if (gamepad2.a) shooter.intakeBelt.setPower(1);
-            else shooter.intakeBelt.setPower(0);
+            shooter.intakeBelt.setPower(gamepad2.right_stick_y);
 
             //shooter.setFlywheelsRPM(gamepad2.right_trigger);
 
 
             //testing
-            if(gamepad2.y) shooter.fireRing(69, 1);
+            if(gamepad2.y) shooter.fireRing(97, 1);
 
             if (isStopRequested()){
                 robot.stop();

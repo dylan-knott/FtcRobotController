@@ -33,6 +33,7 @@ public class ProjectileSystems extends Thread
     private final double TWO_RING_DIST = 4;
     private int ringCount = 0;
     private int queuedRings;
+    public boolean parentTerminated = false;
 
     private Map<Float, Integer> distToAngle4500  = new HashMap<>();;
 
@@ -97,11 +98,11 @@ public class ProjectileSystems extends Thread
 
     /*******************************************UNUSED*******************************************/
 
-    public void fireRing(float dist, int numQueued)
+    public void fireRing(double degrees, int numQueued)
     {
         //TODO: connection of distance to deflector angle
         if (mode == Mode.IDLE) {
-            setDeflector(97);
+            setDeflector(degrees);
             queuedRings += numQueued;
             if (queuedRings > 3) {
                 queuedRings = 3;
@@ -188,9 +189,9 @@ public class ProjectileSystems extends Thread
 
 
                     //Mix of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
-                    if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 25 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM) {
+                    if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 35 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM) {
                         //sleep(100);
-                        indexer.setPosition(50.0 / 280.0f);
+                        indexer.setPosition(30.0 / 280.0f);
                         TimerTask endFire = new TimerTask() {
                             @Override
                             public void run() {
@@ -211,7 +212,7 @@ public class ProjectileSystems extends Thread
 
             case PRIME:
                 //Used to specify how long to run belt for TODO: Find correct Value
-                //Desnigned to load the next ring into the chamber - needs dev- runs after
+                //Designed to load the next ring into the chamber - needs dev- runs after
                 int beltDelay = 500;
                 intakeBelt.setPower(1);
 
@@ -249,6 +250,10 @@ public class ProjectileSystems extends Thread
         telemetry.addData("In firing mode", flywheel.getVelocity() * TPS_TO_RPM);
         telemetry.addData("Shooter Runtime", System.currentTimeMillis());
         telemetry.update();
+        if (parentTerminated) {
+            Thread.currentThread().interrupt();
+            return;
+        }
     }
 
 }

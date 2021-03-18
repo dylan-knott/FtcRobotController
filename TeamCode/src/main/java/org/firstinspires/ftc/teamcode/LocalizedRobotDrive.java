@@ -18,7 +18,7 @@ public class LocalizedRobotDrive {
     //Compensate for reach of the wobble arm, measured from the center of the bot
     public final double ARM_REACH = 20;
     //Compensate for angled trajectory of ring out of the shooter
-    public final double SHOOTER_ANGLE_ERROR = Math.toRadians(12);
+    public final double SHOOTER_ANGLE_ERROR = Math.toRadians(0);
 
     private Telemetry telemetry = null;
     private allianceColor teamColor = null;

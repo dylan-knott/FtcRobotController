@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode.competition;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.CV.TensorFlowRingIdentification;
@@ -14,81 +15,115 @@ import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 @Autonomous(name="Red 1 Wobble Left")
 public class Red1WobbleLeft extends LinearOpMode {
 
-    private final int INITIAL_TURN = -35;
-    private final int SHOOTER_TIMEOUT_SECONDS = 7;
+    private final int INITIAL_TURN = -20;
 
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
     ProjectileSystems shooter = new ProjectileSystems();
     TensorFlowRingIdentification tf = new TensorFlowRingIdentification();
     APMecanumDrive drive = null;
-    Pose2d dropPose = null;
+    Vector2d dropPoseA = new Vector2d(12, -64 + robot.ARM_REACH);
+    Vector2d dropPoseB = new Vector2d(36, -38 + robot.ARM_REACH);
+    Vector2d dropPoseC = new Vector2d(52, -65 + robot.ARM_REACH);
+    Pose2d startPos = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , -24 + robot.CHASSIS_WIDTH / 2,0 );
+
+        //Build Trajectories
 
     public void runOpMode() throws InterruptedException {
         //init for robot and shooter
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
+        shooter.setDaemon(true);
         tf.initObjectDetector(hardwareMap, telemetry);
         drive = robot.rrDrive;
 
+        //Set up different trajectories based on where the ring stack determines the robot should go, they will be built ahead of time, and it will choose which to follow at run time
+        Trajectory traj0 = drive.trajectoryBuilder(startPos)
+                .splineToLinearHeading(new Pose2d(-24, -10, Math.toRadians(-90)), 0)
+                .build();
+        Trajectory traj1A = drive.trajectoryBuilder(traj0.end(), true)
+                .splineToConstantHeading(dropPoseA, Math.toRadians(-90)) //Move to targeted drop zone
+                .build();
+        Trajectory traj1B = drive.trajectoryBuilder(traj0.end(), true)
+                .splineToConstantHeading(dropPoseB, Math.toRadians(-90)) //Move to targeted drop zone
+                .build();
+        Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), true)
+                .splineToLinearHeading(new Pose2d(dropPoseC.getX(), dropPoseC.getY(), Math.toRadians(-75)), Math.toRadians(-75)) //Move to targeted drop zone
+                .build();
+
+
+        Trajectory traj2A = drive.trajectoryBuilder(traj1A.end(), true)
+                .splineToLinearHeading(new Pose2d(-16, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -16, -10)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(0))
+                .build();
+        Trajectory traj2B = drive.trajectoryBuilder(traj1B.end(), true)
+                .splineToLinearHeading(new Pose2d(-16, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -16, -10)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(0))
+                .build();
+        Trajectory traj2C = drive.trajectoryBuilder(traj1C.end(), true)
+                .splineToLinearHeading(new Pose2d(-16, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT,-16, -10)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(0))
+                .build();
+
+
         //Tell roadrunner where the robot is initially placed
-        //Tell the shooter how many rings are in by default
         drive.setPoseEstimate(new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , -24 + robot.CHASSIS_WIDTH / 2 , 0));
 
         //Wait for start button to be pressed
         waitForStart();
-
         shooter.start();
-        //Turn 15 degrees to look at ring stack
-        drive.turn(Math.toRadians(INITIAL_TURN));
 
         //TODO: Look for Ring Stack
-        char dropZone = tf.runDetect(2);
+        drive.followTrajectory(traj0);
+        char dropZone =  tf.runDetect(2);
         tf.closeTfod();
-        if (dropZone == 'c') dropPose = new Pose2d(52, -65 + robot.ARM_REACH, Math.toRadians(-90));
-        else if (dropZone == 'b') dropPose = new Pose2d(36, -38 + robot.ARM_REACH, Math.toRadians(-90));
-        else dropPose = new Pose2d(12, -64 + robot.ARM_REACH, Math.toRadians(-90));
+
         telemetry.addData("Drop Zone", dropZone);
         telemetry.update();
-        //While the ring stack is being looked for, build the trajectory
-        //This trajectory is for delivering the wobble goal, and driving up until rings are shot
-        Trajectory trajA = drive.trajectoryBuilder(drive.getPoseEstimate().plus(new Pose2d(0, 0, Math.toRadians(INITIAL_TURN))))
-                .splineTo(new Vector2d(-36, -12),0)
-                .build();
 
-        Trajectory trajAB = drive.trajectoryBuilder(trajA.end())
-                    .splineToLinearHeading(dropPose, Math.toRadians(-90)) //Move to targeted drop zone
-                    .build();
-
-
-        Trajectory trajB = drive.trajectoryBuilder(trajAB.end(), true)
-                .splineToLinearHeading(new Pose2d(-18, -18,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(0))
-                .build();
-
-
-        Trajectory trajC = drive.trajectoryBuilder(trajB.end())
-                .splineToLinearHeading(new Pose2d(4,  -12, 0), Math.toRadians(0))
-                .build();
-
-
-        //ROBOT ACTUALLY MOVES
-        drive.followTrajectory(trajA);
-        drive.followTrajectory(trajAB);
-        robot.setArm(110);
-        sleep(800);
-        robot.setClaw(0);
-        sleep(200);
-        robot.setArm(0);
-        drive.followTrajectory(trajB);
-        //Shoot Rings
-        long end = System.currentTimeMillis() + (int)(SHOOTER_TIMEOUT_SECONDS * 10000);
-        shooter.fireRing(69, 1);
+        if (dropZone == 'c') {
+            //Run trajectory set c
+            drive.followTrajectory(traj1C);
+            robot.setArm(110);
+            sleep(800);
+            robot.setClaw(0);
+            sleep(200);
+            robot.setArm(0);
+            drive.followTrajectory(traj2C);
+        }
+        else if (dropZone == 'b') {
+            //Run trajectory set b
+            drive.followTrajectory(traj1B);
+            robot.setArm(110);
+            sleep(800);
+            robot.setClaw(0);
+            sleep(200);
+            robot.setArm(0);
+            drive.followTrajectory(traj2B);
+        }
+        else {
+            //Run trajectory set A
+            drive.followTrajectory(traj1A);
+            robot.setArm(110);
+            sleep(800);
+            robot.setClaw(0);
+            sleep(200);
+            robot.setArm(0);
+            drive.followTrajectory(traj2A);
+        }
+        //Fan shots, aiming to seperate powershot poles for each shot
+        shooter.fireRing(97, 1);
+        while(shooter.getRingCount() > 2);
+        drive.turn(Math.toRadians(15));
+        while(shooter.getRingCount() > 1);
+        drive.turn(Math.toRadians(15));
         while(shooter.getRingCount() > 0);
-        drive.followTrajectory(trajC);
+        Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
+            .splineToLinearHeading(new Pose2d(12, -12, 0), Math.toRadians(0))
+            .build();
+
+        robot.setArm(0);
+        drive.followTrajectory(traj3);
 
         //At the end, kill the shooting thread and store the pose
         //TODO: Kill shooting thread correctly
-        shooter.stop();
+        shooter.parentTerminated = true;
         PoseStorage.currentPose = drive.getPoseEstimate();
-
     }
 }
