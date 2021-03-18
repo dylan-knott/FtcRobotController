@@ -149,10 +149,6 @@ public class ProjectileSystems extends Thread
     }
 
     public void update() throws InterruptedException {
-        //placeholder, need to figure out once built
-        double firePOS = 180;
-        double reloadPOS = 180;
-
         //telemetry.addData("Rings Queued", getRingCount());
         countRings();
 
