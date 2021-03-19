@@ -71,7 +71,7 @@ public class TeleOPMode extends LinearOpMode {
 
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
-            shooter.intakeBelt.setPower(gamepad2.right_stick_y);
+            shooter.intakeBelt.setPower(gamepad2.left_stick_y);
 
 
             //testing
