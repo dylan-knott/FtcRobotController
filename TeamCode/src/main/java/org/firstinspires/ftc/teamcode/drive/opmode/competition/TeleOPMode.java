@@ -75,7 +75,7 @@ public class TeleOPMode extends LinearOpMode {
 
 
             //testing
-            if(gamepad2.y) shooter.fireRing(97, 1);
+            if(gamepad2.y) shooter.fireRing(97, 1, false);
 
             if (isStopRequested()){
                 robot.stop();

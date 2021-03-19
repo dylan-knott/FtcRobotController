@@ -60,7 +60,10 @@ public class ProjectileSystems extends Thread
     public Mode mode;
 
 
+
     public boolean readyToFire =true;
+    public int lastfire =3;
+    public boolean isAuto;
     public void initializeShooter(HardwareMap hardwareMap, Telemetry telem, LocalizedRobotDrive.allianceColor clr)
     {
         telemetry = telem;
@@ -98,7 +101,7 @@ public class ProjectileSystems extends Thread
 
     /*******************************************UNUSED*******************************************/
 
-    public void fireRing(double degrees, int numQueued)
+    public void fireRing(double degrees, int numQueued, boolean auto)
     {
         //TODO: connection of distance to deflector angle
         if (mode == Mode.IDLE) {
@@ -107,6 +110,7 @@ public class ProjectileSystems extends Thread
             if (queuedRings > 3) {
                 queuedRings = 3;
             }
+            isAuto = auto;
             mode = ProjectileSystems.Mode.FIRING;
         }
     }
@@ -165,7 +169,8 @@ public class ProjectileSystems extends Thread
                 reloader.setPosition(0);
                 if (getRingCount() > 0) {
                     readyToFire = true;
-                    //queuedRings--;
+                    if (lastfire == getRingCount() && isAuto == true)
+                        intakeBelt.setPower(1.f);
                     mode = Mode.FIRING;
 
                 } else {
@@ -184,7 +189,8 @@ public class ProjectileSystems extends Thread
                     setFlywheelRPM(flywheelRPM);
 
 
-                    //Mix of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
+                    //M
+                    //x of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
                     if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 40 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM - 10) {
                         //sleep(100);
                         indexer.setPosition(30.0 / 280.0f);
@@ -195,6 +201,7 @@ public class ProjectileSystems extends Thread
                             }
                         };
                         if (readyToFire == true) {
+                            lastfire = getRingCount();
                             timer.schedule(endFire, timeTF);
                             readyToFire = false;
                         }
