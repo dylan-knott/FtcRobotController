@@ -54,8 +54,8 @@ public class DriveConstants {
      * empirically tuned.
      */
     public static double kV = 0.019;
-    public static double kA = 0.0045;
-    public static double kStatic = 0.002;
+    public static double kA = 0.0048;
+    public static double kStatic = 0;
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
