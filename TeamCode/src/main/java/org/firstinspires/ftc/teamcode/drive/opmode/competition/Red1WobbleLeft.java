@@ -19,9 +19,9 @@ public class Red1WobbleLeft extends LinearOpMode {
     ProjectileSystems shooter = new ProjectileSystems();
     TensorFlowRingIdentification tf = new TensorFlowRingIdentification();
     APMecanumDrive drive = null;
-    Vector2d dropPoseA = new Vector2d(12, -64 + robot.ARM_REACH);
+    Vector2d dropPoseA = new Vector2d(12, -60 + robot.ARM_REACH);
     Vector2d dropPoseB = new Vector2d(36, -38 + robot.ARM_REACH);
-    Vector2d dropPoseC = new Vector2d(52, -65 + robot.ARM_REACH);
+    Vector2d dropPoseC = new Vector2d(52, -60 + robot.ARM_REACH);
     Pose2d startPose = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , -24 + robot.CHASSIS_WIDTH / 2,0 );
 
         //Build Trajectories
@@ -38,25 +38,25 @@ public class Red1WobbleLeft extends LinearOpMode {
         Trajectory traj0 = drive.trajectoryBuilder(startPose)
                 .splineToLinearHeading(new Pose2d(-24, -10, Math.toRadians(-90)), 0)
                 .build();
-        Trajectory traj1A = drive.trajectoryBuilder(traj0.end(), true)
+        Trajectory traj1A = drive.trajectoryBuilder(traj0.end(), Math.toRadians(90))
                 .splineToConstantHeading(dropPoseA, Math.toRadians(-90)) //Move to targeted drop zone
                 .build();
-        Trajectory traj1B = drive.trajectoryBuilder(traj0.end(), true)
+        Trajectory traj1B = drive.trajectoryBuilder(traj0.end(), Math.toRadians(90))
                 .splineToConstantHeading(dropPoseB, Math.toRadians(-90)) //Move to targeted drop zone
                 .build();
-        Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), true)
+        Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), Math.toRadians(90))
                 .splineToLinearHeading(new Pose2d(dropPoseC.getX(), dropPoseC.getY(), Math.toRadians(-90)), Math.toRadians(-75)) //Move to targeted drop zone
                 .build();
 
 
         Trajectory traj2A = drive.trajectoryBuilder(traj1A.end(), true)
-                .splineToLinearHeading(new Pose2d(-16, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -16, -10)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-16, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -16, -10)).plus(new Pose2d(0, 0, Math.toRadians(-6))), Math.toRadians(180))
                 .build();
         Trajectory traj2B = drive.trajectoryBuilder(traj1B.end(), true)
-                .splineToLinearHeading(new Pose2d(-16, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -16, -10)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-16, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -16, -10)).plus(new Pose2d(0, 0, Math.toRadians(-6))), Math.toRadians(180))
                 .build();
         Trajectory traj2C = drive.trajectoryBuilder(traj1C.end(), true)
-                .splineToLinearHeading(new Pose2d(-16, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT,-16, -10)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-16, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT,-16, -10)).plus(new Pose2d(0, 0, Math.toRadians(-6))), Math.toRadians(180))
                 .build();
 
 

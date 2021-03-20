@@ -18,9 +18,9 @@ public class Blue1WobbleRight extends LinearOpMode {
     ProjectileSystems shooter = new ProjectileSystems();
     TensorFlowRingIdentification tf = new TensorFlowRingIdentification();
     APMecanumDrive drive = null;
-    Vector2d dropPoseA = new Vector2d(12, 64 - robot.ARM_REACH);
+    Vector2d dropPoseA = new Vector2d(12, 60 - robot.ARM_REACH);
     Vector2d dropPoseB = new Vector2d(36, 38 - robot.ARM_REACH);
-    Vector2d dropPoseC = new Vector2d(52, 65 - robot.ARM_REACH);
+    Vector2d dropPoseC = new Vector2d(52, 60 - robot.ARM_REACH);
     Pose2d startPose = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , 24 - robot.CHASSIS_WIDTH / 2,0 );
 
         //Build Trajectories
@@ -35,15 +35,15 @@ public class Blue1WobbleRight extends LinearOpMode {
 
         //Set up different trajectories based on where the ring stack determines the robot should go, they will be built ahead of time, and it will choose which to follow at run time
         Trajectory traj0 = drive.trajectoryBuilder(startPose)
-                .splineToLinearHeading(new Pose2d(-24, 10, Math.toRadians(90)), 0)
+                .splineToLinearHeading(new Pose2d(-24, 10, Math.toRadians(-90)), 0)
                 .build();
-        Trajectory traj1A = drive.trajectoryBuilder(traj0.end(), true)
+        Trajectory traj1A = drive.trajectoryBuilder(traj0.end(), Math.toRadians(-90))
                 .splineToConstantHeading(dropPoseA, Math.toRadians(90)) //Move to targeted drop zone
                 .build();
-        Trajectory traj1B = drive.trajectoryBuilder(traj0.end(), true)
+        Trajectory traj1B = drive.trajectoryBuilder(traj0.end(), Math.toRadians(-90))
                 .splineToConstantHeading(dropPoseB, Math.toRadians(90)) //Move to targeted drop zone
                 .build();
-        Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), true)
+        Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), Math.toRadians(-90))
                 .splineToLinearHeading(new Pose2d(dropPoseC.getX(), dropPoseC.getY(), Math.toRadians(90)), Math.toRadians(75)) //Move to targeted drop zone
                 .build();
 

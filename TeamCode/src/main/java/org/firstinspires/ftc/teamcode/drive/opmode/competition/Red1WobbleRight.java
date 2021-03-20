@@ -37,16 +37,16 @@ public class Red1WobbleRight extends LinearOpMode {
         //Set up different trajectories based on where the ring stack determines the robot should go, they will be built ahead of time, and it will choose which to follow at run time
         //Trajectory to drive to look at rings
         Trajectory traj0 = drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-24, -55, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-36, -48, Math.toRadians(30)))
                 .build();
         //Trajectories for each ring drop zone
-        Trajectory traj1A = drive.trajectoryBuilder(traj0.end())
+        Trajectory traj1A = drive.trajectoryBuilder(traj0.end(),Math.toRadians(-90))
                 .lineToLinearHeading(new Pose2d(dropPoseA, 0)) //Move to targeted drop zone
                 .build();
-        Trajectory traj1B = drive.trajectoryBuilder(traj0.end())
+        Trajectory traj1B = drive.trajectoryBuilder(traj0.end(),Math.toRadians(-90))
                 .lineToLinearHeading(new Pose2d(dropPoseB, 0)) //Move to targeted drop zone
                 .build();
-        Trajectory traj1C = drive.trajectoryBuilder(traj0.end())
+        Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), Math.toRadians(-90))
                 .lineToLinearHeading(new Pose2d(dropPoseC, 0)) //Move to targeted drop zone
                 .build();
 
