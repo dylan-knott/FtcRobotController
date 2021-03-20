@@ -45,18 +45,18 @@ public class Red1WobbleLeft extends LinearOpMode {
                 .splineToConstantHeading(dropPoseB, Math.toRadians(-90)) //Move to targeted drop zone
                 .build();
         Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(dropPoseC.getX(), dropPoseC.getY(), Math.toRadians(-90)), Math.toRadians(-75)) //Move to targeted drop zone
+                .lineToLinearHeading(new Pose2d(dropPoseC.getX(), dropPoseC.getY(), Math.toRadians(-90))) //Move to targeted drop zone
                 .build();
 
 
         Trajectory traj2A = drive.trajectoryBuilder(traj1A.end(), true)
-                .splineToLinearHeading(new Pose2d(-14, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -14, -10)).plus(new Pose2d(0, 0, Math.toRadians(-2))), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-14, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -14, -10)).plus(new Pose2d(0, 0, Math.toRadians(-4))), Math.toRadians(180))
                 .build();
         Trajectory traj2B = drive.trajectoryBuilder(traj1B.end(), true)
-                .splineToLinearHeading(new Pose2d(-14, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -14, -10)).plus(new Pose2d(0, 0, Math.toRadians(-2))), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-14, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT, -14, -10)).plus(new Pose2d(0, 0, Math.toRadians(-4))), Math.toRadians(180))
                 .build();
         Trajectory traj2C = drive.trajectoryBuilder(traj1C.end(), true)
-                .splineToLinearHeading(new Pose2d(-14, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT,-14, -10)).plus(new Pose2d(0, 0, Math.toRadians(-2))), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-14, -10,drive.getRadiansToTarget(APMecanumDrive.Target.RED_POWERSHOT,-14, -10)).plus(new Pose2d(0, 0, Math.toRadians(-4))), Math.toRadians(180))
                 .build();
 
 
@@ -106,14 +106,14 @@ public class Red1WobbleLeft extends LinearOpMode {
             drive.followTrajectory(traj2A);
         }
         //Fan shots, aiming to separate power-shot poles for each shot
-        shooter.fireRing(98.5, 1, true);
+        shooter.fireRing(97, 1, true);
         while(shooter.getRingCount() > 2);
         drive.turn(Math.toRadians(10));
         while(shooter.getRingCount() > 1);
-        drive.turn(Math.toRadians(9));
+        drive.turn(Math.toRadians(8));
         //Build final path while the shooter is firing the final ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .splineToLinearHeading(new Pose2d(12, -12, 0), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(10, -12, 0), Math.toRadians(0))
                 .build();
         while(shooter.getRingCount() > 0);
 

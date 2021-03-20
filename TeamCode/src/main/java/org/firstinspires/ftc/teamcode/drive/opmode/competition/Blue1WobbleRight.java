@@ -112,7 +112,7 @@ public class Blue1WobbleRight extends LinearOpMode {
         drive.turn(Math.toRadians(10));
         //Build final path while the robot is shooting the last ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .splineToLinearHeading(new Pose2d(12, 12, 0), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(10, 12, 0), Math.toRadians(0))
                 .build();
         while(shooter.getRingCount() > 0);
 

@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
-@Autonomous(name="Blue 1 Wobble Left")
-public class Blue1WobbleLeft extends LinearOpMode {
+@Autonomous(name="Blue Out Park")
+public class RedAWait extends LinearOpMode {
 
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
     ProjectileSystems shooter = new ProjectileSystems();
@@ -37,7 +37,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
         //Set up different trajectories based on where the ring stack determines the robot should go, they will be built ahead of time, and it will choose which to follow at run time
         //Trajectory to drive to look at rings
         Trajectory traj0 = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(-55, 55), Math.toRadians(-40))
+                .splineTo(new Vector2d(12, -60), Math.toRadians(0))
                 .build();
         //Trajectories for each ring drop zone
         Trajectory traj1A = drive.trajectoryBuilder(traj0.end(), true)
@@ -71,50 +71,6 @@ public class Blue1WobbleLeft extends LinearOpMode {
 
         //Look for ring stack with tensorflow
         drive.followTrajectory(traj0);
-        char dropZone =  tf.runDetect(1);
-        tf.closeTfod();
-
-        telemetry.addData("Drop Zone", dropZone);
-        telemetry.update();
-
-        if (dropZone == 'c') {
-            //Run trajectory set c
-            drive.followTrajectory(traj1C);
-            robot.setArm(110);
-            sleep(800);
-            robot.setClaw(0);
-            sleep(200);
-            robot.setArm(0);
-            drive.followTrajectory(traj2C);
-        }
-        else if (dropZone == 'b') {
-            //Run trajectory set b
-            drive.followTrajectory(traj1B);
-            robot.setArm(110);
-            sleep(800);
-            robot.setClaw(0);
-            sleep(200);
-            robot.setArm(0);
-            drive.followTrajectory(traj2B);
-        }
-        else {
-            //Run trajectory set A
-            drive.followTrajectory(traj1A);
-            robot.setArm(110);
-            sleep(800);
-            robot.setClaw(0);
-            sleep(200);
-            robot.setArm(0);
-            drive.followTrajectory(traj2A);
-        }
-        shooter.fireRing(98, 1, true);
-        Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(12, 36, 0))
-                .build();
-        while(shooter.getRingCount() > 0);
-
-        robot.setArm(0);
-        drive.followTrajectory(traj3);
 
         //At the end, kill the shooting thread and store the pose
         //TODO: Kill shooting thread correctly
