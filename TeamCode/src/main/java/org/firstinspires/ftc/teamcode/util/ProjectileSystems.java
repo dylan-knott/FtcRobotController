@@ -182,7 +182,7 @@ public class ProjectileSystems extends Thread
                 //Fire the current ring, and set mode to reset
 
                 //time alloted for spinup before firing-may be remove
-                int timeTF = 100;
+                int timeTF = 500;
                 double flywheelRPM = 4500;
                 //Turn on flywheel to set RPM -Find correct rpm, make it changeable?
                 if (getRingCount() > 0) {

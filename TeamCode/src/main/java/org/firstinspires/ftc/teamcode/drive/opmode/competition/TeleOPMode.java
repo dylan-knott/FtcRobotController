@@ -49,6 +49,7 @@ public class TeleOPMode extends LinearOpMode {
             if (Math.abs(gamepad1.left_stick_x) < stickDeadzone) strafe = 0; else strafe = 0.971 * Math.tan(-gamepad1.left_stick_x * 0.8);
             if (Math.abs(gamepad1.right_stick_x) < stickDeadzone) turn = 0; else turn = 0.971 * Math.tan(-gamepad1.right_stick_x * 0.8);
 
+            //if (gamepad1.left_bumper)
 
             drive.setWeightedDrivePower(
                     new Pose2d(
@@ -64,14 +65,14 @@ public class TeleOPMode extends LinearOpMode {
             //Gamepad 1  ***Drivetrain***
             if (gamepad1.x) robot.releaseIntake();
             if (gamepad1.right_bumper) robot.setClaw(90);
-            if (gamepad1.left_bumper) robot.setClaw(100);
+            if (gamepad1.left_bumper) robot.setClaw(0);
             if (gamepad1.dpad_up) robot.setArm(110);
             if (gamepad1.dpad_down) robot.setArm(0);
 
 
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
-            shooter.intakeBelt.setPower(gamepad2.left_stick_y);
+            shooter.intakeBelt.setPower(-gamepad2.left_stick_y);
 
 
             //testing
@@ -79,10 +80,9 @@ public class TeleOPMode extends LinearOpMode {
 
             if (isStopRequested()){
                 robot.stop();
-                shooter.stop();
+                shooter.parentTerminated = true;
             }
             PoseStorage.currentPose = drive.getPoseEstimate();
         }
-        shooter.parentTerminated = true;
     }
 }

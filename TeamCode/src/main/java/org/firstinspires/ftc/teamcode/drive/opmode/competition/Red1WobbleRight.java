@@ -37,28 +37,28 @@ public class Red1WobbleRight extends LinearOpMode {
         //Set up different trajectories based on where the ring stack determines the robot should go, they will be built ahead of time, and it will choose which to follow at run time
         //Trajectory to drive to look at rings
         Trajectory traj0 = drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-36, -48, Math.toRadians(30)))
+                .splineToLinearHeading(new Pose2d(-50, -50, Math.toRadians(40)), Math.toRadians(40))
                 .build();
         //Trajectories for each ring drop zone
-        Trajectory traj1A = drive.trajectoryBuilder(traj0.end(),Math.toRadians(-90))
+        Trajectory traj1A = drive.trajectoryBuilder(traj0.end(),true)
                 .lineToLinearHeading(new Pose2d(dropPoseA, 0)) //Move to targeted drop zone
                 .build();
-        Trajectory traj1B = drive.trajectoryBuilder(traj0.end(),Math.toRadians(-90))
+        Trajectory traj1B = drive.trajectoryBuilder(traj0.end(), true)
                 .lineToLinearHeading(new Pose2d(dropPoseB, 0)) //Move to targeted drop zone
                 .build();
-        Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), Math.toRadians(-90))
+        Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), true)
                 .lineToLinearHeading(new Pose2d(dropPoseC, 0)) //Move to targeted drop zone
                 .build();
 
         //Trajectories to approach the shooting position starting at each drop zone
         Trajectory traj2A = drive.trajectoryBuilder(traj1A.end())
-                .lineToLinearHeading(new Pose2d(shootPose ,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose.getX(), shootPose.getY())).minus(new Pose2d(0, 0, Math.toRadians(12))))
+                .lineToLinearHeading(new Pose2d(shootPose ,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose.getX(), shootPose.getY())).minus(new Pose2d(0, 0, Math.toRadians(10))))
                 .build();
         Trajectory traj2B = drive.trajectoryBuilder(traj1B.end())
-                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose.getX(), shootPose.getY())).minus(new Pose2d(0, 0, Math.toRadians(12))))
+                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose.getX(), shootPose.getY())).minus(new Pose2d(0, 0, Math.toRadians(10))))
                 .build();
         Trajectory traj2C = drive.trajectoryBuilder(traj1C.end())
-                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose.getX(), shootPose.getY())).minus(new Pose2d(0, 0, Math.toRadians(12))))
+                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose.getX(), shootPose.getY())).minus(new Pose2d(0, 0, Math.toRadians(10))))
                 .build();
 
 
@@ -107,12 +107,13 @@ public class Red1WobbleRight extends LinearOpMode {
             robot.setArm(0);
             drive.followTrajectory(traj2A);
         }
-        shooter.fireRing(95, 1, true);
+        shooter.fireRing(97, 1, true);
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(12, -36, 0))
                 .build();
         while(shooter.getRingCount() > 0);
 
+        sleep(100);
         robot.setArm(0);
         drive.followTrajectory(traj3);
 

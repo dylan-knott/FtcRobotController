@@ -20,7 +20,7 @@ public class Blue1WobbleRight extends LinearOpMode {
     APMecanumDrive drive = null;
     Vector2d dropPoseA = new Vector2d(12, 60 - robot.ARM_REACH);
     Vector2d dropPoseB = new Vector2d(36, 38 - robot.ARM_REACH);
-    Vector2d dropPoseC = new Vector2d(52, 60 - robot.ARM_REACH);
+    Vector2d dropPoseC = new Vector2d(52, 58 - robot.ARM_REACH);
     Pose2d startPose = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , 24 - robot.CHASSIS_WIDTH / 2,0 );
 
         //Build Trajectories
@@ -35,7 +35,7 @@ public class Blue1WobbleRight extends LinearOpMode {
 
         //Set up different trajectories based on where the ring stack determines the robot should go, they will be built ahead of time, and it will choose which to follow at run time
         Trajectory traj0 = drive.trajectoryBuilder(startPose)
-                .splineToLinearHeading(new Pose2d(-24, 10, Math.toRadians(-90)), 0)
+                .splineToLinearHeading(new Pose2d(-24, 10, Math.toRadians(90)), 0)
                 .build();
         Trajectory traj1A = drive.trajectoryBuilder(traj0.end(), Math.toRadians(-90))
                 .splineToConstantHeading(dropPoseA, Math.toRadians(90)) //Move to targeted drop zone
@@ -49,13 +49,13 @@ public class Blue1WobbleRight extends LinearOpMode {
 
 
         Trajectory traj2A = drive.trajectoryBuilder(traj1A.end(), true)
-                .splineToLinearHeading(new Pose2d(-16, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT, -16, 10)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-14, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT, -14, 10)).plus(new Pose2d(0, 0, Math.toRadians(2))), Math.toRadians(180))
                 .build();
         Trajectory traj2B = drive.trajectoryBuilder(traj1B.end(), true)
-                .splineToLinearHeading(new Pose2d(-16, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT, -16, 10)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-14, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT, -14, 10)).plus(new Pose2d(0, 0, Math.toRadians(2))), Math.toRadians(180))
                 .build();
         Trajectory traj2C = drive.trajectoryBuilder(traj1C.end(), true)
-                .splineToLinearHeading(new Pose2d(-16, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT,-16, 10)).minus(new Pose2d(0, 0, robot.SHOOTER_ANGLE_ERROR)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-14, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT,-14, 10)).plus(new Pose2d(0, 0, Math.toRadians(2))), Math.toRadians(180))
                 .build();
 
 
@@ -105,11 +105,11 @@ public class Blue1WobbleRight extends LinearOpMode {
             drive.followTrajectory(traj2A);
         }
         //Fan shots, aiming to separate power-shot poles for each shot
-        shooter.fireRing(97, 1, true);
+        shooter.fireRing(98, 1, true);
         while(shooter.getRingCount() > 2);
-        drive.turn(Math.toRadians(-10));
+        drive.turn(Math.toRadians(10));
         while(shooter.getRingCount() > 1);
-        drive.turn(Math.toRadians(-10));
+        drive.turn(Math.toRadians(10));
         //Build final path while the robot is shooting the last ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .splineToLinearHeading(new Pose2d(12, 12, 0), Math.toRadians(0))
