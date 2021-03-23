@@ -16,12 +16,8 @@ public class ProjectileSystems extends Thread
     //Hardware declaration, need color sensors
     public DcMotor intakeBelt;
     public DcMotorEx flywheel;
-    public Servo indexer, reloader, deflector;
+    public Servo indexer, deflector;
     public RevColorSensorV3 dist;
-
-
-    public double flywheelPower = 1;
-    public double intakePower = 1;
 
     Telemetry telemetry = null;
     LocalizedRobotDrive.allianceColor teamColor = null;
@@ -32,10 +28,22 @@ public class ProjectileSystems extends Thread
     private final double ONE_RING_DIST = 6.1;
     private final double TWO_RING_DIST = 4;
     private int ringCount = 0;
-    private int queuedRings;
     public boolean parentTerminated = false;
+    public boolean readyToFire =true;
+    public int lastfire =3;
+    public boolean isAuto;
+    double flywheelRPM = 4500;
 
-    private Map<Float, Integer> distToAngle4500  = new HashMap<>();;
+    Timer timer = new Timer();
+
+    public enum Mode
+    {
+        RESET,
+        FIRING,
+        IDLE,
+    }
+
+    public Mode mode;
 
     public void run() {
         while (true) {
@@ -46,24 +54,6 @@ public class ProjectileSystems extends Thread
         }
     }
 
-    Timer timer = new Timer();
-
-    public enum Mode
-    {
-        RESET,
-        FIRING,
-        INTAKE,
-        CHAMBER,
-        PRIME,
-        IDLE,
-    }
-    public Mode mode;
-
-
-
-    public boolean readyToFire =true;
-    public int lastfire =3;
-    public boolean isAuto;
     public void initializeShooter(HardwareMap hardwareMap, Telemetry telem, LocalizedRobotDrive.allianceColor clr)
     {
         telemetry = telem;
@@ -75,7 +65,6 @@ public class ProjectileSystems extends Thread
         indexer = hardwareMap.servo.get("indexer");
         deflector = hardwareMap.servo.get("deflector");
         deflector.setDirection(Servo.Direction.REVERSE);
-        reloader = hardwareMap.servo.get("reloader");
         dist = hardwareMap.get(RevColorSensorV3.class, "distColor");
 
 
@@ -88,7 +77,6 @@ public class ProjectileSystems extends Thread
         //Servo Initialization
         deflector.setPosition(0);
         indexer.setPosition(0);
-        reloader.setPosition(0);
 
         //TODO: Hashmap
         //Distance to angle Hashmap Initalization
@@ -99,23 +87,18 @@ public class ProjectileSystems extends Thread
         mode = Mode.IDLE;
     }
 
-    /*******************************************UNUSED*******************************************/
-
-    public void fireRing(double degrees, int numQueued, boolean auto)
-    {
+    public void fireRing(double degrees, boolean auto) {
         //TODO: connection of distance to deflector angle
         if (mode == Mode.IDLE) {
             setDeflector(degrees);
-            queuedRings += numQueued;
-            if (queuedRings > 3) {
-                queuedRings = 3;
-            }
             isAuto = auto;
-            mode = ProjectileSystems.Mode.FIRING;
+            mode = Mode.FIRING;
+            setFlywheelRPM(flywheelRPM);
         }
     }
 
-    public void setDeflector(double position){
+    public void setDeflector(double position)
+    {
         deflector.setPosition(position / 165.0f);
     }
 
@@ -125,18 +108,12 @@ public class ProjectileSystems extends Thread
         flywheel.setVelocity(flywheelAngularVelocity);
         telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
     }
+
     public int getRingCount (){
         countRings();
         return ringCount;
     }
 
-    //Returns if the shooter is Idle or busy
-    public boolean isBusy() {
-        if (mode == Mode.IDLE) return false;
-        else return true;
-    }
-
-    //Code for ring count
     private void countRings() {
         double ringDist = dist.getDistance(DistanceUnit.CM);
         if (ringDist > NO_RING_DIST) {
@@ -150,102 +127,65 @@ public class ProjectileSystems extends Thread
         }
     }
 
-    public void update() throws InterruptedException {
+    public void update() throws InterruptedException
+    {
         countRings();
 
-        switch (mode) {
+        switch (mode){
+            case IDLE:
+                break;
+
             case RESET:
-                //set all moving system to default position/off
-                if (getRingCount() <= 0) {
-                    readyToFire = true;
-                    setFlywheelRPM(0);
-                    deflector.setPosition(0);
-                }
                 indexer.setPosition(0);
-                intakeBelt.setPower(0);//Set Velo instead?
-                reloader.setPosition(0);
-                if (getRingCount() > 0) {
+
+                if(getRingCount() > 0)
+                {
                     readyToFire = true;
                     if (lastfire == getRingCount() && isAuto == true)
                         intakeBelt.setPower(1.f);
                     mode = Mode.FIRING;
-
-                } else {
-                    mode = Mode.IDLE;
-                    break;
                 }
+                else
+                 {
+                     setFlywheelRPM(0);
+                     deflector.setPosition(0f);
+                     intakeBelt.setPower(0);
+                     readyToFire= true;
+                     mode = Mode.IDLE;
+                 }
+                break;
 
             case FIRING:
-                //Fire the current ring, and set mode to reset
+                int fireDelay = 500;
 
-                //time alloted for spinup before firing-may be remove
-                int timeTF = 500;
-                double flywheelRPM = 4500;
-                //Turn on flywheel to set RPM -Find correct rpm, make it changeable?
-                if (getRingCount() > 0) {
-                    setFlywheelRPM(flywheelRPM);
 
-                    //M
-                    //x of new untested code(Get velo statement) and old(setting flywheel power to full, wait timeTF, then move indexer, and reset
-                    if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 40 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM - 10) {
-                        //sleep(100);
+                if (ringCount > 0 || isAuto == false)
+                {
+
+                    if (flywheel.getVelocity() * TPS_TO_RPM <= flywheelRPM + 40 && flywheel.getVelocity() * TPS_TO_RPM >= flywheelRPM - 10)
+                    {
                         indexer.setPosition(30.0 / 280.0f);
                         TimerTask endFire = new TimerTask() {
                             @Override
-                            public void run() {
-                                mode = Mode.RESET;
+                            public void run() { mode = Mode.RESET;
                             }
                         };
+
                         if (readyToFire == true) {
                             lastfire = getRingCount();
-                            timer.schedule(endFire, timeTF);
+                            timer.schedule(endFire, fireDelay);
                             readyToFire = false;
                         }
                     }
-                } else
+                }
+                else
                 {
                     readyToFire = false;
                     mode= Mode.RESET;
                 }
                 break;
-
-            case PRIME:
-                //Used to specify how long to run belt for TODO: Find correct Value
-                //Designed to load the next ring into the chamber - needs dev- runs after
-                int beltDelay = 500;
-                intakeBelt.setPower(1);
-
-                TimerTask runBelt = new TimerTask() {
-                    @Override
-                    public void run() {
-                        mode = Mode.RESET;
-                    }
-                };
-                timer.schedule(runBelt, beltDelay);
-                break;
-
-            case INTAKE:
-                //Moving rings up to the chamber
-
-                //delay before intake belt is turned off, should be time that it takes ring to move
-                int turnoffDelay = 4000;
-
-                intakeBelt.setPower(1); //I do it this way so the intake can run while the robot is doing other things, then automatically turns off
-
-                TimerTask turnoffIntake = new TimerTask() {
-                    @Override
-                    public void run() {
-                        intakeBelt.setPower(0);
-                    }
-                };
-                timer.schedule(turnoffIntake, turnoffDelay);
-                mode = Mode.IDLE;
-                break;
-
-            case IDLE:
-                //idle state, no commands being given
-                break;
         }
+
         telemetry.addData("In firing mode", flywheel.getVelocity() * TPS_TO_RPM);
         telemetry.addData("Shooter Runtime", System.currentTimeMillis());
         telemetry.update();
@@ -254,6 +194,5 @@ public class ProjectileSystems extends Thread
             return;
         }
     }
-
 }
 

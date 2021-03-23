@@ -9,12 +9,11 @@ import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
-import org.firstinspires.ftc.teamcode.util.ProjectileSystemsRewrite;
 
 @TeleOp(name= "TeleOp purple", group= "TeleOp")
 public class TeleOPBlueTestingShooter extends LinearOpMode {
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
-    ProjectileSystemsRewrite shooter = new ProjectileSystemsRewrite();
+    ProjectileSystems shooter = new ProjectileSystems();
     APMecanumDrive drive = null;
     Vector2d shootPose1  = new Vector2d(-14,54);
     Vector2d shootPose2 = new Vector2d( -14, 10);
@@ -43,7 +42,7 @@ public class TeleOPBlueTestingShooter extends LinearOpMode {
 
         waitForStart();
         robot.setIntakeRelease(0);
-        shooter.mode = ProjectileSystemsRewrite.Mode.IDLE;
+        shooter.mode = ProjectileSystems.Mode.IDLE;
         while (opModeIsActive()) {
 
             //Movement code
