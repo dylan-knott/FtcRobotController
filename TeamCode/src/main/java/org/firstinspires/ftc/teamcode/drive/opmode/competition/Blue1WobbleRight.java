@@ -105,7 +105,7 @@ public class Blue1WobbleRight extends LinearOpMode {
             drive.followTrajectory(traj2A);
         }
         //Fan shots, aiming to separate power-shot poles for each shot
-        shooter.fireRing(98, 1, true);
+        shooter.fireRing(98, true);
         while(shooter.getRingCount() > 2);
         drive.turn(Math.toRadians(10));
         while(shooter.getRingCount() > 1);

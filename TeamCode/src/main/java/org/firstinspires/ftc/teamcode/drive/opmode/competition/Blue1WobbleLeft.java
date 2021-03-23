@@ -107,7 +107,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
             robot.setArm(0);
             drive.followTrajectory(traj2A);
         }
-        shooter.fireRing(98, 1, true);
+        shooter.fireRing(98, true);
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(12, 36, 0))
                 .build();
