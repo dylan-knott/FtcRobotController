@@ -1,20 +1,21 @@
 package org.firstinspires.ftc.teamcode.drive.opmode.competition;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
-@TeleOp(name= "TeleOp", group= "TeleOp")
-public class TeleOPMode extends LinearOpMode {
+@TeleOp(name= "TeleOp Red", group= "TeleOp")
+public class TeleOPRed extends LinearOpMode {
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
     ProjectileSystems shooter = new ProjectileSystems();
     APMecanumDrive drive = null;
+    Vector2d shootPose1  = new Vector2d(-14,-54);
+    Vector2d shootPose2 = new Vector2d( -14, -10);
 
     public void runOpMode() throws InterruptedException {
 
@@ -56,7 +57,6 @@ public class TeleOPMode extends LinearOpMode {
             }
 
 
-
             drive.setWeightedDrivePower(
                     new Pose2d(
                             forward,
@@ -79,10 +79,17 @@ public class TeleOPMode extends LinearOpMode {
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
             shooter.intakeBelt.setPower(-gamepad2.left_stick_y);
-
-
-            //testing
-            if(gamepad2.y) shooter.fireRing(95, 1, false);
+            if (gamepad2.b) {
+                drive.goTo(new Pose2d(shootPose1, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose1.getX(), shootPose1.getY())));
+                while(drive.isBusy()) {
+                }
+                shooter.fireRing(95, 1, false);
+            }
+            else if (gamepad2.a) {
+                drive.goTo(new Pose2d(shootPose2, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose2.getX(), shootPose2.getY())));
+                while(drive.isBusy());
+                shooter.fireRing(95, 1, false);
+            }
 
             if (isStopRequested()){
                 robot.stop();

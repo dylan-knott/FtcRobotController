@@ -11,18 +11,14 @@ import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
-@Autonomous(name="Blue Out Park")
-public class BlueAWait extends LinearOpMode {
+@Autonomous(name="Red Park In")
+public class RedParkIn extends LinearOpMode {
 
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
     ProjectileSystems shooter = new ProjectileSystems();
     TensorFlowRingIdentification tf = new TensorFlowRingIdentification();
     APMecanumDrive drive = null;
-    Vector2d dropPoseA = new Vector2d(10 - robot.ARM_REACH, 53);
-    Vector2d dropPoseB = new Vector2d(38 - robot.ARM_REACH, 35);
-    Vector2d dropPoseC = new Vector2d(56 - robot.ARM_REACH, 51);
-    Vector2d shootPose = new Vector2d(-17, 54);
-    Pose2d startPose = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , 48 + robot.CHASSIS_WIDTH / 2,0 );
+    Pose2d startPose = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , -24 + robot.CHASSIS_WIDTH / 2,0 );
 
         //Build Trajectories
 
@@ -37,30 +33,8 @@ public class BlueAWait extends LinearOpMode {
         //Set up different trajectories based on where the ring stack determines the robot should go, they will be built ahead of time, and it will choose which to follow at run time
         //Trajectory to drive to look at rings
         Trajectory traj0 = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(12, 60), Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(12, -12, 0))
                 .build();
-        //Trajectories for each ring drop zone
-        Trajectory traj1A = drive.trajectoryBuilder(traj0.end(), true)
-                .lineToLinearHeading(new Pose2d(dropPoseA, 0)) //Move to targeted drop zone
-                .build();
-        Trajectory traj1B = drive.trajectoryBuilder(traj0.end(), true)
-                .lineToLinearHeading(new Pose2d(dropPoseB, 0)) //Move to targeted drop zone
-                .build();
-        Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), true)
-                .lineToLinearHeading(new Pose2d(dropPoseC, 0)) //Move to targeted drop zone
-                .build();
-
-        //Trajectories to approach the shooting position starting at each drop zone
-        Trajectory traj2A = drive.trajectoryBuilder(traj1A.end(), true)
-                .lineToLinearHeading(new Pose2d(shootPose ,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose.getX(), shootPose.getY())).minus(new Pose2d(0, 0, Math.toRadians(-10))))
-                .build();
-        Trajectory traj2B = drive.trajectoryBuilder(traj1B.end(), true)
-                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose.getX(), shootPose.getY())).minus(new Pose2d(0, 0, Math.toRadians(-10))))
-                .build();
-        Trajectory traj2C = drive.trajectoryBuilder(traj1C.end(), true)
-                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose.getX(), shootPose.getY())).minus(new Pose2d(0, 0, Math.toRadians(-10))))
-                .build();
-
 
         //Tell roadrunner where the robot is initially placed
         drive.setPoseEstimate(startPose);
@@ -70,6 +44,7 @@ public class BlueAWait extends LinearOpMode {
         shooter.start();
 
         //Look for ring stack with tensorflow
+        sleep(25000);
         drive.followTrajectory(traj0);
 
         //At the end, kill the shooting thread and store the pose

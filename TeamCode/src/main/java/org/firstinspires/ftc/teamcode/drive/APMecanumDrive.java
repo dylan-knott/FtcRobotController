@@ -267,6 +267,12 @@ public class APMecanumDrive extends MecanumDrive {
         return Math.atan2(targetPos.getY() - currentPos.getY(), targetPos.getX() - currentPos.getX());
     }
 
+    public void goTo(Pose2d in) {
+        Trajectory traj = trajectoryBuilder(getPoseEstimate())
+                .lineToLinearHeading(in)
+                .build();
+    }
+
     public void update() {
         updatePoseEstimate();
 
