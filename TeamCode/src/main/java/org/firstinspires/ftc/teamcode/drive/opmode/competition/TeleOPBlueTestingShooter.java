@@ -5,17 +5,16 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystemsRewrite;
 
-@TeleOp(name= "TeleOp Blue", group= "TeleOp")
-public class TeleOPBlue extends LinearOpMode {
+@TeleOp(name= "TeleOp purple", group= "TeleOp")
+public class TeleOPBlueTestingShooter extends LinearOpMode {
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
-    ProjectileSystems shooter = new ProjectileSystems();
+    ProjectileSystemsRewrite shooter = new ProjectileSystemsRewrite();
     APMecanumDrive drive = null;
     Vector2d shootPose1  = new Vector2d(-14,54);
     Vector2d shootPose2 = new Vector2d( -14, 10);
@@ -44,7 +43,7 @@ public class TeleOPBlue extends LinearOpMode {
 
         waitForStart();
         robot.setIntakeRelease(0);
-        shooter.mode = ProjectileSystems.Mode.IDLE;
+        shooter.mode = ProjectileSystemsRewrite.Mode.IDLE;
         while (opModeIsActive()) {
 
             //Movement code
@@ -86,12 +85,12 @@ public class TeleOPBlue extends LinearOpMode {
                 drive.goTo(new Pose2d(shootPose1, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose1.getX(), shootPose1.getY())));
                 while(drive.isBusy()) {
                 }
-                shooter.fireRing(95, 1, false);
+                shooter.fireRing(95, false);
             }
             else if (gamepad2.a) {
                 drive.goTo(new Pose2d(shootPose2, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose2.getX(), shootPose2.getY())));
                 while(drive.isBusy());
-                shooter.fireRing(95, 1, false);
+                shooter.fireRing(95, false);
             }
 
             if (isStopRequested()){
