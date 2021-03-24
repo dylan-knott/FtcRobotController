@@ -16,6 +16,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
 
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
     ProjectileSystems shooter = new ProjectileSystems();
+    Lights lights = new Lights();
     TensorFlowRingIdentification tf = new TensorFlowRingIdentification();
     APMecanumDrive drive = null;
     Vector2d dropPoseA = new Vector2d(10 - robot.ARM_REACH, 53);
@@ -29,6 +30,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         //init for robot and shooter
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
+        lights.initializeLights(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         shooter.setDaemon(true);
         tf.initObjectDetector(hardwareMap, telemetry);
