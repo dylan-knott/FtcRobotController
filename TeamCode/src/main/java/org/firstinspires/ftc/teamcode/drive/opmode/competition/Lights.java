@@ -21,9 +21,25 @@ public class Lights {
     RevBlinkinLedDriver.BlinkinPattern color1;
     RevBlinkinLedDriver.BlinkinPattern color2;
     RevBlinkinLedDriver.BlinkinPattern color3;
+    RevBlinkinLedDriver.BlinkinPattern colorinit;
+    RevBlinkinLedDriver.BlinkinPattern colorshoot;
+    RevBlinkinLedDriver.BlinkinPattern coloroff;
+
+    Mode runMode;
+
+    public enum Mode {
+        one,
+        two,
+        three,
+        autoshooting,
+        init,
+        off;
+    }
     public void initializeLights(HardwareMap hardwareMap, Telemetry telem, LocalizedRobotDrive.allianceColor clr) {
 
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "leds");
+
+        runMode = Mode.init;
 
         if (clr.equals(LocalizedRobotDrive.allianceColor.blue))
         {
@@ -37,6 +53,32 @@ public class Lights {
             color2 = RevBlinkinLedDriver.BlinkinPattern.RED;
             color3 = RevBlinkinLedDriver.BlinkinPattern.RED_ORANGE;
         }
+        colorinit = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+        colorshoot = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
+        coloroff = RevBlinkinLedDriver.BlinkinPattern.BLACK;
 
+    }
+    public void setLights(Mode in) {
+        runMode = in;
+        switch (runMode){
+            case one:
+                lights.setPattern(color1);
+                break;
+            case two:
+                lights.setPattern(color2);
+                break;
+            case three:
+                lights.setPattern(color3);
+                break;
+            case init:
+                lights.setPattern(colorinit);
+                break;
+            case autoshooting:
+                lights.setPattern(colorshoot);
+                break;
+            case off:
+                lights.setPattern((coloroff));
+                break;
+        }
     }
 }
