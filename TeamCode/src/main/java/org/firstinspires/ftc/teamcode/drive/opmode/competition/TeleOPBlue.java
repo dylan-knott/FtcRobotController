@@ -91,6 +91,9 @@ public class TeleOPBlue extends LinearOpMode {
                 while(drive.isBusy());
                 shooter.fireRing(95, false);
             }
+            if (gamepad2.y) {
+                shooter.fireRing(95, false);
+            }
 
             if (isStopRequested()){
                 robot.stop();

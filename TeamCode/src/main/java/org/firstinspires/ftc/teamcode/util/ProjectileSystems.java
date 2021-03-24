@@ -99,7 +99,7 @@ public class ProjectileSystems extends Thread
 
     public void setDeflector(double position)
     {
-        deflector.setPosition(position / 165.0f);
+        deflector.setPosition(position / 270.0f);
     }
 
     public void setFlywheelRPM(double rpm)

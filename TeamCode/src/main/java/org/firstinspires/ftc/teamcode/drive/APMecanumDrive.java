@@ -271,6 +271,7 @@ public class APMecanumDrive extends MecanumDrive {
         Trajectory traj = trajectoryBuilder(getPoseEstimate())
                 .lineToLinearHeading(in)
                 .build();
+        followTrajectory(traj);
     }
 
     public void update() {
