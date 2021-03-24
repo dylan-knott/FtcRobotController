@@ -21,7 +21,7 @@ public class Red1WobbleRight extends LinearOpMode {
     Vector2d dropPoseA = new Vector2d(10 - robot.ARM_REACH, -55);
     Vector2d dropPoseB = new Vector2d(38 - robot.ARM_REACH, -35);
     Vector2d dropPoseC = new Vector2d(56 - robot.ARM_REACH, -53);
-    Vector2d shootPose = new Vector2d(-11, -54);
+    Vector2d shootPose = new Vector2d(-10, -54);
     Pose2d startPose = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , -48 - robot.CHASSIS_WIDTH / 2,0 );
 
         //Build Trajectories
@@ -80,7 +80,7 @@ public class Red1WobbleRight extends LinearOpMode {
         if (dropZone == 'c') {
             //Run trajectory set c
             drive.followTrajectory(traj1C);
-            robot.setArm(110);
+            robot.setArm(130);
             sleep(800);
             robot.setClaw(0);
             sleep(200);
@@ -90,7 +90,7 @@ public class Red1WobbleRight extends LinearOpMode {
         else if (dropZone == 'b') {
             //Run trajectory set b
             drive.followTrajectory(traj1B);
-            robot.setArm(110);
+            robot.setArm(130);
             sleep(800);
             robot.setClaw(0);
             sleep(200);
@@ -100,7 +100,7 @@ public class Red1WobbleRight extends LinearOpMode {
         else {
             //Run trajectory set A
             drive.followTrajectory(traj1A);
-            robot.setArm(110);
+            robot.setArm(130);
             sleep(800);
             robot.setClaw(0);
             sleep(200);

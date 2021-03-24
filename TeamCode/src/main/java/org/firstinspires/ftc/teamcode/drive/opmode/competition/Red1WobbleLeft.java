@@ -77,7 +77,7 @@ public class Red1WobbleLeft extends LinearOpMode {
         if (dropZone == 'c') {
             //Run trajectory set c
             drive.followTrajectory(traj1C);
-            robot.setArm(110);
+            robot.setArm(130);
             sleep(800);
             robot.setClaw(0);
             sleep(200);
@@ -87,7 +87,7 @@ public class Red1WobbleLeft extends LinearOpMode {
         else if (dropZone == 'b') {
             //Run trajectory set b
             drive.followTrajectory(traj1B);
-            robot.setArm(110);
+            robot.setArm(130);
             sleep(800);
             robot.setClaw(0);
             sleep(200);
@@ -97,7 +97,7 @@ public class Red1WobbleLeft extends LinearOpMode {
         else {
             //Run trajectory set A
             drive.followTrajectory(traj1A);
-            robot.setArm(110);
+            robot.setArm(130);
             sleep(800);
             robot.setClaw(0);
             sleep(200);
@@ -105,7 +105,7 @@ public class Red1WobbleLeft extends LinearOpMode {
             drive.followTrajectory(traj2A);
         }
         //Fan shots, aiming to separate power-shot poles for each shot
-        shooter.fireRing(110, true);
+        shooter.fireRing(111, true);
         while(shooter.getRingCount() > 2);
         drive.turn(Math.toRadians(10));
         while(shooter.getRingCount() > 1);

@@ -80,7 +80,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
         if (dropZone == 'c') {
             //Run trajectory set c
             drive.followTrajectory(traj1C);
-            robot.setArm(110);
+            robot.setArm(130);
             sleep(800);
             robot.setClaw(0);
             sleep(200);
@@ -90,7 +90,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
         else if (dropZone == 'b') {
             //Run trajectory set b
             drive.followTrajectory(traj1B);
-            robot.setArm(110);
+            robot.setArm(130);
             sleep(800);
             robot.setClaw(0);
             sleep(200);
@@ -100,14 +100,14 @@ public class Blue1WobbleLeft extends LinearOpMode {
         else {
             //Run trajectory set A
             drive.followTrajectory(traj1A);
-            robot.setArm(110);
+            robot.setArm(130);
             sleep(800);
             robot.setClaw(0);
             sleep(200);
             robot.setArm(0);
             drive.followTrajectory(traj2A);
         }
-        shooter.fireRing(98, true);
+        shooter.fireRing(110, true);
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(12, 36, 0))
                 .build();

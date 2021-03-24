@@ -73,7 +73,7 @@ public class TeleOPBlue extends LinearOpMode {
             if (gamepad1.x) robot.releaseIntake();
             if (gamepad1.dpad_right) robot.setClaw(90);
             if (gamepad1.dpad_left) robot.setClaw(0);
-            if (gamepad1.dpad_up) robot.setArm(120);
+            if (gamepad1.dpad_up) robot.setArm(130);
             if (gamepad1.dpad_down) robot.setArm(0);
 
 
@@ -84,15 +84,15 @@ public class TeleOPBlue extends LinearOpMode {
                 drive.goTo(new Pose2d(shootPose1, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose1.getX(), shootPose1.getY())));
                 while(drive.isBusy()) {
                 }
-                shooter.fireRing(95, false);
+                shooter.fireRing(110, false);
             }
             else if (gamepad2.a) {
                 drive.goTo(new Pose2d(shootPose2, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose2.getX(), shootPose2.getY())));
                 while(drive.isBusy());
-                shooter.fireRing(95, false);
+                shooter.fireRing(110, false);
             }
             if (gamepad2.y) {
-                shooter.fireRing(95, false);
+                shooter.fireRing(110, false);
             }
 
             if (isStopRequested()){

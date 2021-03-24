@@ -156,7 +156,7 @@ public class ProjectileSystems extends Thread
                 break;
 
             case FIRING:
-                int fireDelay = 500;
+                int fireDelay = 600;
 
 
                 if (ringCount > 0 || isAuto == false)
