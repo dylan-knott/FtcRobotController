@@ -29,6 +29,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
         //init for robot and shooter
+        lights.setLights(Lights.Mode.off);
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         lights.initializeLights(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
@@ -68,6 +69,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         //Wait for start button to be pressed
+        lights.setLights(Lights.Mode.init);
         waitForStart();
         shooter.start();
 
@@ -113,7 +115,9 @@ public class Blue1WobbleLeft extends LinearOpMode {
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(12, 36, 0))
                 .build();
+        lights.setLights(Lights.Mode.autoshooting);
         while(shooter.getRingCount() > 0);
+
 
         robot.setArm(0);
         drive.followTrajectory(traj3);

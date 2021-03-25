@@ -16,6 +16,7 @@ public class Red1WobbleLeft extends LinearOpMode {
 
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
     ProjectileSystems shooter = new ProjectileSystems();
+    Lights lights = new Lights();
     TensorFlowRingIdentification tf = new TensorFlowRingIdentification();
     APMecanumDrive drive = null;
     Vector2d dropPoseA = new Vector2d(12, -60 + robot.ARM_REACH);
@@ -27,6 +28,7 @@ public class Red1WobbleLeft extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
         //init for robot and shooter
+        lights.setLights(Lights.Mode.off);
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.red);
         shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.red);
         shooter.setDaemon(true);
@@ -63,6 +65,7 @@ public class Red1WobbleLeft extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         //Wait for start button to be pressed
+        lights.setLights(Lights.Mode.init);
         waitForStart();
         shooter.start();
 
@@ -116,7 +119,9 @@ public class Red1WobbleLeft extends LinearOpMode {
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .splineToLinearHeading(new Pose2d(10, -12, 0), Math.toRadians(0))
                 .build();
+        lights.setLights(Lights.Mode.autoshooting);
         while(shooter.getRingCount() > 0);
+
 
         robot.setArm(0);
         drive.followTrajectory(traj3);
