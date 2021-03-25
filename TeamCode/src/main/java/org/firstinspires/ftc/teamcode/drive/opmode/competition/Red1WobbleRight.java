@@ -124,6 +124,7 @@ public class Red1WobbleRight extends LinearOpMode {
 
         sleep(100);
         robot.setArm(0);
+        lights.setLights(Lights.Mode.park);
         drive.followTrajectory(traj3);
 
         //At the end, kill the shooting thread and store the pose

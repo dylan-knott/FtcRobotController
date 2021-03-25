@@ -129,6 +129,7 @@ public class Red1WobbleLeft extends LinearOpMode {
 
 
         robot.setArm(0);
+        lights.setLights(Lights.Mode.park);
         drive.followTrajectory(traj3);
 
         //At the end, kill the shooting thread and store the pose
