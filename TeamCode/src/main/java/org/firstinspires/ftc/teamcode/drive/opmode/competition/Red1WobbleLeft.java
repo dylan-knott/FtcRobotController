@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.CV.TensorFlowRingIdentification;
 import org.firstinspires.ftc.teamcode.LocalizedRobotDrive;
 import org.firstinspires.ftc.teamcode.drive.APMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.Lights;
 import org.firstinspires.ftc.teamcode.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 
@@ -28,6 +29,7 @@ public class Red1WobbleLeft extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
         //init for robot and shooter
+        lights.initializeLights(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.red);
         lights.setLights(Lights.Mode.off);
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.red);
         shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.red);
