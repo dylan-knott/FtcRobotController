@@ -113,6 +113,7 @@ public class Red1WobbleLeft extends LinearOpMode {
             drive.followTrajectory(traj2A);
         }
         //Fan shots, aiming to separate power-shot poles for each shot
+        lights.setLights(Lights.Mode.autoshooting);
         shooter.fireRing(111, true,1);
         while(shooter.getRingCount() > 2);
         drive.turn(Math.toRadians(10));
@@ -120,7 +121,6 @@ public class Red1WobbleLeft extends LinearOpMode {
         while(shooter.getRingCount() > 1);
         shooter.fireRing(111, true,1);
         drive.turn(Math.toRadians(8));
-        lights.setLights(Lights.Mode.autoshooting);
         //Build final path while the shooter is firing the final ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .splineToLinearHeading(new Pose2d(10, -12, 0), Math.toRadians(0))
@@ -129,6 +129,7 @@ public class Red1WobbleLeft extends LinearOpMode {
 
 
         robot.setArm(0);
+        lights.setLights(Lights.Mode.park);
         drive.followTrajectory(traj3);
 
         //At the end, kill the shooting thread and store the pose

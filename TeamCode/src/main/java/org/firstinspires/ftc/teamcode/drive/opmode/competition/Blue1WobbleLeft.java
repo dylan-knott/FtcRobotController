@@ -115,8 +115,8 @@ public class Blue1WobbleLeft extends LinearOpMode {
             robot.setArm(0);
             drive.followTrajectory(traj2A);
         }
-        shooter.fireRing(110, true);
         lights.setLights(Lights.Mode.autoshooting);
+        shooter.fireRing(110, true);
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(12, 36, 0))
                 .build();
@@ -124,6 +124,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
 
 
         robot.setArm(0);
+        lights.setLights(Lights.Mode.park);
         drive.followTrajectory(traj3);
 
         //At the end, kill the shooting thread and store the pose

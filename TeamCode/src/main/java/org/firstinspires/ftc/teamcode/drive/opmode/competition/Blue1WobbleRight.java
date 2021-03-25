@@ -113,12 +113,12 @@ public class Blue1WobbleRight extends LinearOpMode {
             drive.followTrajectory(traj2A);
         }
         //Fan shots, aiming to separate power-shot poles for each shot
+        lights.setLights(Lights.Mode.autoshooting);
         shooter.fireRing(110, true);
         while(shooter.getRingCount() > 2);
         drive.turn(Math.toRadians(10));
         while(shooter.getRingCount() > 1);
         drive.turn(Math.toRadians(10));
-        lights.setLights(Lights.Mode.autoshooting);
         //Build final path while the robot is shooting the last ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .splineToLinearHeading(new Pose2d(10, 12, 0), Math.toRadians(0))
@@ -128,6 +128,7 @@ public class Blue1WobbleRight extends LinearOpMode {
 
 
         robot.setArm(0);
+        lights.setLights(Lights.Mode.park);
         drive.followTrajectory(traj3);
 
         //At the end, kill the shooting thread and store the pose
