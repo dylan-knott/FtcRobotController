@@ -53,13 +53,13 @@ public class Blue1WobbleRight extends LinearOpMode {
 
 
         Trajectory traj2A = drive.trajectoryBuilder(traj1A.end(), true)
-                .splineToLinearHeading(new Pose2d(-14, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT, -14, 10)).plus(new Pose2d(0, 0, Math.toRadians(2))), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-14, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT, -14, 10)).plus(new Pose2d(0, 0, Math.toRadians(13))), Math.toRadians(180))
                 .build();
         Trajectory traj2B = drive.trajectoryBuilder(traj1B.end(), true)
-                .splineToLinearHeading(new Pose2d(-14, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT, -14, 10)).plus(new Pose2d(0, 0, Math.toRadians(2))), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-14, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT, -14, 10)).plus(new Pose2d(0, 0, Math.toRadians(13))), Math.toRadians(180))
                 .build();
         Trajectory traj2C = drive.trajectoryBuilder(traj1C.end(), true)
-                .splineToLinearHeading(new Pose2d(-14, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT,-14, 10)).plus(new Pose2d(0, 0, Math.toRadians(2))), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-14, 10,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_POWERSHOT,-14, 10)).plus(new Pose2d(0, 0, Math.toRadians(13))), Math.toRadians(180))
                 .build();
 
 
@@ -110,12 +110,10 @@ public class Blue1WobbleRight extends LinearOpMode {
             drive.followTrajectory(traj2A);
         }
         //Fan shots, aiming to separate power-shot poles for each shot
-        shooter.fireRing(110, true, 1);
+        shooter.fireRing(110, true);
         while(shooter.getRingCount() > 2);
-        shooter.fireRing(110, true, 1);
         drive.turn(Math.toRadians(10));
         while(shooter.getRingCount() > 1);
-        shooter.fireRing(110, true, 1);
         drive.turn(Math.toRadians(10));
         //Build final path while the robot is shooting the last ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
