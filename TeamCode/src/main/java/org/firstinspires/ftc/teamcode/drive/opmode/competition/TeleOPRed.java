@@ -83,15 +83,15 @@ public class TeleOPRed extends LinearOpMode {
                 drive.goTo(new Pose2d(shootPose1, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose1.getX(), shootPose1.getY())));
                 while(drive.isBusy()) {
                 }
-                shooter.fireRing(110,  false);
+                shooter.fireRing(108,  false);
             }
             else if (gamepad2.a) {
                 drive.goTo(new Pose2d(shootPose2, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose2.getX(), shootPose2.getY())));
                 while(drive.isBusy());
-                shooter.fireRing(110,  false);
+                shooter.fireRing(108,  false);
             }
             if (gamepad2.y) {
-                shooter.fireRing(110, false);
+                shooter.fireRing(108, false);
             }
 
 
