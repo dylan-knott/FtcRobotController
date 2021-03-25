@@ -24,6 +24,7 @@ public class Lights {
     RevBlinkinLedDriver.BlinkinPattern colorinit;
     RevBlinkinLedDriver.BlinkinPattern colorshoot;
     RevBlinkinLedDriver.BlinkinPattern coloroff;
+    RevBlinkinLedDriver.BlinkinPattern colorpark;
 
     Mode runMode;
 
@@ -33,6 +34,7 @@ public class Lights {
         three,
         autoshooting,
         init,
+        park,
         off;
     }
     public void initializeLights(HardwareMap hardwareMap, Telemetry telem, LocalizedRobotDrive.allianceColor clr) {
@@ -55,6 +57,7 @@ public class Lights {
         }
         colorinit = RevBlinkinLedDriver.BlinkinPattern.GREEN;
         colorshoot = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
+        colorpark = RevBlinkinLedDriver.BlinkinPattern.WHITE;
         coloroff = RevBlinkinLedDriver.BlinkinPattern.BLACK;
 
     }
@@ -75,6 +78,9 @@ public class Lights {
                 break;
             case autoshooting:
                 lights.setPattern(colorshoot);
+                break;
+            case park:
+                lights.setPattern(colorpark);
                 break;
             case off:
                 lights.setPattern((coloroff));

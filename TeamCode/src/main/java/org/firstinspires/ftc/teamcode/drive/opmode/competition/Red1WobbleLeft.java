@@ -81,6 +81,7 @@ public class Red1WobbleLeft extends LinearOpMode {
 
         if (dropZone == 'c') {
             //Run trajectory set c
+            lights.setLights(Lights.Mode.three);
             drive.followTrajectory(traj1C);
             robot.setArm(130);
             sleep(800);
@@ -91,6 +92,7 @@ public class Red1WobbleLeft extends LinearOpMode {
         }
         else if (dropZone == 'b') {
             //Run trajectory set b
+            lights.setLights(Lights.Mode.two);
             drive.followTrajectory(traj1B);
             robot.setArm(130);
             sleep(800);
@@ -101,6 +103,7 @@ public class Red1WobbleLeft extends LinearOpMode {
         }
         else {
             //Run trajectory set A
+            lights.setLights(Lights.Mode.one);
             drive.followTrajectory(traj1A);
             robot.setArm(130);
             sleep(800);
@@ -117,11 +120,11 @@ public class Red1WobbleLeft extends LinearOpMode {
         while(shooter.getRingCount() > 1);
         shooter.fireRing(111, true,1);
         drive.turn(Math.toRadians(8));
+        lights.setLights(Lights.Mode.autoshooting);
         //Build final path while the shooter is firing the final ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .splineToLinearHeading(new Pose2d(10, -12, 0), Math.toRadians(0))
                 .build();
-        lights.setLights(Lights.Mode.autoshooting);
         while(shooter.getRingCount() > 0);
 
 
