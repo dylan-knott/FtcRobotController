@@ -15,6 +15,7 @@ public class BlueParkIn extends LinearOpMode {
 
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
     ProjectileSystems shooter = new ProjectileSystems();
+    Lights lights = new Lights();
     TensorFlowRingIdentification tf = new TensorFlowRingIdentification();
     APMecanumDrive drive = null;
     Pose2d startPose = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , 24 + robot.CHASSIS_WIDTH / 2,0 );
@@ -24,6 +25,7 @@ public class BlueParkIn extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         //init for robot and shooter
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
+        lights.initializeLights(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
         shooter.setDaemon(true);
         tf.initObjectDetector(hardwareMap, telemetry);
@@ -44,6 +46,7 @@ public class BlueParkIn extends LinearOpMode {
 
         //Look for ring stack with tensorflow
         sleep(25000);
+        lights.setLights(Lights.Mode.park);
         drive.followTrajectory(traj0);
 
         //At the end, kill the shooting thread and store the pose
