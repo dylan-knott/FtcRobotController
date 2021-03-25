@@ -39,7 +39,7 @@ public class Blue1WobbleRight extends LinearOpMode {
 
         //Set up different trajectories based on where the ring stack determines the robot should go, they will be built ahead of time, and it will choose which to follow at run time
         Trajectory traj0 = drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-24, 10, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-22, 10, Math.toRadians(90)))
                 .build();
         Trajectory traj1A = drive.trajectoryBuilder(traj0.end(), Math.toRadians(-90))
                 .splineToConstantHeading(dropPoseA, Math.toRadians(90)) //Move to targeted drop zone
