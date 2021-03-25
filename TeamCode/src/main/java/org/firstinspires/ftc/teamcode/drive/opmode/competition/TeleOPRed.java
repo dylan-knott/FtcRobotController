@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.util.ProjectileSystems;
 public class TeleOPRed extends LinearOpMode {
     LocalizedRobotDrive robot = new LocalizedRobotDrive();
     ProjectileSystems shooter = new ProjectileSystems();
+    Lights lights = new Lights();
     APMecanumDrive drive = null;
     Vector2d shootPose1  = new Vector2d(-14,-54);
     Vector2d shootPose2 = new Vector2d( -14, -10);
@@ -25,8 +26,9 @@ public class TeleOPRed extends LinearOpMode {
         }
 
         //init for robot and shooter
-        robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
-        shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.blue);
+        robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.red);
+        shooter.initializeShooter(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.red);
+        lights.initializeLights(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.red);
         drive = robot.rrDrive;
 
         //Values to send to pose2d for driving
@@ -100,6 +102,23 @@ public class TeleOPRed extends LinearOpMode {
                 shooter.parentTerminated = true;
             }
             PoseStorage.currentPose = drive.getPoseEstimate();
+
+            //Lights
+            switch (shooter.getRingCount())
+            {
+                case 1:
+                    lights.setLights(Lights.Mode.one);
+                    break;
+                case 2:
+                    lights.setLights(Lights.Mode.two);
+                    break;
+                case 3:
+                    lights.setLights(Lights.Mode.three);
+                    break;
+                default:
+                    lights.setLights(Lights.Mode.off);
+                    break;
+            }
         }
     }
 }
