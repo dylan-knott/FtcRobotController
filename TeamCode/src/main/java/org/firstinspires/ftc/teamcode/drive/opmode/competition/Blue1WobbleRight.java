@@ -41,10 +41,10 @@ public class Blue1WobbleRight extends LinearOpMode {
                 .splineToConstantHeading(dropPoseA, Math.toRadians(90)) //Move to targeted drop zone
                 .build();
         Trajectory traj1B = drive.trajectoryBuilder(traj0.end(), Math.toRadians(-90))
-                .splineToConstantHeading(dropPoseB, Math.toRadians(90)) //Move to targeted drop zone
+                .lineToLinearHeading(new Pose2d(dropPoseB, Math.toRadians(90))) //Move to targeted drop zone
                 .build();
         Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(dropPoseC.getX(), dropPoseC.getY(), Math.toRadians(90)), Math.toRadians(75)) //Move to targeted drop zone
+                .lineToLinearHeading(new Pose2d(dropPoseC, Math.toRadians(75))) //Move to targeted drop zone
                 .build();
 
 
@@ -105,10 +105,12 @@ public class Blue1WobbleRight extends LinearOpMode {
             drive.followTrajectory(traj2A);
         }
         //Fan shots, aiming to separate power-shot poles for each shot
-        shooter.fireRing(110, true);
+        shooter.fireRing(110, true, 1);
         while(shooter.getRingCount() > 2);
+        shooter.fireRing(110, true, 1);
         drive.turn(Math.toRadians(10));
         while(shooter.getRingCount() > 1);
+        shooter.fireRing(110, true, 1);
         drive.turn(Math.toRadians(10));
         //Build final path while the robot is shooting the last ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())

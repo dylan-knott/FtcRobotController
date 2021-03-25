@@ -21,7 +21,7 @@ public class Red1WobbleRight extends LinearOpMode {
     Vector2d dropPoseA = new Vector2d(10 - robot.ARM_REACH, -55);
     Vector2d dropPoseB = new Vector2d(38 - robot.ARM_REACH, -35);
     Vector2d dropPoseC = new Vector2d(56 - robot.ARM_REACH, -53);
-    Vector2d shootPose = new Vector2d(-10, -54);
+    Vector2d shootPose = new Vector2d(-9, -54);
     Pose2d startPose = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , -48 - robot.CHASSIS_WIDTH / 2,0 );
 
         //Build Trajectories
@@ -58,7 +58,7 @@ public class Red1WobbleRight extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose.getX(), shootPose.getY())).plus(new Pose2d(0, 0, Math.toRadians(-10))))
                 .build();
         Trajectory traj2C = drive.trajectoryBuilder(traj1C.end())
-                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose.getX(), shootPose.getY())).plus(new Pose2d(0, 0, Math.toRadians(-10))))
+                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose.getX(), shootPose.getY())).plus(new Pose2d(0, 0, Math.toRadians(-9))))
                 .build();
 
 
@@ -107,7 +107,7 @@ public class Red1WobbleRight extends LinearOpMode {
             robot.setArm(0);
             drive.followTrajectory(traj2A);
         }
-        shooter.fireRing(110, true);
+        shooter.fireRing(108, true);
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(12, -36, 0))
                 .build();

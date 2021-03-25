@@ -20,7 +20,7 @@ public class Red1WobbleLeft extends LinearOpMode {
     APMecanumDrive drive = null;
     Vector2d dropPoseA = new Vector2d(12, -60 + robot.ARM_REACH);
     Vector2d dropPoseB = new Vector2d(36, -38 + robot.ARM_REACH);
-    Vector2d dropPoseC = new Vector2d(52, -60 + robot.ARM_REACH);
+    Vector2d dropPoseC = new Vector2d(54, -60 + robot.ARM_REACH);
     Pose2d startPose = new Pose2d(-72 + robot.CHASSIS_LENGTH / 2 , -24 + robot.CHASSIS_WIDTH / 2,0 );
 
         //Build Trajectories
@@ -41,10 +41,10 @@ public class Red1WobbleLeft extends LinearOpMode {
                 .splineToConstantHeading(dropPoseA, Math.toRadians(-90)) //Move to targeted drop zone
                 .build();
         Trajectory traj1B = drive.trajectoryBuilder(traj0.end(), Math.toRadians(90))
-                .splineToConstantHeading(dropPoseB, Math.toRadians(-90)) //Move to targeted drop zone
+                .lineToLinearHeading(new Pose2d(dropPoseB, Math.toRadians(-90))) //Move to targeted drop zone
                 .build();
         Trajectory traj1C = drive.trajectoryBuilder(traj0.end(), Math.toRadians(90))
-                .lineToLinearHeading(new Pose2d(dropPoseC.getX(), dropPoseC.getY(), Math.toRadians(-90))) //Move to targeted drop zone
+                .lineToLinearHeading(new Pose2d(dropPoseC, Math.toRadians(-90))) //Move to targeted drop zone
                 .build();
 
 
@@ -108,7 +108,9 @@ public class Red1WobbleLeft extends LinearOpMode {
         shooter.fireRing(111, true,1);
         while(shooter.getRingCount() > 2);
         drive.turn(Math.toRadians(10));
+        shooter.fireRing(111, true,2);
         while(shooter.getRingCount() > 1);
+        shooter.fireRing(111, true,1);
         drive.turn(Math.toRadians(8));
         //Build final path while the shooter is firing the final ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
