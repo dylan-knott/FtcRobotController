@@ -33,6 +33,7 @@ public class ProjectileSystems extends Thread
     public int lastfire =3;
     public boolean isAuto;
     double flywheelRPM = 4500;
+    public int ringQueue;
 
     Timer timer = new Timer();
 
@@ -87,13 +88,24 @@ public class ProjectileSystems extends Thread
         mode = Mode.IDLE;
     }
 
+    public void fireRing(double degrees, boolean auto, int queue) {
+        //TODO: connection of distance to deflector angle
+        if (mode == Mode.IDLE) {
+            setDeflector(degrees);
+            isAuto = auto;
+            setFlywheelRPM(flywheelRPM);
+            ringQueue = queue;
+            mode = Mode.FIRING;
+        }
+    }
+
     public void fireRing(double degrees, boolean auto) {
         //TODO: connection of distance to deflector angle
         if (mode == Mode.IDLE) {
             setDeflector(degrees);
             isAuto = auto;
-            mode = Mode.FIRING;
             setFlywheelRPM(flywheelRPM);
+            mode = Mode.FIRING;
         }
     }
 
@@ -138,7 +150,7 @@ public class ProjectileSystems extends Thread
             case RESET:
                 indexer.setPosition(0);
 
-                if(getRingCount() > 0)
+                if(getRingCount() > 0 && ringQueue !=0 )
                 {
                     readyToFire = true;
                     if (lastfire == getRingCount() && isAuto == true)
@@ -146,13 +158,13 @@ public class ProjectileSystems extends Thread
                     mode = Mode.FIRING;
                 }
                 else
-                 {
+                    {
                      setFlywheelRPM(0);
                      deflector.setPosition(0f);
                      intakeBelt.setPower(0);
                      readyToFire= true;
                      mode = Mode.IDLE;
-                 }
+                     }
                 break;
 
             case FIRING:
@@ -174,6 +186,7 @@ public class ProjectileSystems extends Thread
                         if (readyToFire == true) {
                             lastfire = getRingCount();
                             timer.schedule(endFire, fireDelay);
+                            ringQueue--;
                             readyToFire = false;
                         }
                     }
