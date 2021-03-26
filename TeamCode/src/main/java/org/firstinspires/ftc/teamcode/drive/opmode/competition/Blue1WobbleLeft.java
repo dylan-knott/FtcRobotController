@@ -56,13 +56,13 @@ public class Blue1WobbleLeft extends LinearOpMode {
 
         //Trajectories to approach the shooting position starting at each drop zone
         Trajectory traj2A = drive.trajectoryBuilder(traj1A.end(), true)
-                .lineToLinearHeading(new Pose2d(shootPose ,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose.getX(), shootPose.getY())).plus(new Pose2d(0, 0, Math.toRadians(16))))
+                .lineToLinearHeading(new Pose2d(shootPose ,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose.getX(), shootPose.getY())).plus(new Pose2d(0, 0, Math.toRadians(25))))
                 .build();
         Trajectory traj2B = drive.trajectoryBuilder(traj1B.end(), true)
-                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose.getX(), shootPose.getY())).plus(new Pose2d(0, 0, Math.toRadians(16))))
+                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose.getX(), shootPose.getY())).plus(new Pose2d(0, 0, Math.toRadians(25))))
                 .build();
         Trajectory traj2C = drive.trajectoryBuilder(traj1C.end(), true)
-                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose.getX(), shootPose.getY())).plus(new Pose2d(0, 0, Math.toRadians(16))))
+                .lineToLinearHeading(new Pose2d(shootPose,drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose.getX(), shootPose.getY())).plus(new Pose2d(0, 0, Math.toRadians(25))))
                 .build();
 
 
@@ -116,7 +116,7 @@ public class Blue1WobbleLeft extends LinearOpMode {
             drive.followTrajectory(traj2A);
         }
         lights.setLights(Lights.Mode.autoshooting);
-        shooter.fireRing(110, true);
+        shooter.fireRing(107.5, true);
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(12, 36, 0))
                 .build();
