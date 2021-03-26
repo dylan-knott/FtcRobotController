@@ -114,12 +114,10 @@ public class Red1WobbleLeft extends LinearOpMode {
         }
         //Fan shots, aiming to separate power-shot poles for each shot
         lights.setLights(Lights.Mode.autoshooting);
-        shooter.fireRing(111, true,1);
+        shooter.fireRing(111, true);
         while(shooter.getRingCount() > 2);
         drive.turn(Math.toRadians(10));
-        shooter.fireRing(111, true,2);
         while(shooter.getRingCount() > 1);
-        shooter.fireRing(111, true,1);
         drive.turn(Math.toRadians(8));
         //Build final path while the shooter is firing the final ring
         Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())

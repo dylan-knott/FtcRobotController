@@ -16,7 +16,7 @@ public class ProjectileSystems extends Thread
     //Hardware declaration, need color sensors
     public DcMotor intakeBelt;
     public DcMotorEx flywheel;
-    public Servo indexer, deflector;
+    public Servo indexer, deflector, deflector2;
     public RevColorSensorV3 dist;
 
     Telemetry telemetry = null;
@@ -65,6 +65,7 @@ public class ProjectileSystems extends Thread
         intakeBelt = hardwareMap.dcMotor.get("conveyor");
         indexer = hardwareMap.servo.get("indexer");
         deflector = hardwareMap.servo.get("deflector");
+        deflector2 = hardwareMap.servo.get("deflector_2");
         deflector.setDirection(Servo.Direction.REVERSE);
         dist = hardwareMap.get(RevColorSensorV3.class, "distColor");
 
@@ -74,9 +75,9 @@ public class ProjectileSystems extends Thread
         intakeBelt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeBelt.setDirection(DcMotor.Direction.REVERSE);
 
-
         //Servo Initialization
         deflector.setPosition(0);
+        deflector2.setPosition(0);
         indexer.setPosition(0);
 
         //TODO: Hashmap
@@ -111,6 +112,7 @@ public class ProjectileSystems extends Thread
 
     public void setDeflector(double position)
     {
+        deflector2.setPosition(position / 270.0f);
         deflector.setPosition(position / 270.0f);
     }
 
@@ -161,6 +163,7 @@ public class ProjectileSystems extends Thread
                     {
                      setFlywheelRPM(0);
                      deflector.setPosition(0f);
+                     deflector2.setPosition(0f);
                      intakeBelt.setPower(0);
                      readyToFire= true;
                      mode = Mode.IDLE;

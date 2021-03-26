@@ -85,13 +85,13 @@ public class TeleOPBlue extends LinearOpMode {
             robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
             shooter.intakeBelt.setPower(-gamepad2.left_stick_y);
             if (gamepad2.b) {
-                drive.goTo(new Pose2d(shootPose1, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose1.getX(), shootPose1.getY())));
+                drive.goTo(new Pose2d(shootPose1, drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose1.getX(), shootPose1.getY())));
                 while(drive.isBusy()) {
                 }
                 shooter.fireRing(108, false);
             }
             else if (gamepad2.a) {
-                drive.goTo(new Pose2d(shootPose2, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose2.getX(), shootPose2.getY())));
+                drive.goTo(new Pose2d(shootPose2, drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose2.getX(), shootPose2.getY())));
                 while(drive.isBusy());
                 shooter.fireRing(108, false);
             }
