@@ -23,9 +23,9 @@ public class TeleOPBlue extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         shooter.setDaemon(true);
-        if (shooter.isAlive()) {
+        /*if (shooter.isAlive()) {
             shooter.stop();
-        }
+        }*/
 
 
         //init for robot and shooter
@@ -84,26 +84,21 @@ public class TeleOPBlue extends LinearOpMode {
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
             shooter.intakeBelt.setPower(-gamepad2.left_stick_y);
-            if (gamepad2.b) {
-                drive.goTo(new Pose2d(shootPose1, drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose1.getX(), shootPose1.getY())));
+            if (gamepad2.dpad_down) {
+                drive.goTo(new Pose2d(shootPose1, Math.toRadians(-9)));
                 while(drive.isBusy()) {
                 }
-                shooter.fireRing(108, false);
+                shooter.fireRing(107, false);
             }
-            else if (gamepad2.a) {
-                drive.goTo(new Pose2d(shootPose2, drive.getRadiansToTarget(APMecanumDrive.Target.RED_TOWER, shootPose2.getX(), shootPose2.getY())));
+            else if (gamepad2.dpad_up) {
+                drive.goTo(new Pose2d(shootPose2, Math.toRadians(20)));
                 while(drive.isBusy());
-                shooter.fireRing(108, false);
+                shooter.fireRing(107, false);
             }
             if (gamepad2.y) {
-                shooter.fireRing(108, false);
+                shooter.fireRing(107, false);
             }
 
-            if (isStopRequested()){
-                robot.stop();
-                shooter.parentTerminated = true;
-            }
-            PoseStorage.currentPose = drive.getPoseEstimate();
 
             //Lights
             switch (shooter.getRingCount())
@@ -121,6 +116,13 @@ public class TeleOPBlue extends LinearOpMode {
                     lights.setLights(Lights.Mode.off);
                     break;
             }
+
+            if (isStopRequested()){
+                robot.stop();
+                shooter.parentTerminated = true;
+            }
+            PoseStorage.currentPose = drive.getPoseEstimate();
+
 
         }
     }

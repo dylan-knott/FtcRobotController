@@ -120,7 +120,7 @@ public class ProjectileSystems extends Thread
     {
         double flywheelAngularVelocity = RPM_TO_TPS * rpm;
         flywheel.setVelocity(flywheelAngularVelocity);
-        telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
+        //telemetry.addData("Flywheel RPM: ", flywheelAngularVelocity);
     }
 
     public int getRingCount (){
@@ -202,9 +202,9 @@ public class ProjectileSystems extends Thread
                 break;
         }
 
-        telemetry.addData("In firing mode", flywheel.getVelocity() * TPS_TO_RPM);
-        telemetry.addData("Shooter Runtime", System.currentTimeMillis());
-        telemetry.update();
+        //telemetry.addData("In firing mode", flywheel.getVelocity() * TPS_TO_RPM);
+        //telemetry.addData("Shooter Runtime", System.currentTimeMillis());
+        //telemetry.update();
         if (parentTerminated) {
             Thread.currentThread().interrupt();
             return;

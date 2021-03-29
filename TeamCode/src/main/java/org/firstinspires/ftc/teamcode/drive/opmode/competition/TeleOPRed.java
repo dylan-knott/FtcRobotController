@@ -22,9 +22,10 @@ public class TeleOPRed extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         shooter.setDaemon(true);
+        /*
         if (shooter.isAlive()) {
             shooter.stop();
-        }
+        }*/
 
         //init for robot and shooter
         robot.initializeRobot(hardwareMap, telemetry, LocalizedRobotDrive.allianceColor.red);
@@ -82,19 +83,19 @@ public class TeleOPRed extends LinearOpMode {
             //Gamepad 2  ***Gun and intake***
             robot.setIntake(gamepad2.right_stick_y * robot.intakePower);
             shooter.intakeBelt.setPower(-gamepad2.left_stick_y);
-            if (gamepad2.b) {
+            if (gamepad2.dpad_down) {
                 drive.goTo(new Pose2d(shootPose1, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose1.getX(), shootPose1.getY())));
                 while(drive.isBusy()) {
                 }
-                shooter.fireRing(108,  false);
+                shooter.fireRing(107,  false);
             }
-            else if (gamepad2.a) {
+            else if (gamepad2.dpad_up) {
                 drive.goTo(new Pose2d(shootPose2, drive.getRadiansToTarget(APMecanumDrive.Target.BLUE_TOWER, shootPose2.getX(), shootPose2.getY())));
                 while(drive.isBusy());
-                shooter.fireRing(108,  false);
+                shooter.fireRing(107,  false);
             }
             if (gamepad2.y) {
-                shooter.fireRing(108, false);
+                shooter.fireRing(107, false);
             }
 
 
